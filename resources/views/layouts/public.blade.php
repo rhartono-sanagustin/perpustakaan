@@ -9,20 +9,32 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand-lg borrower-navbar">
+    <nav class="navbar navbar-expand borrower-navbar">
         <div class="container-xl">
             <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('home') }}">
                 <span class="brand-mark brand-mark-sm"><i class="bi bi-book-half" aria-hidden="true"></i></span>
-                <span class="d-flex flex-column lh-sm">
+                <span class="d-none d-sm-flex flex-column lh-sm">
                     <span class="fw-semibold">{{ config('library.name') }}</span>
                     <span class="small text-muted">{{ config('library.school_name') }}</span>
                 </span>
+                <span class="d-sm-none fw-semibold">{{ config('library.name') }}</span>
             </a>
 
-            <div class="ms-auto">
-                <a href="{{ route('login') }}" class="btn btn-primary btn-sm px-3">
-                    <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i>Masuk
+            <div class="ms-auto d-flex align-items-center gap-1 gap-sm-2">
+                <a href="{{ route('catalog.index') }}" class="nav-link {{ request()->routeIs('catalog.*') ? 'active' : '' }}" aria-label="Katalog">
+                    <i class="bi bi-journal-bookmark d-sm-none" aria-hidden="true"></i>
+                    <span class="d-none d-sm-inline">Katalog</span>
                 </a>
+
+                @auth
+                    <a href="{{ route('dashboard') }}" class="btn btn-primary btn-sm px-3">
+                        <i class="bi bi-speedometer2 me-1" aria-hidden="true"></i>Dashboard
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-primary btn-sm px-3">
+                        <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i>Masuk
+                    </a>
+                @endauth
             </div>
         </div>
     </nav>

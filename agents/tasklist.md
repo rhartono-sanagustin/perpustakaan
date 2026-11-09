@@ -1,8 +1,8 @@
 # Tasklist — Sistem Informasi Perpustakaan Sekolah
 
 **Terakhir diperbarui:** 9 November 2026  
-**Progress keseluruhan:** 43% (52 dari 122 task)  
-**Fase saat ini:** Fase 1 — Fondasi, Setup & Autentikasi (selesai, menunggu review)
+**Progress keseluruhan:** 64% (78 dari 122 task)  
+**Fase saat ini:** Fase 2 — Database Domain, Katalog & Master Data Admin (selesai, menunggu review)
 
 > Catatan: progress dihitung dari jumlah checklist task, bukan estimasi jam kerja.
 > Setiap task selesai ditandai `[x] ✅` dan diberi catatan file yang dibuat/diubah.
@@ -44,18 +44,33 @@
 - [x] ✅ Task 2.1 - Migration atribut akun perpustakaan pada tabel `users` `[Sedang]` (Selesai)
   - File: `database/migrations/2026_11_08_000001_add_library_fields_to_users_table.php`
   - Kolom: `role`, `nomor_induk`, `status`, `kelas`, `unit_kerja`, `no_telepon`; email nullable.
-- [ ] Task 2.2 - Migration tabel `categories`
-- [ ] Task 2.3 - Migration tabel `authors`
-- [ ] Task 2.4 - Migration tabel `publishers`
-- [ ] Task 2.5 - Migration tabel `books`
-- [ ] Task 2.6 - Migration pivot `book_author`
-- [ ] Task 2.7 - Migration tabel `book_copies`
-- [ ] Task 2.8 - Migration tabel `loan_requests`
-- [ ] Task 2.9 - Migration tabel `loans`
-- [ ] Task 2.10 - Migration tabel `library_settings`
-- [ ] Task 2.11 - Migration tabel `audit_logs`
-- [ ] Task 2.12 - Migration tabel `announcements`
-- [ ] Task 2.13 - Seeder data master, eksemplar, dan transaksi contoh
+- [x] ✅ Task 2.2 - Migration tabel `categories` (Selesai)
+  - File: `database/migrations/2026_11_09_000001_create_categories_table.php`
+- [x] ✅ Task 2.3 - Migration tabel `authors` (Selesai)
+  - File: `database/migrations/2026_11_09_000002_create_authors_table.php`
+- [x] ✅ Task 2.4 - Migration tabel `publishers` (Selesai)
+  - File: `database/migrations/2026_11_09_000003_create_publishers_table.php`
+- [x] ✅ Task 2.5 - Migration tabel `books` (Selesai)
+  - File: `database/migrations/2026_11_09_000004_create_books_table.php`
+- [x] ✅ Task 2.6 - Migration pivot `book_author` (Selesai)
+  - File: `database/migrations/2026_11_09_000005_create_book_author_table.php`
+  - Catatan: pivot tanpa timestamp; relasi many-to-many menyebut tabel `book_author` secara eksplisit.
+- [x] ✅ Task 2.7 - Migration tabel `book_copies` (Selesai)
+  - File: `database/migrations/2026_11_09_000006_create_book_copies_table.php`
+- [x] ✅ Task 2.8 - Migration tabel `loan_requests` (Selesai)
+  - File: `database/migrations/2026_11_09_000007_create_loan_requests_table.php`
+- [x] ✅ Task 2.9 - Migration tabel `loans` (Selesai)
+  - File: `database/migrations/2026_11_09_000008_create_loans_table.php`
+  - Catatan: menyimpan `duration_days` dan `quota_snapshot` sebagai snapshot kebijakan saat checkout.
+- [x] ✅ Task 2.10 - Migration tabel `library_settings` (Selesai)
+  - File: `database/migrations/2026_11_09_000009_create_library_settings_table.php`
+- [x] ✅ Task 2.11 - Migration tabel `audit_logs` (Selesai)
+  - File: `database/migrations/2026_11_09_000010_create_audit_logs_table.php`
+- [x] ✅ Task 2.12 - Migration tabel `announcements` (Selesai)
+  - File: `database/migrations/2026_11_09_000011_create_announcements_table.php`
+- [x] ✅ Task 2.13 - Seeder data master, eksemplar, dan transaksi contoh (Selesai)
+  - File: `database/seeders/LibrarySettingSeeder.php`, `database/seeders/MasterDataSeeder.php`, `database/seeders/CirculationSeeder.php`, `database/seeders/DatabaseSeeder.php`
+  - Hasil seed dev: 13 judul, 27 eksemplar, 22 tersedia, 5 permintaan, 3 pinjaman, 1 terlambat.
 
 ---
 
@@ -65,12 +80,20 @@
   - File: `app/Models/User.php`, `app/Enums/UserRole.php`, `app/Enums/UserStatus.php`
 - [x] ✅ Task 3.2 - Factory `User` dengan state admin/guru/siswa/nonaktif `[Mudah]` (Selesai)
   - File: `database/factories/UserFactory.php`
-- [ ] Task 3.3 - Model `Category`, `Author`, `Publisher`
-- [ ] Task 3.4 - Model `Book` dan relasi many-to-many penulis
-- [ ] Task 3.5 - Model `BookCopy` dengan status/kondisi
-- [ ] Task 3.6 - Model `LoanRequest`
-- [ ] Task 3.7 - Model `Loan` dengan status turunan terlambat
-- [ ] Task 3.8 - Model `LibrarySetting`, `AuditLog`, `Announcement`
+- [x] ✅ Task 3.3 - Model `Category`, `Author`, `Publisher` (Selesai)
+  - File: `app/Models/Category.php`, `app/Models/Author.php`, `app/Models/Publisher.php`, `app/Models/Concerns/HasSlug.php`, `database/factories/CategoryFactory.php`, `database/factories/AuthorFactory.php`, `database/factories/PublisherFactory.php`
+- [x] ✅ Task 3.4 - Model `Book` dan relasi many-to-many penulis (Selesai)
+  - File: `app/Models/Book.php`, `database/factories/BookFactory.php`
+  - Catatan: scope pencarian, filter kategori/ketersediaan, hitung eksemplar, dan URL sampul.
+- [x] ✅ Task 3.5 - Model `BookCopy` dengan status/kondisi (Selesai)
+  - File: `app/Models/BookCopy.php`, `app/Enums/BookCopyStatus.php`, `app/Enums/BookCondition.php`, `database/factories/BookCopyFactory.php`
+- [x] ✅ Task 3.6 - Model `LoanRequest` (Selesai)
+  - File: `app/Models/LoanRequest.php`, `app/Enums/LoanRequestStatus.php`, `database/factories/LoanRequestFactory.php`
+- [x] ✅ Task 3.7 - Model `Loan` dengan status turunan terlambat (Selesai)
+  - File: `app/Models/Loan.php`, `app/Enums/LoanStatus.php`, `database/factories/LoanFactory.php`
+  - Catatan: `Terlambat` dihitung dari pinjaman aktif yang melewati `due_at`, bukan status tersimpan.
+- [x] ✅ Task 3.8 - Model `LibrarySetting`, `AuditLog`, `Announcement` (Selesai)
+  - File: `app/Models/LibrarySetting.php`, `app/Models/AuditLog.php`, `app/Models/Announcement.php`, `app/Enums/AnnouncementAudience.php`, factory terkait
 - [ ] Task 3.9 - Policy otorisasi buku, pinjaman, pengguna, dan pengajuan
 
 ---
@@ -85,11 +108,16 @@
   - File: `app/Http/Middleware/EnsureUserHasRole.php`, `app/Http/Middleware/EnsureUserIsActive.php`
 - [x] ✅ Task 4.4 - Redirect dashboard sesuai peran dan dashboard placeholder `[Mudah]` (Selesai)
   - File: `app/Http/Controllers/DashboardController.php`, `app/Http/Controllers/Admin/DashboardController.php`, `app/Http/Controllers/Borrower/DashboardController.php`, `routes/web.php`
-- [ ] Task 4.5 - Backend katalog: pencarian, filter, pagination, detail
+- [x] ✅ Task 4.5 - Backend katalog: pencarian, filter, pagination, detail (Selesai)
+  - File: `app/Http/Controllers/CatalogController.php`, `app/Models/Book.php`, `routes/web.php`
 - [ ] Task 4.6 - Backend pengajuan pinjam dan pembatalan oleh peminjam
 - [ ] Task 4.7 - Backend pinjaman aktif, riwayat, dan profil peminjam
-- [ ] Task 4.8 - CRUD admin buku dan eksemplar
-- [ ] Task 4.9 - CRUD admin kategori, penulis, dan penerbit
+- [x] ✅ Task 4.8 - CRUD admin buku dan eksemplar (Selesai)
+  - File: `app/Http/Controllers/Admin/BookController.php`, `app/Http/Controllers/Admin/BookCopyController.php`, `app/Http/Requests/Admin/BookRequest.php`, `app/Http/Requests/Admin/BookCopyRequest.php`, `routes/web.php`
+  - Catatan: hapus buku = arsip; eksemplar dengan riwayat transaksi dinonaktifkan, bukan dihapus.
+- [x] ✅ Task 4.9 - CRUD admin kategori, penulis, dan penerbit (Selesai)
+  - File: `app/Http/Controllers/Admin/CategoryController.php`, `app/Http/Controllers/Admin/AuthorController.php`, `app/Http/Controllers/Admin/PublisherController.php`, request terkait
+  - Catatan: kategori yang masih dipakai buku dinonaktifkan; penulis/penerbit yang masih dipakai tidak dapat dihapus.
 - [ ] Task 4.10 - Antrean permintaan, approve/reject dengan alasan
 - [ ] Task 4.11 - Checkout dan pengembalian dengan transaksi database
 - [ ] Task 4.12 - Laporan, CSV, dan halaman cetak
@@ -117,7 +145,9 @@
 - [x] ✅ Task 5.7 - Otorisasi role pada route admin/peminjam `[Sedang]` (Selesai)
   - File: `app/Http/Middleware/EnsureUserHasRole.php`, `routes/web.php`
 - [ ] Task 5.8 - Policy ownership untuk transaksi milik sendiri
-- [ ] Task 5.9 - Validasi upload sampul dan penyimpanan file aman
+- [x] ✅ Task 5.9 - Validasi upload sampul dan penyimpanan file aman (Selesai)
+  - File: `app/Http/Requests/Admin/BookRequest.php`, `app/Http/Controllers/Admin/BookController.php`
+  - Catatan: hanya JPG/PNG/WEBP maksimal 2 MB; file disimpan di disk `public` dengan nama acak; sampul lama dihapus saat diganti.
 - [ ] Task 5.10 - Perlindungan formula injection pada ekspor CSV
 - [ ] Task 5.11 - Audit log tindakan admin
 - [ ] Task 5.12 - Review XSS pada seluruh tampilan data pengguna
@@ -149,11 +179,15 @@
   - File: `resources/views/partials/flash.blade.php`
 - [x] ✅ Task 6.11 - Halaman error 403, 404, 419, 429, 500 `[Mudah]` (Selesai)
   - File: `resources/views/errors/*.blade.php`
-- [ ] Task 6.12 - Halaman katalog index
-- [ ] Task 6.13 - Halaman detail buku
+- [x] ✅ Task 6.12 - Halaman katalog index (Selesai)
+  - File: `resources/views/catalog/index.blade.php`, `resources/views/components/book-card.blade.php`, `resources/views/layouts/public.blade.php`
+- [x] ✅ Task 6.13 - Halaman detail buku (Selesai)
+  - File: `resources/views/catalog/show.blade.php`
 - [ ] Task 6.14 - Halaman pinjaman saya, riwayat, dan profil peminjam
-- [ ] Task 6.15 - Halaman admin buku dan eksemplar
-- [ ] Task 6.16 - Halaman admin kategori, penulis, dan penerbit
+- [x] ✅ Task 6.15 - Halaman admin buku dan eksemplar (Selesai)
+  - File: `resources/views/admin/books/index.blade.php`, `resources/views/admin/books/form.blade.php`, `resources/views/admin/books/copies/index.blade.php`, `resources/views/admin/books/copies/form.blade.php`, `resources/views/admin/copies/index.blade.php`
+- [x] ✅ Task 6.16 - Halaman admin kategori, penulis, dan penerbit (Selesai)
+  - File: `resources/views/admin/categories/*.blade.php`, `resources/views/admin/authors/*.blade.php`, `resources/views/admin/publishers/*.blade.php`
 - [ ] Task 6.17 - Halaman admin permintaan, checkout, pengembalian, dan riwayat
 - [ ] Task 6.18 - Halaman laporan admin
 - [ ] Task 6.19 - Halaman pengguna, pengaturan, dan pesan sistem
@@ -253,3 +287,28 @@
 - Tampilan diperbarui ke gaya flat design Bootstrap atas permintaan review: tanpa gradient dan shadow, warna solid, radius kecil, serta aksen garis primary pada topbar dan kartu autentikasi.
 - Verifikasi ulang tampilan: `npm run build`, `php artisan view:cache`, dan screenshot login, beranda, dashboard admin, serta dashboard peminjam.
 - Katalog publik dan modul domain lainnya belum diimplementasikan; akan dikerjakan pada fase berikutnya.
+
+---
+
+## Catatan Fase 2
+
+- Fase 2 selesai dan siap direview sebelum masuk Fase 3 (sirkulasi).
+- Perintah verifikasi yang sudah dijalankan:
+  - `php artisan migrate` — 11 migration domain berhasil.
+  - `php artisan db:seed` — pengaturan, data master, dan transaksi contoh berhasil.
+  - `php artisan test` — 35 test lulus, 141 assertion.
+  - `php artisan view:cache` — seluruh Blade berhasil dikompilasi.
+  - `npm run build` — berhasil.
+  - `php vendor/bin/pint --dirty` — berhasil.
+- Smoke test HTTP 200: `/katalog`, `/katalog/laskar-pelangi`, serta 13 halaman admin (dashboard, buku, eksemplar, kategori, penulis, penerbit).
+- Cakupan Fase 2:
+  - Skema domain: kategori, penulis, penerbit, buku, pivot penulis, eksemplar, permintaan, pinjaman, pengaturan, audit log, pengumuman.
+  - Katalog publik dengan pencarian judul/penulis/ISBN, filter kategori dan ketersediaan, pagination, detail buku, lokasi rak, dan buku terkait.
+  - CRUD admin buku (termasuk unggah sampul), eksemplar, kategori, penulis, dan penerbit.
+  - Dashboard admin dan peminjam memakai data agregat nyata.
+- Aturan integritas yang sudah diterapkan:
+  - Status eksemplar `Dipinjam` tidak dapat diisi manual; hanya untuk checkout Fase 3.
+  - Eksemplar dengan pinjaman aktif tidak dapat diubah ke status lain.
+  - Buku dihapus dengan cara diarsipkan; eksemplar dengan riwayat transaksi dinonaktifkan.
+  - Ketersediaan katalog dihitung dari eksemplar berstatus `Tersedia`.
+- Ditunda ke fase berikutnya: policy ownership, pengajuan pinjaman, checkout/pengembalian, laporan, pengguna, pengaturan, pengumuman, polling, dan audit log otomatis.

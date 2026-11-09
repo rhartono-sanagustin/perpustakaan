@@ -375,10 +375,40 @@ a {
 }
 
 .book-cover {
+    width: 100%;
     aspect-ratio: 3 / 4;
     object-fit: cover;
     background: #eef2f6;
     border-radius: var(--library-radius);
+}
+
+.book-title-clamp,
+.book-author-clamp {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+}
+
+.book-title-clamp {
+    min-height: 2.6em;
+    -webkit-line-clamp: 2;
+}
+
+.book-author-clamp {
+    -webkit-line-clamp: 1;
+}
+
+.book-title-clamp a:hover {
+    color: var(--library-primary) !important;
+}
+
+.admin-cover {
+    width: 40px;
+    height: 56px;
+    object-fit: cover;
+    border: 1px solid var(--library-border);
+    border-radius: var(--library-radius);
+    background: #eef2f6;
 }
 
 .book-cover-placeholder {

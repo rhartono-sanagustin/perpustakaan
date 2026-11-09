@@ -30,20 +30,19 @@
                     </a>
 
                     <div class="sidebar-heading">Katalog Buku</div>
-                    <a class="nav-link disabled" href="#" aria-disabled="true">
+                    <a class="nav-link {{ request()->routeIs('admin.books.index', 'admin.books.create', 'admin.books.edit') ? 'active' : '' }}" href="{{ route('admin.books.index') }}">
                         <i class="bi bi-journal-bookmark" aria-hidden="true"></i>Daftar Buku
-                        <span class="badge text-bg-light border ms-auto">Segera</span>
                     </a>
-                    <a class="nav-link disabled" href="#" aria-disabled="true">
+                    <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}">
                         <i class="bi bi-tags" aria-hidden="true"></i>Kategori
                     </a>
-                    <a class="nav-link disabled" href="#" aria-disabled="true">
+                    <a class="nav-link {{ request()->routeIs('admin.authors.*') ? 'active' : '' }}" href="{{ route('admin.authors.index') }}">
                         <i class="bi bi-pen" aria-hidden="true"></i>Penulis
                     </a>
-                    <a class="nav-link disabled" href="#" aria-disabled="true">
+                    <a class="nav-link {{ request()->routeIs('admin.publishers.*') ? 'active' : '' }}" href="{{ route('admin.publishers.index') }}">
                         <i class="bi bi-building" aria-hidden="true"></i>Penerbit
                     </a>
-                    <a class="nav-link disabled" href="#" aria-disabled="true">
+                    <a class="nav-link {{ request()->routeIs('admin.copies.*', 'admin.books.copies.*') ? 'active' : '' }}" href="{{ route('admin.copies.index') }}">
                         <i class="bi bi-collection" aria-hidden="true"></i>Eksemplar/Inventaris
                     </a>
 
