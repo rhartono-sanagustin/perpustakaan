@@ -36,12 +36,14 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link disabled" href="#" aria-disabled="true">
-                                Katalog <span class="badge text-bg-light border ms-1">Segera</span>
+                            <a class="nav-link {{ request()->routeIs('catalog.*') ? 'active' : '' }}" href="{{ route('catalog.index') }}">
+                                Katalog
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link disabled" href="#" aria-disabled="true">Pinjaman Saya</a>
+                            <a class="nav-link disabled" href="#" aria-disabled="true">
+                                Pinjaman Saya <span class="badge text-bg-light border ms-1">Segera</span>
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link disabled" href="#" aria-disabled="true">Riwayat</a>

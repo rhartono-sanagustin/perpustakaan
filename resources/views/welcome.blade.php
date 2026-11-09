@@ -15,13 +15,15 @@
                     sekolah dengan alur yang jelas dan mudah digunakan.
                 </p>
                 <div class="d-flex flex-wrap gap-2">
-                    <a href="{{ route('login') }}" class="btn btn-primary btn-lg">
-                        <i class="bi bi-box-arrow-in-right me-2" aria-hidden="true"></i>Masuk ke Perpustakaan
+                    <a href="{{ route('catalog.index') }}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-search me-2" aria-hidden="true"></i>Jelajahi Katalog
                     </a>
-                    <a href="#fitur" class="btn btn-outline-secondary btn-lg">Lihat Fitur</a>
+                    <a href="{{ route('login') }}" class="btn btn-outline-secondary btn-lg">
+                        <i class="bi bi-box-arrow-in-right me-2" aria-hidden="true"></i>Masuk
+                    </a>
                 </div>
                 <p class="small text-muted mt-3 mb-0">
-                    Katalog publik akan tersedia pada tahap berikutnya.
+                    Katalog dapat diakses tanpa login. Pengajuan pinjaman memerlukan akun aktif.
                 </p>
             </div>
 

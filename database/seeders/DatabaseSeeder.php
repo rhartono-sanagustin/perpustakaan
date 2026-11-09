@@ -73,5 +73,11 @@ class DatabaseSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+
+        $this->call([
+            LibrarySettingSeeder::class,
+            MasterDataSeeder::class,
+            CirculationSeeder::class,
+        ]);
     }
 }
