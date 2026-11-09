@@ -1,12 +1,474 @@
-@import 'tailwindcss';
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source "../**/*.blade.php";
-@source "../**/*.js";
-@source "../**/*.vue";
+:root {
+    --library-primary: #1f4e79;
+    --library-primary-hover: #173b5c;
+    --library-primary-soft: #e8eef5;
+    --library-secondary: #0f766e;
+    --library-app-bg: #f5f7fa;
+    --library-surface: #ffffff;
+    --library-text: #243244;
+    --library-muted: #667085;
+    --library-border: #e4e7ec;
+    --library-radius: 0.25rem;
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --bs-primary: var(--library-primary);
+    --bs-primary-rgb: 31, 78, 121;
+    --bs-secondary: #667085;
+    --bs-secondary-rgb: 102, 112, 133;
+    --bs-warning: #b7791f;
+    --bs-warning-rgb: 183, 121, 31;
+    --bs-link-color: var(--library-primary);
+    --bs-link-hover-color: var(--library-primary-hover);
+    --bs-body-color: var(--library-text);
+    --bs-body-bg: var(--library-app-bg);
+    --bs-border-color: var(--library-border);
+    --bs-border-radius: var(--library-radius);
+    --bs-border-radius-sm: 0.2rem;
+    --bs-border-radius-lg: 0.35rem;
+    --bs-body-font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+body {
+    color: var(--library-text);
+    background: var(--library-app-bg);
+    min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+a {
+    text-decoration: none;
+}
+
+.card {
+    border: 1px solid var(--library-border);
+    border-radius: var(--library-radius);
+    box-shadow: none;
+}
+
+.card-header {
+    padding: 0.85rem 1rem;
+    background-color: #f8f9fb;
+    border-bottom: 1px solid var(--library-border);
+}
+
+.card-footer {
+    background-color: #f8f9fb;
+    border-top-color: var(--library-border);
+}
+
+.shadow,
+.shadow-sm,
+.shadow-lg {
+    box-shadow: none !important;
+}
+
+.btn {
+    border-radius: var(--library-radius);
+    font-weight: 500;
+    box-shadow: none;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--library-primary);
+    --bs-btn-border-color: var(--library-primary);
+    --bs-btn-hover-bg: var(--library-primary-hover);
+    --bs-btn-hover-border-color: var(--library-primary-hover);
+    --bs-btn-active-bg: var(--library-primary-hover);
+    --bs-btn-active-border-color: var(--library-primary-hover);
+    --bs-btn-disabled-bg: var(--library-primary);
+    --bs-btn-disabled-border-color: var(--library-primary);
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--library-primary);
+    --bs-btn-border-color: var(--library-primary);
+    --bs-btn-hover-bg: var(--library-primary);
+    --bs-btn-hover-border-color: var(--library-primary);
+    --bs-btn-active-bg: var(--library-primary);
+    --bs-btn-active-border-color: var(--library-primary);
+}
+
+.btn:focus,
+.btn:focus-visible {
+    box-shadow: none;
+    outline: 2px solid var(--library-primary);
+    outline-offset: 2px;
+}
+
+.text-bg-primary {
+    background-color: rgba(var(--bs-primary-rgb), var(--bs-bg-opacity, 1)) !important;
+}
+
+.text-bg-warning {
+    color: #000 !important;
+}
+
+.form-control,
+.form-select {
+    border-color: #d0d5dd;
+    border-radius: var(--library-radius);
+}
+
+.input-group-text {
+    background-color: #f2f4f7;
+    border-color: #d0d5dd;
+    color: var(--library-muted);
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    border-color: var(--library-primary);
+    box-shadow: none;
+    outline: 2px solid rgba(31, 78, 121, 0.2);
+    outline-offset: 0;
+}
+
+.badge {
+    border-radius: var(--library-radius);
+    font-weight: 600;
+}
+
+.alert {
+    border-width: 1px;
+    border-radius: var(--library-radius);
+}
+
+.dropdown-menu {
+    --bs-dropdown-border-color: var(--library-border);
+    --bs-dropdown-border-radius: var(--library-radius);
+    border: 1px solid var(--library-border);
+    border-radius: var(--library-radius);
+    box-shadow: none;
+}
+
+.dropdown-item:active {
+    background-color: var(--library-primary);
+}
+
+.modal-content,
+.popover {
+    border: 1px solid var(--library-border);
+    border-radius: var(--library-radius);
+    box-shadow: none !important;
+}
+
+.toast {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: var(--library-radius);
+    box-shadow: none !important;
+}
+
+.offcanvas {
+    --bs-offcanvas-box-shadow: none;
+}
+
+.navbar-toggler:focus {
+    box-shadow: none;
+    outline: 2px solid var(--library-primary);
+    outline-offset: 2px;
+}
+
+.pagination {
+    --bs-pagination-color: var(--library-primary);
+    --bs-pagination-hover-color: var(--library-primary-hover);
+    --bs-pagination-focus-color: var(--library-primary-hover);
+    --bs-pagination-focus-box-shadow: none;
+    --bs-pagination-active-bg: var(--library-primary);
+    --bs-pagination-active-border-color: var(--library-primary);
+    --bs-pagination-border-radius: var(--library-radius);
+}
+
+.progress {
+    --bs-progress-border-radius: var(--library-radius);
+    background-color: #eef2f6;
+}
+
+.brand-mark {
+    width: 48px;
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: var(--library-radius);
+    background: var(--library-primary);
+    color: #fff;
+    font-size: 1.35rem;
+}
+
+.brand-mark-sm {
+    width: 38px;
+    height: 38px;
+    border-radius: 0.2rem;
+    font-size: 1.05rem;
+}
+
+.auth-page {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background: var(--library-app-bg);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 470px;
+}
+
+.auth-card .card {
+    border-top: 4px solid var(--library-primary);
+}
+
+.admin-shell {
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    --bs-offcanvas-width: 260px;
+    background: var(--library-surface);
+    border-right: 1px solid var(--library-border);
+}
+
+.admin-sidebar .offcanvas-body {
+    padding: 1rem;
+}
+
+@media (min-width: 992px) {
+    .admin-sidebar {
+        position: sticky;
+        top: 0;
+        width: 260px;
+        height: 100vh;
+        flex-shrink: 0;
+        overflow-y: auto;
+    }
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--library-text);
+    padding: 0.25rem 0.5rem;
+}
+
+.sidebar-brand:hover {
+    color: var(--library-primary);
+}
+
+.sidebar-heading {
+    padding: 0.9rem 0.75rem 0.25rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--library-muted);
+}
+
+.sidebar-nav .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: var(--library-radius);
+    color: var(--library-text);
+    font-size: 0.925rem;
+}
+
+.sidebar-nav .nav-link:hover {
+    background: #f2f4f7;
+    color: var(--library-primary);
+}
+
+.sidebar-nav .nav-link.active {
+    background: var(--library-primary);
+    color: #fff;
+    font-weight: 600;
+}
+
+.sidebar-nav .nav-link.active:hover {
+    background: var(--library-primary-hover);
+    color: #fff;
+}
+
+.sidebar-nav .nav-link.disabled {
+    color: var(--library-muted);
+    opacity: 0.7;
+}
+
+.admin-topbar {
+    background: var(--library-surface);
+    border-top: 3px solid var(--library-primary);
+    border-bottom: 1px solid var(--library-border);
+}
+
+.admin-main {
+    min-width: 0;
+}
+
+.borrower-navbar {
+    background: var(--library-surface);
+    border-top: 3px solid var(--library-primary);
+    border-bottom: 1px solid var(--library-border);
+}
+
+.borrower-navbar .nav-link {
+    color: var(--library-text);
+    border-radius: var(--library-radius);
+    padding: 0.5rem 0.75rem;
+}
+
+.borrower-navbar .nav-link:hover {
+    color: var(--library-primary);
+    background: #f2f4f7;
+}
+
+.borrower-navbar .nav-link.active {
+    color: #fff;
+    background: var(--library-primary);
+}
+
+.borrower-navbar .nav-link.active:hover {
+    color: #fff;
+    background: var(--library-primary-hover);
+}
+
+.borrower-navbar .nav-link.disabled {
+    color: var(--library-muted);
+    opacity: 0.7;
+}
+
+.kpi-card .kpi-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.kpi-icon {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: var(--library-radius);
+    font-size: 1.15rem;
+}
+
+.book-cover {
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    background: #eef2f6;
+    border-radius: var(--library-radius);
+}
+
+.book-cover-placeholder {
+    aspect-ratio: 3 / 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8eef5;
+    border-radius: var(--library-radius);
+    color: var(--library-primary);
+    font-size: 2rem;
+}
+
+.empty-state {
+    padding: 2.5rem 1rem;
+    text-align: center;
+}
+
+.empty-state > .bi {
+    display: inline-flex;
+    width: 64px;
+    height: 64px;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--library-radius);
+    background: #f2f4f7;
+    color: var(--library-muted);
+    font-size: 1.75rem;
+}
+
+.min-w-0 {
+    min-width: 0;
+}
+
+.toast-container {
+    z-index: 1090;
+}
+
+.table > :not(caption) > * > * {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom-color: var(--library-border);
+}
+
+.table thead th {
+    background-color: #f2f4f7;
+    color: var(--library-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.table-hover > tbody > tr:hover > * {
+    --bs-table-bg-state: #f8f9fb;
+}
+
+@media (max-width: 575.98px) {
+    .auth-page {
+        padding: 1rem;
+    }
+
+    .auth-card .card-body {
+        padding: 1.5rem !important;
+    }
+}
+
+@media print {
+    body {
+        background: #fff;
+    }
+
+    .admin-sidebar,
+    .admin-topbar,
+    .borrower-navbar,
+    .no-print,
+    footer,
+    .toast-container {
+        display: none !important;
+    }
+
+    .admin-main,
+    .container-xl {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+    }
+
+    .card {
+        border: 1px solid #ccc;
+    }
 }

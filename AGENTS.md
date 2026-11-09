@@ -4,13 +4,13 @@
 Laravel 12.71 / PHP 8.2.26 (composer `^8.2`; keep code PHP 8.2-compatible) school library app (Sistem Informasi Perpustakaan Sekolah). It is currently still the stock skeleton: default `users` table/model (name/email/password only), `welcome` view, and `/` route. No auth UI, Breeze/Jetstream, role package, domain models, or library features exist yet. The PRD requires `role` (admin/guru/siswa), `nomor_induk`, and an active/inactive account status on users.
 
 ## Read first
-- `.agents/prd.md` — roles, business rules, loan/copy statuses, MVP scope.
-- `.agents/design.md` — required Bootstrap 5 UI, Indonesian copy, tokens, page/component patterns.
-- `.agents/task-instruction.md` — task workflow and checklist categories.
+- `agents/prd.md` — roles, business rules, loan/copy statuses, MVP scope.
+- `agents/design.md` — required Bootstrap 5 UI, Indonesian copy, tokens, page/component patterns.
+- `agents/task-instruction.md` — task workflow and checklist categories.
 
 These specs are the source of truth; don't rewrite or revert them to match the code. The root `README.md` is stock Laravel boilerplate.
 
-**Required after each task:** update `.agents/tasklist.md` (create it if missing) with `[x]` ✅, changed files, and overall progress %.
+**Required after each task:** update `agents/tasklist.md` (create it if missing) with `[x]` ✅, changed files, and overall progress %.
 
 ## Commands
 - Setup: `composer install`, `npm install`, copy `.env.example` to `.env` if missing, set `APP_KEY` (`php artisan key:generate` if empty), create the configured DB, `php artisan migrate`. The local `.env` currently uses MySQL DB `perpustakaan`; a fresh `.env` copied from `.env.example` uses SQLite (`database/database.sqlite`).

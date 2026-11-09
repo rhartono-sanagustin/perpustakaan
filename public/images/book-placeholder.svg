@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" role="img" aria-labelledby="title desc">
+    <title id="title">Sampul buku belum tersedia</title>
+    <desc id="desc">Ilustrasi buku terbuka dengan latar belakang biru muda.</desc>
+    <rect width="600" height="800" fill="#e8eef5"/>
+    <path d="M120 240c60-30 120-30 180 0v340c-60-30-120-30-180 0V240z" fill="#ffffff" stroke="#1f4e79" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M480 240c-60-30-120-30-180 0v340c60-30 120-30 180 0V240z" fill="#ffffff" stroke="#1f4e79" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M300 240v340" stroke="#1f4e79" stroke-width="12" stroke-linecap="round"/>
+    <rect x="150" y="290" width="105" height="14" rx="0" fill="#1f4e79" opacity=".65"/>
+    <rect x="150" y="330" width="90" height="14" rx="0" fill="#1f4e79" opacity=".45"/>
+    <rect x="150" y="370" width="110" height="14" rx="0" fill="#1f4e79" opacity=".35"/>
+    <rect x="345" y="290" width="105" height="14" rx="0" fill="#1f4e79" opacity=".65"/>
+    <rect x="345" y="330" width="90" height="14" rx="0" fill="#1f4e79" opacity=".45"/>
+    <rect x="345" y="370" width="110" height="14" rx="0" fill="#1f4e79" opacity=".35"/>
+    <text x="300" y="690" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif" font-size="26" fill="#667085">Sampul belum tersedia</text>
+</svg>

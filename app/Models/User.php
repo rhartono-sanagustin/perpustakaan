@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\UserRole;
+use App\Enums\UserStatus;
+use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -21,6 +24,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'nomor_induk',
+        'status',
+        'kelas',
+        'unit_kerja',
+        'no_telepon',
     ];
 
     /**
@@ -43,6 +52,53 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'role' => UserRole::class,
+            'status' => UserStatus::class,
         ];
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === UserRole::Admin;
+    }
+
+    public function isGuru(): bool
+    {
+        return $this->role === UserRole::Guru;
+    }
+
+    public function isSiswa(): bool
+    {
+        return $this->role === UserRole::Siswa;
+    }
+
+    public function isBorrower(): bool
+    {
+        return $this->role->isBorrower();
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === UserStatus::Aktif;
+    }
+
+    public function roleLabel(): string
+    {
+        return $this->role->label();
+    }
+
+    public function statusLabel(): string
+    {
+        return $this->status->label();
+    }
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('status', UserStatus::Aktif);
+    }
+
+    public function scopeRole(Builder $query, UserRole $role): Builder
+    {
+        return $query->where('role', $role);
     }
 }
