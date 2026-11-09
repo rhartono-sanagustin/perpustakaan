@@ -8,6 +8,7 @@ use App\Models\Author;
 use App\Models\Book;
 use App\Models\Category;
 use App\Models\Publisher;
+use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,8 +17,12 @@ use Illuminate\View\View;
 
 class BookController extends Controller
 {
+    public function __construct(private readonly AuditLogger $auditLogger) {}
+
     public function index(Request $request): View
     {
+        $this->authorize('viewAny', Book::class);
+
         $search = $this->stringQuery($request, 'q', 100);
         $status = $this->stringQuery($request, 'status', 20);
         $categoryId = filter_var($request->query('category_id'), FILTER_VALIDATE_INT) ?: null;
@@ -48,6 +53,8 @@ class BookController extends Controller
 
     public function create(): View
     {
+        $this->authorize('create', Book::class);
+
         return view('admin.books.form', [
             'book' => new Book(['language' => 'Indonesia', 'is_active' => true]),
             'categories' => Category::orderBy('name')->get(),
@@ -59,6 +66,8 @@ class BookController extends Controller
 
     public function store(BookRequest $request): RedirectResponse
     {
+        $this->authorize('create', Book::class);
+
         $data = $request->validated();
         $authorIds = $data['authors'];
         unset($data['authors'], $data['cover'], $data['remove_cover']);
@@ -76,6 +85,9 @@ class BookController extends Controller
             return $book;
         });
 
+        $book->load('authors');
+        $this->auditLogger->record('book.created', $book, null, $this->auditSnapshot($book));
+
         return redirect()
             ->route('admin.books.index')
             ->with('success', 'Buku "'.$book->title.'" berhasil ditambahkan.');
@@ -83,6 +95,8 @@ class BookController extends Controller
 
     public function edit(Book $book): View
     {
+        $this->authorize('update', $book);
+
         $book->load('authors');
 
         return view('admin.books.form', [
@@ -96,6 +110,11 @@ class BookController extends Controller
 
     public function update(BookRequest $request, Book $book): RedirectResponse
     {
+        $this->authorize('update', $book);
+
+        $book->load('authors');
+        $before = $this->auditSnapshot($book);
+
         $data = $request->validated();
         $authorIds = $data['authors'];
         unset($data['authors'], $data['cover'], $data['remove_cover']);
@@ -115,6 +134,9 @@ class BookController extends Controller
             $book->authors()->sync($authorIds);
         });
 
+        $book->refresh()->load('authors');
+        $this->auditLogger->recordChanges('book.updated', $book, $before, $this->auditSnapshot($book));
+
         return redirect()
             ->route('admin.books.index')
             ->with('success', 'Buku "'.$book->title.'" berhasil diperbarui.');
@@ -122,7 +144,11 @@ class BookController extends Controller
 
     public function archive(Book $book): RedirectResponse
     {
+        $this->authorize('archive', $book);
+
+        $before = ['is_active' => $book->is_active];
         $book->update(['is_active' => false]);
+        $this->auditLogger->recordChanges('book.archived', $book, $before, ['is_active' => false]);
 
         return redirect()
             ->route('admin.books.index')
@@ -131,7 +157,11 @@ class BookController extends Controller
 
     public function activate(Book $book): RedirectResponse
     {
+        $this->authorize('activate', $book);
+
+        $before = ['is_active' => $book->is_active];
         $book->update(['is_active' => true]);
+        $this->auditLogger->recordChanges('book.activated', $book, $before, ['is_active' => true]);
 
         return redirect()
             ->route('admin.books.index')
@@ -143,6 +173,26 @@ class BookController extends Controller
         if ($book->cover_path) {
             Storage::disk('public')->delete($book->cover_path);
         }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function auditSnapshot(Book $book): array
+    {
+        return [
+            'title' => $book->title,
+            'isbn' => $book->isbn,
+            'category_id' => $book->category_id,
+            'publisher_id' => $book->publisher_id,
+            'publication_year' => $book->publication_year,
+            'edition' => $book->edition,
+            'language' => $book->language,
+            'summary' => $book->summary,
+            'cover_path' => $book->cover_path,
+            'is_active' => $book->is_active,
+            'authors' => $book->authors->pluck('id')->sort()->values()->all(),
+        ];
     }
 
     private function stringQuery(Request $request, string $key, int $limit): string

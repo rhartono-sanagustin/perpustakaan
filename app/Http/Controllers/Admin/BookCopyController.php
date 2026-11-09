@@ -8,14 +8,19 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\BookCopyRequest;
 use App\Models\Book;
 use App\Models\BookCopy;
+use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class BookCopyController extends Controller
 {
+    public function __construct(private readonly AuditLogger $auditLogger) {}
+
     public function all(Request $request): View
     {
+        $this->authorize('viewAny', BookCopy::class);
+
         $search = $this->stringQuery($request, 'q', 100);
         $status = $this->stringQuery($request, 'status', 30);
 
@@ -49,6 +54,8 @@ class BookCopyController extends Controller
 
     public function index(Book $book): View
     {
+        $this->authorize('viewAny', BookCopy::class);
+
         $search = $this->stringQuery(request(), 'q', 100);
         $status = $this->stringQuery(request(), 'status', 30);
 
@@ -82,6 +89,8 @@ class BookCopyController extends Controller
 
     public function create(Book $book): View
     {
+        $this->authorize('create', BookCopy::class);
+
         return view('admin.books.copies.form', [
             'book' => $book,
             'copy' => new BookCopy([
@@ -95,7 +104,10 @@ class BookCopyController extends Controller
 
     public function store(BookCopyRequest $request, Book $book): RedirectResponse
     {
+        $this->authorize('create', BookCopy::class);
+
         $copy = $book->copies()->create($request->validated());
+        $this->auditLogger->record('book_copy.created', $copy, null, $this->auditSnapshot($copy));
 
         return redirect()
             ->route('admin.books.copies.index', $book)
@@ -104,6 +116,8 @@ class BookCopyController extends Controller
 
     public function edit(Book $book, BookCopy $copy): View
     {
+        $this->authorize('update', $copy);
+
         return view('admin.books.copies.form', [
             'book' => $book,
             'copy' => $copy,
@@ -114,7 +128,11 @@ class BookCopyController extends Controller
 
     public function update(BookCopyRequest $request, Book $book, BookCopy $copy): RedirectResponse
     {
+        $this->authorize('update', $copy);
+
+        $before = $this->auditSnapshot($copy);
         $copy->update($request->validated());
+        $this->auditLogger->recordChanges('book_copy.updated', $copy, $before, $this->auditSnapshot($copy->refresh()));
 
         return redirect()
             ->route('admin.books.copies.index', $book)
@@ -123,14 +141,19 @@ class BookCopyController extends Controller
 
     public function destroy(Book $book, BookCopy $copy): RedirectResponse
     {
+        $this->authorize('delete', $copy);
+
         if ($copy->activeLoan()->exists()) {
             return redirect()
                 ->route('admin.books.copies.index', $book)
                 ->with('error', 'Eksemplar masih memiliki pinjaman aktif dan belum dapat diarsipkan.');
         }
 
+        $before = $this->auditSnapshot($copy);
+
         if ($copy->loans()->exists()) {
             $copy->update(['status' => BookCopyStatus::Nonaktif]);
+            $this->auditLogger->recordChanges('book_copy.deactivated', $copy, $before, $this->auditSnapshot($copy));
 
             return redirect()
                 ->route('admin.books.copies.index', $book)
@@ -139,10 +162,26 @@ class BookCopyController extends Controller
 
         $code = $copy->inventory_code;
         $copy->delete();
+        $this->auditLogger->record('book_copy.deleted', $copy, $before, null);
 
         return redirect()
             ->route('admin.books.copies.index', $book)
             ->with('success', 'Eksemplar '.$code.' berhasil dihapus.');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function auditSnapshot(BookCopy $copy): array
+    {
+        return [
+            'book_id' => $copy->book_id,
+            'inventory_code' => $copy->inventory_code,
+            'shelf_location' => $copy->shelf_location,
+            'condition' => $copy->condition->value,
+            'status' => $copy->status->value,
+            'notes' => $copy->notes,
+        ];
     }
 
     /**

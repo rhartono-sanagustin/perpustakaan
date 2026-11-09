@@ -1,8 +1,8 @@
 # Tasklist — Sistem Informasi Perpustakaan Sekolah
 
 **Terakhir diperbarui:** 9 November 2026  
-**Progress keseluruhan:** 64% (78 dari 122 task)  
-**Fase saat ini:** Fase 2 — Database Domain, Katalog & Master Data Admin (selesai, menunggu review)
+**Progress keseluruhan:** 66% (81 dari 122 task)  
+**Fase saat ini:** Fase 2 — Database Domain, Katalog & Master Data Admin (selesai; policy, audit log, dan penguatan test ditambahkan)
 
 > Catatan: progress dihitung dari jumlah checklist task, bukan estimasi jam kerja.
 > Setiap task selesai ditandai `[x] ✅` dan diberi catatan file yang dibuat/diubah.
@@ -94,7 +94,9 @@
   - Catatan: `Terlambat` dihitung dari pinjaman aktif yang melewati `due_at`, bukan status tersimpan.
 - [x] ✅ Task 3.8 - Model `LibrarySetting`, `AuditLog`, `Announcement` (Selesai)
   - File: `app/Models/LibrarySetting.php`, `app/Models/AuditLog.php`, `app/Models/Announcement.php`, `app/Enums/AnnouncementAudience.php`, factory terkait
-- [ ] Task 3.9 - Policy otorisasi buku, pinjaman, pengguna, dan pengajuan
+- [x] ✅ Task 3.9 - Policy otorisasi buku, pinjaman, pengguna, dan pengajuan (Selesai)
+  - File: `app/Policies/BookPolicy.php`, `app/Policies/BookCopyPolicy.php`, `app/Policies/CategoryPolicy.php`, `app/Policies/AuthorPolicy.php`, `app/Policies/PublisherPolicy.php`, `app/Policies/LoanPolicy.php`, `app/Policies/LoanRequestPolicy.php`, `app/Policies/UserPolicy.php`, `app/Providers/AppServiceProvider.php`
+  - Catatan: seluruh policy didaftarkan eksplisit lewat `Gate::policy()`; controller admin memakai `$this->authorize()` sebagai lapisan kedua setelah middleware `role:admin`.
 
 ---
 
@@ -144,12 +146,16 @@
   - File: `app/Http/Requests/Auth/LoginRequest.php`
 - [x] ✅ Task 5.7 - Otorisasi role pada route admin/peminjam `[Sedang]` (Selesai)
   - File: `app/Http/Middleware/EnsureUserHasRole.php`, `routes/web.php`
-- [ ] Task 5.8 - Policy ownership untuk transaksi milik sendiri
+- [x] ✅ Task 5.8 - Policy ownership untuk transaksi milik sendiri (Selesai)
+  - File: `app/Policies/LoanPolicy.php`, `app/Policies/LoanRequestPolicy.php`, `app/Policies/UserPolicy.php`, `tests/Feature/Security/PolicyTest.php`
+  - Catatan: guru/siswa hanya dapat melihat pinjaman dan pengajuan miliknya; admin dapat melihat semua. Pembatalan pengajuan dibatasi pada status yang diizinkan, dan checkout hanya untuk pengajuan disetujui yang belum kedaluwarsa.
 - [x] ✅ Task 5.9 - Validasi upload sampul dan penyimpanan file aman (Selesai)
   - File: `app/Http/Requests/Admin/BookRequest.php`, `app/Http/Controllers/Admin/BookController.php`
   - Catatan: hanya JPG/PNG/WEBP maksimal 2 MB; file disimpan di disk `public` dengan nama acak; sampul lama dihapus saat diganti.
 - [ ] Task 5.10 - Perlindungan formula injection pada ekspor CSV
-- [ ] Task 5.11 - Audit log tindakan admin
+- [x] ✅ Task 5.11 - Audit log tindakan admin (Selesai)
+  - File: `app/Services/AuditLogger.php`, `app/Http/Controllers/Admin/BookController.php`, `app/Http/Controllers/Admin/BookCopyController.php`, `app/Http/Controllers/Admin/CategoryController.php`, `app/Http/Controllers/Admin/AuthorController.php`, `app/Http/Controllers/Admin/PublisherController.php`, `tests/Feature/Admin/AuditLogTest.php`
+  - Catatan: mencatat aktor, aksi, tipe/ID entitas, nilai sebelum-sesudah, IP, dan user agent. Perubahan hanya mencatat atribut yang benar-benar berubah; arsip/penonaktifan juga tercatat.
 - [ ] Task 5.12 - Review XSS pada seluruh tampilan data pengguna
 
 ---
@@ -296,7 +302,7 @@
 - Perintah verifikasi yang sudah dijalankan:
   - `php artisan migrate` — 11 migration domain berhasil.
   - `php artisan db:seed` — pengaturan, data master, dan transaksi contoh berhasil.
-  - `php artisan test` — 35 test lulus, 141 assertion.
+  - `php artisan test` — 47 test lulus, 269 assertion.
   - `php artisan view:cache` — seluruh Blade berhasil dikompilasi.
   - `npm run build` — berhasil.
   - `php vendor/bin/pint --dirty` — berhasil.
@@ -311,4 +317,9 @@
   - Eksemplar dengan pinjaman aktif tidak dapat diubah ke status lain.
   - Buku dihapus dengan cara diarsipkan; eksemplar dengan riwayat transaksi dinonaktifkan.
   - Ketersediaan katalog dihitung dari eksemplar berstatus `Tersedia`.
-- Ditunda ke fase berikutnya: policy ownership, pengajuan pinjaman, checkout/pengembalian, laporan, pengguna, pengaturan, pengumuman, polling, dan audit log otomatis.
+- Penyelesaian sisa item Fase 2:
+  - Policy otorisasi untuk buku, eksemplar, kategori, penulis, penerbit, pinjaman, pengajuan, dan pengguna; kepemilikan transaksi diperiksa di level policy.
+  - Audit log tindakan admin pada CRUD buku/eksemplar dan seluruh master data, termasuk arsip dan penonaktifan.
+  - Penguatan test: matriks policy, kepemilikan transaksi, aturan pembatalan/checkout pengajuan, dan pencatatan audit log.
+  - `php vendor/bin/pint --dirty` — berhasil.
+- Ditunda ke fase berikutnya: pengajuan pinjaman, checkout/pengembalian, laporan, pengguna, pengaturan, pengumuman, polling, dan audit log otomatis untuk modul yang belum dibangun.
