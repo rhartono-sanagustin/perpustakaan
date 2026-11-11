@@ -17,8 +17,8 @@
     <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3 mb-4">
         <x-kpi-card icon="journal-bookmark" :value="$totalBooks" label="Total Judul Aktif" variant="primary" :href="route('admin.books.index')" />
         <x-kpi-card icon="collection" :value="$availableCopies" label="Eksemplar Tersedia" variant="success" :href="route('admin.copies.index', ['status' => 'tersedia'])" />
-        <x-kpi-card icon="arrow-left-right" :value="$activeLoans" label="Peminjaman Aktif" variant="info" />
-        <x-kpi-card icon="exclamation-triangle" :value="$overdueLoansCount" label="Terlambat" variant="danger" />
+        <x-kpi-card icon="arrow-left-right" :value="$activeLoans" label="Peminjaman Aktif" variant="info" :href="route('admin.loans.index')" />
+        <x-kpi-card icon="exclamation-triangle" :value="$overdueLoansCount" label="Terlambat" variant="danger" :href="route('admin.loans.index', ['overdue' => 1])" />
     </div>
 
     <div class="row g-3">
@@ -26,7 +26,10 @@
             <div class="card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h2 class="h6 mb-0">Permintaan Peminjaman Terbaru</h2>
-                    <span class="badge text-bg-light border">{{ $pendingRequestsCount }} menunggu</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge text-bg-light border">{{ $pendingRequestsCount }} menunggu</span>
+                        <a href="{{ route('admin.requests.index') }}" class="small">Lihat semua</a>
+                    </div>
                 </div>
 
                 @if ($recentRequests->isEmpty())
@@ -134,6 +137,12 @@
             <div class="d-flex flex-wrap gap-2">
                 <a href="{{ route('admin.books.create') }}" class="btn btn-primary btn-sm">
                     <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Tambah Buku
+                </a>
+                <a href="{{ route('admin.requests.index') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-inbox me-1" aria-hidden="true"></i>Permintaan
+                </a>
+                <a href="{{ route('admin.returns.index') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-return-left me-1" aria-hidden="true"></i>Pengembalian
                 </a>
                 <a href="{{ route('admin.copies.index') }}" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-collection me-1" aria-hidden="true"></i>Inventaris

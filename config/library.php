@@ -20,4 +20,22 @@ return [
     'default_cover' => 'images/book-placeholder.svg',
 
     'logo' => 'images/logo.svg',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Nilai Awal Kebijakan Sirkulasi
+    |--------------------------------------------------------------------------
+    |
+    | Nilai ini dipakai sebagai fallback apabila baris library_settings belum
+    | tersedia. Admin dapat mengubah kebijakan aktif melalui tabel pengaturan.
+    |
+    */
+
+    'loan_defaults' => [
+        'max_loans_siswa' => 2,
+        'max_loans_guru' => 5,
+        'loan_duration_siswa' => 7,
+        'loan_duration_guru' => 14,
+        'pickup_deadline_days' => 1,
+    ],
 ];

@@ -33,9 +33,9 @@
     </div>
 
     <div class="row row-cols-1 row-cols-sm-3 g-3 mb-4">
-        <x-kpi-card icon="arrow-left-right" :value="$activeLoansCount" label="Pinjaman Aktif" variant="primary" />
-        <x-kpi-card icon="hourglass-split" :value="$pendingRequestsCount" label="Menunggu Diproses" variant="warning" />
-        <x-kpi-card icon="exclamation-triangle" :value="$overdueLoansCount" label="Terlambat" variant="danger" />
+        <x-kpi-card icon="arrow-left-right" :value="$activeLoansCount" label="Pinjaman Aktif" variant="primary" :href="route('borrower.loans.index')" />
+        <x-kpi-card icon="hourglass-split" :value="$pendingRequestsCount" label="Menunggu Diproses" variant="warning" :href="route('borrower.loans.index', ['tab' => 'menunggu'])" />
+        <x-kpi-card icon="exclamation-triangle" :value="$overdueLoansCount" label="Terlambat" variant="danger" :href="route('borrower.loans.index', ['tab' => 'terlambat'])" />
     </div>
 
     <div class="row g-3">
@@ -43,7 +43,10 @@
             <div class="card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h2 class="h6 mb-0">Buku yang Sedang Dipinjam</h2>
-                    <span class="badge text-bg-light border">{{ $activeLoansCount }} buku</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge text-bg-light border">{{ $activeLoansCount }} buku</span>
+                        <a href="{{ route('borrower.loans.index') }}" class="small">Lihat semua</a>
+                    </div>
                 </div>
 
                 @if ($activeLoans->isEmpty())
@@ -81,8 +84,9 @@
 
         <div class="col-12 col-lg-5">
             <div class="card h-100">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h2 class="h6 mb-0">Permintaan Terbaru</h2>
+                    <a href="{{ route('borrower.loans.index', ['tab' => 'menunggu']) }}" class="small">Lihat semua</a>
                 </div>
 
                 @if ($pendingRequests->isEmpty())
@@ -113,8 +117,9 @@
     </div>
 
     <div class="card mt-3">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <h2 class="h6 mb-0">Riwayat Terbaru</h2>
+            <a href="{{ route('borrower.loans.history') }}" class="small">Lihat semua</a>
         </div>
 
         @if ($recentHistory->isEmpty())

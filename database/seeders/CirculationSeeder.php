@@ -6,6 +6,7 @@ use App\Enums\BookCondition;
 use App\Enums\BookCopyStatus;
 use App\Enums\LoanRequestStatus;
 use App\Enums\LoanStatus;
+use App\Enums\ReturnCondition;
 use App\Models\Book;
 use App\Models\BookCopy;
 use App\Models\Loan;
@@ -80,7 +81,7 @@ class CirculationSeeder extends Seeder
             'due_at' => now()->subDays(31)->toDateString(),
             'returned_at' => now()->subDays(20)->toDateString(),
             'status' => LoanStatus::Dikembalikan,
-            'return_condition' => BookCondition::Baik,
+            'return_condition' => ReturnCondition::Baik,
             'return_notes' => 'Buku dikembalikan dalam kondisi baik.',
             'duration_days' => 7,
             'quota_snapshot' => 2,

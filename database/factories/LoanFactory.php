@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Enums\BookCondition;
 use App\Enums\LoanStatus;
+use App\Enums\ReturnCondition;
 use App\Models\BookCopy;
 use App\Models\Loan;
 use App\Models\User;
@@ -39,7 +39,7 @@ class LoanFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'returned_at' => now(),
             'status' => LoanStatus::Dikembalikan,
-            'return_condition' => BookCondition::Baik,
+            'return_condition' => ReturnCondition::Baik,
         ]);
     }
 

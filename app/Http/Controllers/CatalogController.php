@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use App\Enums\BookCopyStatus;
 use App\Models\Book;
 use App\Models\Category;
+use App\Services\CirculationService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class CatalogController extends Controller
 {
+    public function __construct(private readonly CirculationService $circulation) {}
+
     public function index(Request $request): View
     {
         $search = $this->stringQuery($request, 'q', 100);
@@ -87,10 +90,17 @@ class CatalogController extends Controller
             ->take(4)
             ->get();
 
+        $eligibility = null;
+
+        if (auth()->check() && auth()->user()->isBorrower()) {
+            $eligibility = $this->circulation->requestEligibility(auth()->user(), $book);
+        }
+
         return view('catalog.show', [
             'book' => $book,
             'shelfLocations' => $shelfLocations,
             'relatedBooks' => $relatedBooks,
+            'eligibility' => $eligibility,
         ]);
     }
 

@@ -36,20 +36,20 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('catalog.*') ? 'active' : '' }}" href="{{ route('catalog.index') }}">
+                            <a class="nav-link {{ request()->routeIs('catalog.*', 'borrower.requests.create') ? 'active' : '' }}" href="{{ route('catalog.index') }}">
                                 Katalog
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link disabled" href="#" aria-disabled="true">
-                                Pinjaman Saya <span class="badge text-bg-light border ms-1">Segera</span>
+                            <a class="nav-link {{ request()->routeIs('borrower.loans.index') ? 'active' : '' }}" href="{{ route('borrower.loans.index') }}">
+                                Pinjaman Saya
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link disabled" href="#" aria-disabled="true">Riwayat</a>
+                            <a class="nav-link {{ request()->routeIs('borrower.loans.history') ? 'active' : '' }}" href="{{ route('borrower.loans.history') }}">Riwayat</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link disabled" href="#" aria-disabled="true">Profil</a>
+                            <a class="nav-link {{ request()->routeIs('borrower.profile.*') ? 'active' : '' }}" href="{{ route('borrower.profile.edit') }}">Profil</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -90,6 +90,7 @@
         </div>
     </footer>
 
+    @include('partials.confirm-modal')
     @include('partials.flash')
     @stack('scripts')
 </body>

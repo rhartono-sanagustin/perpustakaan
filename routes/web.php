@@ -5,9 +5,14 @@ use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\BookCopyController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\LoanController as AdminLoanController;
+use App\Http\Controllers\Admin\LoanRequestController as AdminLoanRequestController;
 use App\Http\Controllers\Admin\PublisherController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Borrower\DashboardController as BorrowerDashboardController;
+use App\Http\Controllers\Borrower\LoanController as BorrowerLoanController;
+use App\Http\Controllers\Borrower\LoanRequestController as BorrowerLoanRequestController;
+use App\Http\Controllers\Borrower\ProfileController as BorrowerProfileController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
@@ -55,9 +60,33 @@ Route::middleware(['auth', 'active', 'role:admin'])
 
         Route::resource('authors', AuthorController::class)->except(['show']);
         Route::resource('publishers', PublisherController::class)->except(['show']);
+
+        Route::get('/requests', [AdminLoanRequestController::class, 'index'])->name('requests.index');
+        Route::get('/requests/{loanRequest}', [AdminLoanRequestController::class, 'show'])->name('requests.show');
+        Route::post('/requests/{loanRequest}/approve', [AdminLoanRequestController::class, 'approve'])->name('requests.approve');
+        Route::post('/requests/{loanRequest}/reject', [AdminLoanRequestController::class, 'reject'])->name('requests.reject');
+        Route::post('/requests/{loanRequest}/cancel', [AdminLoanRequestController::class, 'cancel'])->name('requests.cancel');
+        Route::get('/requests/{loanRequest}/checkout', [AdminLoanRequestController::class, 'checkoutForm'])->name('requests.checkout');
+        Route::post('/requests/{loanRequest}/checkout', [AdminLoanRequestController::class, 'checkout'])->name('requests.checkout.store');
+
+        Route::get('/loans', [AdminLoanController::class, 'index'])->name('loans.index');
+        Route::get('/returns', [AdminLoanController::class, 'returns'])->name('returns.index');
+        Route::get('/history', [AdminLoanController::class, 'history'])->name('loans.history');
+        Route::get('/loans/{loan}/return', [AdminLoanController::class, 'returnForm'])->name('loans.return');
+        Route::post('/loans/{loan}/return', [AdminLoanController::class, 'returnLoan'])->name('loans.return.store');
     });
 
 Route::middleware(['auth', 'active', 'role:guru,siswa'])
     ->group(function () {
         Route::get('/beranda', [BorrowerDashboardController::class, 'index'])->name('borrower.dashboard');
+
+        Route::get('/pinjaman', [BorrowerLoanController::class, 'index'])->name('borrower.loans.index');
+        Route::get('/riwayat', [BorrowerLoanController::class, 'history'])->name('borrower.loans.history');
+
+        Route::get('/profil', [BorrowerProfileController::class, 'edit'])->name('borrower.profile.edit');
+        Route::put('/profil', [BorrowerProfileController::class, 'update'])->name('borrower.profile.update');
+
+        Route::get('/katalog/{book:slug}/ajukan', [BorrowerLoanRequestController::class, 'create'])->name('borrower.requests.create');
+        Route::post('/katalog/{book:slug}/ajukan', [BorrowerLoanRequestController::class, 'store'])->name('borrower.requests.store');
+        Route::post('/pengajuan/{loanRequest}/batal', [BorrowerLoanRequestController::class, 'cancel'])->name('borrower.requests.cancel');
     });

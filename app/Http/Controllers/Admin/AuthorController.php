@@ -5,14 +5,19 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AuthorRequest;
 use App\Models\Author;
+use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AuthorController extends Controller
 {
+    public function __construct(private readonly AuditLogger $auditLogger) {}
+
     public function index(Request $request): View
     {
+        $this->authorize('viewAny', Author::class);
+
         $search = $this->stringQuery($request, 'q', 100);
 
         $authors = Author::query()
@@ -30,6 +35,8 @@ class AuthorController extends Controller
 
     public function create(): View
     {
+        $this->authorize('create', Author::class);
+
         return view('admin.authors.form', [
             'author' => new Author,
         ]);
@@ -37,7 +44,10 @@ class AuthorController extends Controller
 
     public function store(AuthorRequest $request): RedirectResponse
     {
+        $this->authorize('create', Author::class);
+
         $author = Author::create($request->validated());
+        $this->auditLogger->record('author.created', $author, null, $this->auditSnapshot($author));
 
         return redirect()
             ->route('admin.authors.index')
@@ -46,6 +56,8 @@ class AuthorController extends Controller
 
     public function edit(Author $author): View
     {
+        $this->authorize('update', $author);
+
         return view('admin.authors.form', [
             'author' => $author,
         ]);
@@ -53,7 +65,11 @@ class AuthorController extends Controller
 
     public function update(AuthorRequest $request, Author $author): RedirectResponse
     {
+        $this->authorize('update', $author);
+
+        $before = $this->auditSnapshot($author);
         $author->update($request->validated());
+        $this->auditLogger->recordChanges('author.updated', $author, $before, $this->auditSnapshot($author->refresh()));
 
         return redirect()
             ->route('admin.authors.index')
@@ -62,6 +78,8 @@ class AuthorController extends Controller
 
     public function destroy(Author $author): RedirectResponse
     {
+        $this->authorize('delete', $author);
+
         if ($author->books()->exists()) {
             return redirect()
                 ->route('admin.authors.index')
@@ -69,11 +87,25 @@ class AuthorController extends Controller
         }
 
         $name = $author->name;
+        $before = $this->auditSnapshot($author);
         $author->delete();
+        $this->auditLogger->record('author.deleted', $author, $before, null);
 
         return redirect()
             ->route('admin.authors.index')
             ->with('success', 'Penulis "'.$name.'" berhasil dihapus.');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function auditSnapshot(Author $author): array
+    {
+        return [
+            'name' => $author->name,
+            'slug' => $author->slug,
+            'bio' => $author->bio,
+        ];
     }
 
     private function stringQuery(Request $request, string $key, int $limit): string

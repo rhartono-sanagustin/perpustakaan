@@ -1,8 +1,8 @@
 # Tasklist — Sistem Informasi Perpustakaan Sekolah
 
-**Terakhir diperbarui:** 9 November 2026  
-**Progress keseluruhan:** 64% (78 dari 122 task)  
-**Fase saat ini:** Fase 2 — Database Domain, Katalog & Master Data Admin (selesai, menunggu review)
+**Terakhir diperbarui:** 11 November 2026  
+**Progress keseluruhan:** 73% (89 dari 122 task)  
+**Fase saat ini:** Fase 3 — Sirkulasi (selesai; siap direview)
 
 > Catatan: progress dihitung dari jumlah checklist task, bukan estimasi jam kerja.
 > Setiap task selesai ditandai `[x] ✅` dan diberi catatan file yang dibuat/diubah.
@@ -94,7 +94,9 @@
   - Catatan: `Terlambat` dihitung dari pinjaman aktif yang melewati `due_at`, bukan status tersimpan.
 - [x] ✅ Task 3.8 - Model `LibrarySetting`, `AuditLog`, `Announcement` (Selesai)
   - File: `app/Models/LibrarySetting.php`, `app/Models/AuditLog.php`, `app/Models/Announcement.php`, `app/Enums/AnnouncementAudience.php`, factory terkait
-- [ ] Task 3.9 - Policy otorisasi buku, pinjaman, pengguna, dan pengajuan
+- [x] ✅ Task 3.9 - Policy otorisasi buku, pinjaman, pengguna, dan pengajuan (Selesai)
+  - File: `app/Policies/BookPolicy.php`, `app/Policies/BookCopyPolicy.php`, `app/Policies/CategoryPolicy.php`, `app/Policies/AuthorPolicy.php`, `app/Policies/PublisherPolicy.php`, `app/Policies/LoanPolicy.php`, `app/Policies/LoanRequestPolicy.php`, `app/Policies/UserPolicy.php`, `app/Providers/AppServiceProvider.php`
+  - Catatan: seluruh policy didaftarkan eksplisit lewat `Gate::policy()`; controller admin memakai `$this->authorize()` sebagai lapisan kedua setelah middleware `role:admin`.
 
 ---
 
@@ -110,16 +112,24 @@
   - File: `app/Http/Controllers/DashboardController.php`, `app/Http/Controllers/Admin/DashboardController.php`, `app/Http/Controllers/Borrower/DashboardController.php`, `routes/web.php`
 - [x] ✅ Task 4.5 - Backend katalog: pencarian, filter, pagination, detail (Selesai)
   - File: `app/Http/Controllers/CatalogController.php`, `app/Models/Book.php`, `routes/web.php`
-- [ ] Task 4.6 - Backend pengajuan pinjam dan pembatalan oleh peminjam
-- [ ] Task 4.7 - Backend pinjaman aktif, riwayat, dan profil peminjam
+- [x] ✅ Task 4.6 - Backend pengajuan pinjam dan pembatalan oleh peminjam (Selesai)
+  - File: `app/Http/Controllers/Borrower/LoanRequestController.php`, `app/Http/Requests/Borrower/StoreLoanRequest.php`, `app/Services/CirculationService.php`, `resources/views/borrower/requests/create.blade.php`, `routes/web.php`
+  - Catatan: pengajuan menargetkan buku; eksemplar baru ditetapkan saat checkout. Kuota menghitung pinjaman aktif + pengajuan terbuka.
+- [x] ✅ Task 4.7 - Backend pinjaman aktif, riwayat, dan profil peminjam (Selesai)
+  - File: `app/Http/Controllers/Borrower/LoanController.php`, `app/Http/Controllers/Borrower/ProfileController.php`, `app/Http/Requests/Borrower/UpdateProfileRequest.php`, `resources/views/borrower/loans/index.blade.php`, `resources/views/borrower/loans/history.blade.php`, `resources/views/borrower/profile.blade.php`, `routes/web.php`
+  - Catatan: seluruh query dibatasi `user_id`; perubahan profil mencakup nama, email, telepon, dan kata sandi.
 - [x] ✅ Task 4.8 - CRUD admin buku dan eksemplar (Selesai)
   - File: `app/Http/Controllers/Admin/BookController.php`, `app/Http/Controllers/Admin/BookCopyController.php`, `app/Http/Requests/Admin/BookRequest.php`, `app/Http/Requests/Admin/BookCopyRequest.php`, `routes/web.php`
   - Catatan: hapus buku = arsip; eksemplar dengan riwayat transaksi dinonaktifkan, bukan dihapus.
 - [x] ✅ Task 4.9 - CRUD admin kategori, penulis, dan penerbit (Selesai)
   - File: `app/Http/Controllers/Admin/CategoryController.php`, `app/Http/Controllers/Admin/AuthorController.php`, `app/Http/Controllers/Admin/PublisherController.php`, request terkait
   - Catatan: kategori yang masih dipakai buku dinonaktifkan; penulis/penerbit yang masih dipakai tidak dapat dihapus.
-- [ ] Task 4.10 - Antrean permintaan, approve/reject dengan alasan
-- [ ] Task 4.11 - Checkout dan pengembalian dengan transaksi database
+- [x] ✅ Task 4.10 - Antrean permintaan, approve/reject dengan alasan (Selesai)
+  - File: `app/Http/Controllers/Admin/LoanRequestController.php`, `app/Http/Requests/Admin/RejectLoanRequest.php`, `app/Services/CirculationService.php`, `resources/views/admin/circulation/requests/index.blade.php`, `resources/views/admin/circulation/requests/show.blade.php`, `routes/web.php`
+  - Catatan: persetujuan menahan stok secara logis, menetapkan batas pengambilan, dan tetap bukan peminjaman sampai checkout.
+- [x] ✅ Task 4.11 - Checkout dan pengembalian dengan transaksi database (Selesai)
+  - File: `app/Http/Controllers/Admin/LoanController.php`, `app/Http/Requests/Admin/CheckoutLoanRequest.php`, `app/Http/Requests/Admin/ReturnLoanRequest.php`, `app/Enums/ReturnCondition.php`, `app/Services/CirculationService.php`, `resources/views/admin/circulation/requests/checkout.blade.php`, `resources/views/admin/circulation/loans/index.blade.php`, `resources/views/admin/circulation/loans/return.blade.php`, `resources/views/admin/circulation/loans/history.blade.php`, `routes/web.php`
+  - Catatan: checkout dan pengembalian memakai `DB::transaction`; durasi dan kuota disnapshot pada pinjaman; kondisi kembali memperbarui status/kondisi eksemplar.
 - [ ] Task 4.12 - Laporan, CSV, dan halaman cetak
 - [ ] Task 4.13 - CRUD pengguna, reset password, aktif/nonaktif
 - [ ] Task 4.14 - Pengaturan kuota, durasi, dan batas pengambilan
@@ -144,12 +154,16 @@
   - File: `app/Http/Requests/Auth/LoginRequest.php`
 - [x] ✅ Task 5.7 - Otorisasi role pada route admin/peminjam `[Sedang]` (Selesai)
   - File: `app/Http/Middleware/EnsureUserHasRole.php`, `routes/web.php`
-- [ ] Task 5.8 - Policy ownership untuk transaksi milik sendiri
+- [x] ✅ Task 5.8 - Policy ownership untuk transaksi milik sendiri (Selesai)
+  - File: `app/Policies/LoanPolicy.php`, `app/Policies/LoanRequestPolicy.php`, `app/Policies/UserPolicy.php`, `tests/Feature/Security/PolicyTest.php`
+  - Catatan: guru/siswa hanya dapat melihat pinjaman dan pengajuan miliknya; admin dapat melihat semua. Pembatalan pengajuan dibatasi pada status yang diizinkan, dan checkout hanya untuk pengajuan disetujui yang belum kedaluwarsa.
 - [x] ✅ Task 5.9 - Validasi upload sampul dan penyimpanan file aman (Selesai)
   - File: `app/Http/Requests/Admin/BookRequest.php`, `app/Http/Controllers/Admin/BookController.php`
   - Catatan: hanya JPG/PNG/WEBP maksimal 2 MB; file disimpan di disk `public` dengan nama acak; sampul lama dihapus saat diganti.
 - [ ] Task 5.10 - Perlindungan formula injection pada ekspor CSV
-- [ ] Task 5.11 - Audit log tindakan admin
+- [x] ✅ Task 5.11 - Audit log tindakan admin (Selesai)
+  - File: `app/Services/AuditLogger.php`, `app/Http/Controllers/Admin/BookController.php`, `app/Http/Controllers/Admin/BookCopyController.php`, `app/Http/Controllers/Admin/CategoryController.php`, `app/Http/Controllers/Admin/AuthorController.php`, `app/Http/Controllers/Admin/PublisherController.php`, `tests/Feature/Admin/AuditLogTest.php`
+  - Catatan: mencatat aktor, aksi, tipe/ID entitas, nilai sebelum-sesudah, IP, dan user agent. Perubahan hanya mencatat atribut yang benar-benar berubah; arsip/penonaktifan juga tercatat.
 - [ ] Task 5.12 - Review XSS pada seluruh tampilan data pengguna
 
 ---
@@ -183,12 +197,14 @@
   - File: `resources/views/catalog/index.blade.php`, `resources/views/components/book-card.blade.php`, `resources/views/layouts/public.blade.php`
 - [x] ✅ Task 6.13 - Halaman detail buku (Selesai)
   - File: `resources/views/catalog/show.blade.php`
-- [ ] Task 6.14 - Halaman pinjaman saya, riwayat, dan profil peminjam
+- [x] ✅ Task 6.14 - Halaman pinjaman saya, riwayat, dan profil peminjam (Selesai)
+  - File: `resources/views/borrower/loans/index.blade.php`, `resources/views/borrower/loans/history.blade.php`, `resources/views/borrower/profile.blade.php`, `resources/views/borrower/requests/create.blade.php`
 - [x] ✅ Task 6.15 - Halaman admin buku dan eksemplar (Selesai)
   - File: `resources/views/admin/books/index.blade.php`, `resources/views/admin/books/form.blade.php`, `resources/views/admin/books/copies/index.blade.php`, `resources/views/admin/books/copies/form.blade.php`, `resources/views/admin/copies/index.blade.php`
 - [x] ✅ Task 6.16 - Halaman admin kategori, penulis, dan penerbit (Selesai)
   - File: `resources/views/admin/categories/*.blade.php`, `resources/views/admin/authors/*.blade.php`, `resources/views/admin/publishers/*.blade.php`
-- [ ] Task 6.17 - Halaman admin permintaan, checkout, pengembalian, dan riwayat
+- [x] ✅ Task 6.17 - Halaman admin permintaan, checkout, pengembalian, dan riwayat (Selesai)
+  - File: `resources/views/admin/circulation/requests/index.blade.php`, `resources/views/admin/circulation/requests/show.blade.php`, `resources/views/admin/circulation/requests/checkout.blade.php`, `resources/views/admin/circulation/loans/index.blade.php`, `resources/views/admin/circulation/loans/return.blade.php`, `resources/views/admin/circulation/loans/history.blade.php`
 - [ ] Task 6.18 - Halaman laporan admin
 - [ ] Task 6.19 - Halaman pengguna, pengaturan, dan pesan sistem
 - [ ] Task 6.20 - Layout dan style halaman cetak
@@ -208,7 +224,9 @@
   - File: `resources/js/app.js`, `resources/views/auth/login.blade.php`
 - [x] ✅ Task 7.4 - Loading state dan pencegahan klik ganda `[Mudah]` (Selesai)
   - File: `resources/js/app.js`
-- [ ] Task 7.5 - Modal konfirmasi reusable
+- [x] ✅ Task 7.5 - Modal konfirmasi reusable (Selesai)
+  - File: `resources/views/partials/confirm-modal.blade.php`, `resources/js/app.js`, `resources/views/layouts/admin.blade.php`, `resources/views/layouts/borrower.blade.php`, `resources/views/layouts/public.blade.php`
+  - Catatan: form `data-confirm` memakai modal Bootstrap; tombol loading tidak dinonaktifkan saat pengguna membatalkan konfirmasi.
 - [ ] Task 7.6 - Share detail buku (Web Share API + clipboard)
 - [ ] Task 7.7 - Polling notifikasi admin
 - [ ] Task 7.8 - Polling status pinjaman peminjam
@@ -226,7 +244,9 @@
 - [ ] Task 8.2 - Sound notification permintaan peminjaman baru
 - [ ] Task 8.3 - Share detail buku
 - [ ] Task 8.4 - Pesan sistem/announcement di dashboard peminjam
-- [ ] Task 8.5 - Peringatan jatuh tempo pinjaman
+- [x] ✅ Task 8.5 - Peringatan jatuh tempo pinjaman (Selesai)
+  - File: `resources/views/borrower/dashboard.blade.php`, `resources/views/borrower/loans/index.blade.php`, `resources/views/admin/dashboard.blade.php`, `resources/views/admin/circulation/loans/index.blade.php`, `resources/views/admin/circulation/loans/return.blade.php`
+  - Catatan: status `Terlambat`, sisa hari, dan tanggal jatuh tempo ditampilkan pada dashboard serta halaman pinjaman/pengembalian.
 - [x] ✅ Task 8.6 - Placeholder sampul buku `[Mudah]` (Selesai)
   - File: `public/images/book-placeholder.svg`
 - [ ] Task 8.7 - Ekspor CSV laporan
@@ -296,7 +316,7 @@
 - Perintah verifikasi yang sudah dijalankan:
   - `php artisan migrate` — 11 migration domain berhasil.
   - `php artisan db:seed` — pengaturan, data master, dan transaksi contoh berhasil.
-  - `php artisan test` — 35 test lulus, 141 assertion.
+  - `php artisan test` — 47 test lulus, 269 assertion.
   - `php artisan view:cache` — seluruh Blade berhasil dikompilasi.
   - `npm run build` — berhasil.
   - `php vendor/bin/pint --dirty` — berhasil.
@@ -311,4 +331,30 @@
   - Eksemplar dengan pinjaman aktif tidak dapat diubah ke status lain.
   - Buku dihapus dengan cara diarsipkan; eksemplar dengan riwayat transaksi dinonaktifkan.
   - Ketersediaan katalog dihitung dari eksemplar berstatus `Tersedia`.
-- Ditunda ke fase berikutnya: policy ownership, pengajuan pinjaman, checkout/pengembalian, laporan, pengguna, pengaturan, pengumuman, polling, dan audit log otomatis.
+- Penyelesaian sisa item Fase 2:
+  - Policy otorisasi untuk buku, eksemplar, kategori, penulis, penerbit, pinjaman, pengajuan, dan pengguna; kepemilikan transaksi diperiksa di level policy.
+  - Audit log tindakan admin pada CRUD buku/eksemplar dan seluruh master data, termasuk arsip dan penonaktifan.
+  - Penguatan test: matriks policy, kepemilikan transaksi, aturan pembatalan/checkout pengajuan, dan pencatatan audit log.
+  - `php vendor/bin/pint --dirty` — berhasil.
+- Ditunda ke fase berikutnya: pengajuan pinjaman, checkout/pengembalian, laporan, pengguna, pengaturan, pengumuman, polling, dan audit log otomatis untuk modul yang belum dibangun.
+
+---
+
+## Catatan Fase 3
+
+- Fase 3 (sirkulasi) selesai dan siap direview sebelum masuk Fase 4.
+- Perintah verifikasi yang sudah dijalankan:
+  - `php artisan test` — 71 test lulus, 403 assertion.
+  - `php artisan view:cache` — seluruh Blade berhasil dikompilasi.
+  - `npm run build` — berhasil.
+  - `php vendor/bin/pint --dirty` — berhasil.
+- Cakupan Fase 3:
+  - Peminjam dapat mengajukan peminjaman per judul buku, membatalkan pengajuan, melihat pinjaman aktif, riwayat, dan memperbarui profil.
+  - Admin dapat memproses antrean pengajuan (setujui/tolak dengan alasan/batalkan), mencatat checkout eksemplar, mencatat pengembalian beserta kondisi buku, dan menelusuri riwayat transaksi.
+  - Kuota menghitung pinjaman aktif + pengajuan terbuka (`Menunggu` dan `Disetujui` yang belum kedaluwarsa); pengajuan disetujui menahan stok secara logis.
+  - Persetujuan memiliki batas pengambilan (`pickup_deadline_days`); pengajuan yang melewati batas ditampilkan `Kedaluwarsa` dan diblokir dari checkout.
+  - Checkout dan pengembalian dibungkus transaksi database; checkout mengunci pengajuan, peminjam, dan eksemplar, sedangkan persetujuan mengunci baris buku untuk mencegah stok tertahan berlebih.
+  - Kondisi kembali (`Baik`, `Rusak Ringan`, `Rusak Berat`, `Hilang`) memperbarui status/kondisi eksemplar melalui enum `ReturnCondition`.
+  - Audit log mencatat pembuatan pengajuan, persetujuan, penolakan, pembatalan, checkout, dan pengembalian.
+  - Modal konfirmasi Bootstrap reusable dipakai seluruh form destruktif/berisiko.
+- Ditunda: checkout langsung oleh admin tanpa pengajuan (FR-LOAN-10), laporan/CSV, pengguna, pengaturan, pengumuman, polling/sound, dan command cleanup permintaan kedaluwarsa (Fase 9).
