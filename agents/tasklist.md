@@ -1,8 +1,8 @@
 # Tasklist — Sistem Informasi Perpustakaan Sekolah
 
 **Terakhir diperbarui:** 11 November 2026  
-**Progress keseluruhan:** 73% (89 dari 122 task)  
-**Fase saat ini:** Fase 3 — Sirkulasi (selesai; siap direview)
+**Progress keseluruhan:** 87% (106 dari 122 task)  
+**Fase saat ini:** Fase 4 — Laporan & Manajemen (selesai; siap direview)
 
 > Catatan: progress dihitung dari jumlah checklist task, bukan estimasi jam kerja.
 > Setiap task selesai ditandai `[x] ✅` dan diberi catatan file yang dibuat/diubah.
@@ -130,10 +130,18 @@
 - [x] ✅ Task 4.11 - Checkout dan pengembalian dengan transaksi database (Selesai)
   - File: `app/Http/Controllers/Admin/LoanController.php`, `app/Http/Requests/Admin/CheckoutLoanRequest.php`, `app/Http/Requests/Admin/ReturnLoanRequest.php`, `app/Enums/ReturnCondition.php`, `app/Services/CirculationService.php`, `resources/views/admin/circulation/requests/checkout.blade.php`, `resources/views/admin/circulation/loans/index.blade.php`, `resources/views/admin/circulation/loans/return.blade.php`, `resources/views/admin/circulation/loans/history.blade.php`, `routes/web.php`
   - Catatan: checkout dan pengembalian memakai `DB::transaction`; durasi dan kuota disnapshot pada pinjaman; kondisi kembali memperbarui status/kondisi eksemplar.
-- [ ] Task 4.12 - Laporan, CSV, dan halaman cetak
-- [ ] Task 4.13 - CRUD pengguna, reset password, aktif/nonaktif
-- [ ] Task 4.14 - Pengaturan kuota, durasi, dan batas pengambilan
-- [ ] Task 4.15 - CRUD pesan sistem/announcement
+- [x] ✅ Task 4.12 - Laporan, CSV, dan halaman cetak `[Sedang]` (Selesai)
+  - File: `app/Http/Controllers/Admin/ReportController.php`, `app/Services/ReportService.php`, `app/Services/CsvExporter.php`, `app/Support/ReportFilters.php`, `resources/views/admin/reports/*.blade.php`, `resources/views/layouts/print.blade.php`, `routes/web.php`
+  - Catatan: enam laporan (ringkasan, peminjaman, pengembalian, keterlambatan, inventaris, buku populer) berbagi filter periode/kategori/peran/status; CSV dan cetak mewarisi filter aktif. Default periode adalah bulan berjalan.
+- [x] ✅ Task 4.13 - CRUD pengguna, reset password, aktif/nonaktif `[Sedang]` (Selesai)
+  - File: `app/Http/Controllers/Admin/UserController.php`, `app/Http/Requests/Admin/StoreUserRequest.php`, `app/Http/Requests/Admin/UpdateUserRequest.php`, `app/Http/Requests/Admin/ResetUserPasswordRequest.php`, `resources/views/admin/users/*.blade.php`, `routes/web.php`
+  - Catatan: admin tidak dapat mengubah/menghapus akunnya sendiri; reset password hanya menerima sandi baru tanpa menampilkannya; akun dengan riwayat transaksi atau jejak audit dinonaktifkan, bukan dihapus.
+- [x] ✅ Task 4.14 - Pengaturan kuota, durasi, dan batas pengambilan `[Sedang]` (Selesai)
+  - File: `app/Http/Controllers/Admin/LibrarySettingController.php`, `app/Http/Requests/Admin/UpdateLibrarySettingsRequest.php`, `config/library.php`, `resources/views/admin/settings/index.blade.php`, `routes/web.php`
+  - Catatan: lima kebijakan sirkulasi dapat diubah admin dengan validasi rentang; setiap perubahan dicatat per kunci dan berlaku untuk transaksi baru.
+- [x] ✅ Task 4.15 - CRUD pesan sistem/announcement `[Sedang]` (Selesai)
+  - File: `app/Http/Controllers/Admin/AnnouncementController.php`, `app/Http/Requests/Admin/AnnouncementRequest.php`, `resources/views/admin/announcements/*.blade.php`, `resources/views/borrower/dashboard.blade.php`, `routes/web.php`
+  - Catatan: isi pengumuman berupa teks biasa yang di-escape saat ditampilkan; hanya pengumuman aktif, sudah terbit, dan sesuai audiens yang tampil di dashboard (maksimal tiga).
 - [ ] Task 4.16 - Endpoint polling notifikasi admin dan peminjam
 
 ---
@@ -160,11 +168,15 @@
 - [x] ✅ Task 5.9 - Validasi upload sampul dan penyimpanan file aman (Selesai)
   - File: `app/Http/Requests/Admin/BookRequest.php`, `app/Http/Controllers/Admin/BookController.php`
   - Catatan: hanya JPG/PNG/WEBP maksimal 2 MB; file disimpan di disk `public` dengan nama acak; sampul lama dihapus saat diganti.
-- [ ] Task 5.10 - Perlindungan formula injection pada ekspor CSV
+- [x] ✅ Task 5.10 - Perlindungan formula injection pada ekspor CSV `[Sedang]` (Selesai)
+  - File: `app/Services/CsvExporter.php`, `tests/Feature/Admin/ReportTest.php`
+  - Catatan: CSV memakai BOM UTF-8 dan delimiter `;`; nilai yang diawali `=`, `+`, `-`, `@`, atau tab diberi prefiks kutip tunggal, dan baris baru dinormalisasi.
 - [x] ✅ Task 5.11 - Audit log tindakan admin (Selesai)
   - File: `app/Services/AuditLogger.php`, `app/Http/Controllers/Admin/BookController.php`, `app/Http/Controllers/Admin/BookCopyController.php`, `app/Http/Controllers/Admin/CategoryController.php`, `app/Http/Controllers/Admin/AuthorController.php`, `app/Http/Controllers/Admin/PublisherController.php`, `tests/Feature/Admin/AuditLogTest.php`
   - Catatan: mencatat aktor, aksi, tipe/ID entitas, nilai sebelum-sesudah, IP, dan user agent. Perubahan hanya mencatat atribut yang benar-benar berubah; arsip/penonaktifan juga tercatat.
-- [ ] Task 5.12 - Review XSS pada seluruh tampilan data pengguna
+- [x] ✅ Task 5.12 - Review XSS pada seluruh tampilan data pengguna `[Sedang]` (Selesai)
+  - File: `resources/views/admin/announcements/*.blade.php`, `resources/views/borrower/dashboard.blade.php`, `tests/Feature/Admin/AnnouncementManagementTest.php`
+  - Catatan: seluruh output memakai escaping Blade; pengumuman teks biasa di-escape dan baris baru ditampilkan lewat CSS `white-space: pre-line`, bukan HTML mentah.
 
 ---
 
@@ -205,9 +217,15 @@
   - File: `resources/views/admin/categories/*.blade.php`, `resources/views/admin/authors/*.blade.php`, `resources/views/admin/publishers/*.blade.php`
 - [x] ✅ Task 6.17 - Halaman admin permintaan, checkout, pengembalian, dan riwayat (Selesai)
   - File: `resources/views/admin/circulation/requests/index.blade.php`, `resources/views/admin/circulation/requests/show.blade.php`, `resources/views/admin/circulation/requests/checkout.blade.php`, `resources/views/admin/circulation/loans/index.blade.php`, `resources/views/admin/circulation/loans/return.blade.php`, `resources/views/admin/circulation/loans/history.blade.php`
-- [ ] Task 6.18 - Halaman laporan admin
-- [ ] Task 6.19 - Halaman pengguna, pengaturan, dan pesan sistem
-- [ ] Task 6.20 - Layout dan style halaman cetak
+- [x] ✅ Task 6.18 - Halaman laporan admin `[Sedang]` (Selesai)
+  - File: `resources/views/admin/reports/index.blade.php`, `resources/views/admin/reports/loans.blade.php`, `resources/views/admin/reports/overdue.blade.php`, `resources/views/admin/reports/inventory.blade.php`, `resources/views/admin/reports/popular.blade.php`, `resources/views/admin/reports/_nav.blade.php`, `resources/views/admin/reports/_filters.blade.php`
+  - Catatan: navigasi antar laporan, filter seragam, ringkasan status eksemplar, dan tombol ekspor/cetak.
+- [x] ✅ Task 6.19 - Halaman pengguna, pengaturan, dan pesan sistem `[Sedang]` (Selesai)
+  - File: `resources/views/admin/users/index.blade.php`, `resources/views/admin/users/form.blade.php`, `resources/views/admin/settings/index.blade.php`, `resources/views/admin/announcements/index.blade.php`, `resources/views/admin/announcements/form.blade.php`
+  - Catatan: formulir responsif, konfirmasi tindakan destruktif, dan tampilan status/audiens memakai komponen Bootstrap yang sudah ada.
+- [x] ✅ Task 6.20 - Layout dan style halaman cetak `[Sedang]` (Selesai)
+  - File: `resources/views/layouts/print.blade.php`, `resources/views/admin/reports/print.blade.php`, `resources/css/app.css`, `resources/js/app.js`
+  - Catatan: halaman cetak A4 landscape dengan toolbar pratinjau, header identitas sekolah, tanda tangan petugas, dan aturan `@media print` tanpa dependensi PDF.
 - [x] ✅ Task 6.21 - Terapkan gaya flat design Bootstrap pada layout, komponen, dan halaman `[Sedang]` (Selesai)
   - File: `resources/css/app.css`, `resources/views/layouts/auth.blade.php`, `resources/views/welcome.blade.php`, `resources/views/components/kpi-card.blade.php`, `resources/views/admin/dashboard.blade.php`, `resources/views/borrower/dashboard.blade.php`, `resources/views/errors/minimal.blade.php`, `public/images/logo.svg`, `public/images/book-placeholder.svg`
   - Catatan: tanpa gradient/bayangan, warna solid, radius 0.25rem, aksen garis primary, dan header kartu abu-abu muda.
@@ -243,14 +261,20 @@
   - File: `resources/views/partials/flash.blade.php`, `resources/js/app.js`
 - [ ] Task 8.2 - Sound notification permintaan peminjaman baru
 - [ ] Task 8.3 - Share detail buku
-- [ ] Task 8.4 - Pesan sistem/announcement di dashboard peminjam
+- [x] ✅ Task 8.4 - Pesan sistem/announcement di dashboard peminjam `[Mudah]` (Selesai)
+  - File: `resources/views/borrower/dashboard.blade.php`, `app/Http/Controllers/Borrower/DashboardController.php`
+  - Catatan: maksimal tiga pengumuman aktif sesuai peran, dengan judul, isi, waktu terbit, dan nama pembuat.
 - [x] ✅ Task 8.5 - Peringatan jatuh tempo pinjaman (Selesai)
   - File: `resources/views/borrower/dashboard.blade.php`, `resources/views/borrower/loans/index.blade.php`, `resources/views/admin/dashboard.blade.php`, `resources/views/admin/circulation/loans/index.blade.php`, `resources/views/admin/circulation/loans/return.blade.php`
   - Catatan: status `Terlambat`, sisa hari, dan tanggal jatuh tempo ditampilkan pada dashboard serta halaman pinjaman/pengembalian.
 - [x] ✅ Task 8.6 - Placeholder sampul buku `[Mudah]` (Selesai)
   - File: `public/images/book-placeholder.svg`
-- [ ] Task 8.7 - Ekspor CSV laporan
-- [ ] Task 8.8 - Halaman cetak laporan
+- [x] ✅ Task 8.7 - Ekspor CSV laporan `[Mudah]` (Selesai)
+  - File: `app/Services/CsvExporter.php`, `app/Http/Controllers/Admin/ReportController.php`, `routes/web.php`
+  - Catatan: unduhan streaming untuk enam laporan, aman untuk Excel Indonesia, dan terlindungi dari formula injection.
+- [x] ✅ Task 8.8 - Halaman cetak laporan `[Mudah]` (Selesai)
+  - File: `resources/views/layouts/print.blade.php`, `resources/views/admin/reports/print.blade.php`, `resources/css/app.css`, `resources/js/app.js`
+  - Catatan: cetak melalui dialog browser; tidak menambah dependensi PDF baru.
 - [x] ✅ Task 8.9 - Halaman error berbahasa Indonesia `[Mudah]` (Selesai)
   - File: `resources/views/errors/*.blade.php`
 - [x] ✅ Task 8.10 - Bantuan kontak admin di halaman login `[Mudah]` (Selesai)
@@ -260,11 +284,19 @@
 
 ## 9. Cleanup Command & Scheduler
 
-- [ ] Task 9.1 - Artisan command `library:cleanup`
-- [ ] Task 9.2 - Batalkan permintaan disetujui yang melewati batas pengambilan
-- [ ] Task 9.3 - Daftarkan schedule harian
-- [ ] Task 9.4 - Opsi `--dry-run`
-- [ ] Task 9.5 - Test command cleanup
+- [x] ✅ Task 9.1 - Artisan command `library:cleanup` `[Mudah]` (Selesai)
+  - File: `app/Console/Commands/CleanupExpiredLoanRequests.php`
+- [x] ✅ Task 9.2 - Batalkan permintaan disetujui yang melewati batas pengambilan `[Sedang]` (Selesai)
+  - File: `app/Services/CirculationService.php`
+  - Catatan: status berubah menjadi `Dibatalkan`, `cancelled_at` diisi, dan audit `loan_request.expired` dicatat dalam transaksi database.
+- [x] ✅ Task 9.3 - Daftarkan schedule harian `[Mudah]` (Selesai)
+  - File: `routes/console.php`
+  - Catatan: dijadwalkan setiap hari pukul 01.00.
+- [x] ✅ Task 9.4 - Opsi `--dry-run` `[Mudah]` (Selesai)
+  - File: `app/Console/Commands/CleanupExpiredLoanRequests.php`
+  - Catatan: hanya menghitung pengajuan kedaluwarsa tanpa mengubah data.
+- [x] ✅ Task 9.5 - Test command cleanup `[Sedang]` (Selesai)
+  - File: `tests/Feature/Console/CleanupExpiredLoanRequestsTest.php`
 
 ---
 
@@ -358,3 +390,31 @@
   - Audit log mencatat pembuatan pengajuan, persetujuan, penolakan, pembatalan, checkout, dan pengembalian.
   - Modal konfirmasi Bootstrap reusable dipakai seluruh form destruktif/berisiko.
 - Ditunda: checkout langsung oleh admin tanpa pengajuan (FR-LOAN-10), laporan/CSV, pengguna, pengaturan, pengumuman, polling/sound, dan command cleanup permintaan kedaluwarsa (Fase 9).
+
+---
+
+## Catatan Fase 4
+
+- Fase 4 (laporan & manajemen) selesai dan siap direview sebelum masuk fitur realtime dan final polish.
+- Perintah verifikasi yang sudah dijalankan:
+  - `php artisan test` — 110 test lulus, 628 assertion.
+  - `php artisan view:cache` — seluruh Blade berhasil dikompilasi.
+  - `npm run build` — berhasil.
+  - `php vendor/bin/pint --dirty` dan Pint pada seluruh file baru — berhasil.
+  - `php artisan route:list --path=admin` — 71 route admin terdaftar.
+- Cakupan Fase 4:
+  - Enam laporan admin dengan filter periode (default bulan berjalan), kategori, peran, status/kondisi, pencarian, dan batas jumlah data.
+  - Ekspor CSV streaming dengan BOM UTF-8, delimiter `;`, normalisasi baris baru, dan perlindungan formula injection.
+  - Halaman cetak berbasis browser (A4 landscape) untuk seluruh laporan, lengkap dengan identitas sekolah dan tanda tangan petugas.
+  - CRUD pengguna dengan pembuatan akun, edit, reset kata sandi, aktif/nonaktif, dan penghapusan aman.
+  - Halaman pengaturan lima kebijakan sirkulasi dengan validasi rentang dan audit per perubahan.
+  - CRUD pengumuman dengan audiens, status aktif, jadwal terbit, dan tampilan maksimal tiga pengumuman di dashboard peminjam.
+  - Command `library:cleanup` dengan `--dry-run`, dijadwalkan harian pukul 01.00.
+  - Test fitur untuk laporan/CSV/cetak, pengguna, pengaturan, pengumuman, cleanup, dan policy Fase 4.
+- Aturan keamanan yang diterapkan:
+  - Laporan hanya untuk admin melalui gate `view-reports` dan middleware `role:admin`.
+  - Admin tidak dapat mengelola akunnya sendiri (edit, reset, aktif/nonaktif, hapus).
+  - Akun dengan riwayat transaksi, kepengarangan pengumuman, atau jejak audit dinonaktifkan agar integritas data tetap terjaga.
+  - Isi pengumuman selalu di-escape; tidak ada HTML mentah yang dirender.
+  - Ekspor CSV melindungi sel dari eksekusi formula saat dibuka di aplikasi spreadsheet.
+- Ditunda: polling notifikasi admin/peminjam, sound notification, share detail buku, auto-submit filter katalog, grafik dashboard, dukungan `prefers-reduced-motion`, checkout langsung tanpa pengajuan, perpanjangan pinjaman, denda, QA responsif/aksesibilitas menyeluruh, dokumentasi setup/UAT, dan test E2E satu alur penuh (Task 10.3).

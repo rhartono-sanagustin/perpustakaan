@@ -437,6 +437,53 @@ class CirculationService
         });
     }
 
+    /**
+     * Batalkan persetujuan yang melewati batas pengambilan.
+     */
+    public function expireStaleApprovedRequests(bool $dryRun = false): int
+    {
+        $query = LoanRequest::query()
+            ->where('status', LoanRequestStatus::Disetujui)
+            ->whereNotNull('expires_at')
+            ->where('expires_at', '<=', now());
+
+        if ($dryRun) {
+            return $query->count();
+        }
+
+        return DB::transaction(function (): int {
+            $requests = LoanRequest::query()
+                ->where('status', LoanRequestStatus::Disetujui)
+                ->whereNotNull('expires_at')
+                ->where('expires_at', '<=', now())
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get();
+
+            $count = 0;
+
+            foreach ($requests as $request) {
+                $before = $this->requestSnapshot($request);
+
+                $request->update([
+                    'status' => LoanRequestStatus::Dibatalkan,
+                    'cancelled_at' => now(),
+                ]);
+
+                $this->auditLogger->recordChanges(
+                    'loan_request.expired',
+                    $request,
+                    $before,
+                    $this->requestSnapshot($request->refresh())
+                );
+
+                $count++;
+            }
+
+            return $count;
+        });
+    }
+
     private function setting(string $key, mixed $default): mixed
     {
         if (! array_key_exists($key, $this->settingCache)) {

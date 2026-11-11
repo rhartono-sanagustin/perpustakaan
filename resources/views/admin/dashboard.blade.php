@@ -144,6 +144,9 @@
                 <a href="{{ route('admin.returns.index') }}" class="btn btn-outline-primary btn-sm">
                     <i class="bi bi-arrow-return-left me-1" aria-hidden="true"></i>Pengembalian
                 </a>
+                <a href="{{ route('admin.reports.index') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-bar-chart me-1" aria-hidden="true"></i>Laporan
+                </a>
                 <a href="{{ route('admin.copies.index') }}" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-collection me-1" aria-hidden="true"></i>Inventaris
                 </a>

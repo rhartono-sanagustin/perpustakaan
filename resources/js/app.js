@@ -117,4 +117,18 @@ document.addEventListener('DOMContentLoaded', () => {
             button.innerHTML = `<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>${button.dataset.loadingText || 'Memproses...'}`;
         });
     });
+
+    document.querySelectorAll('[data-print]').forEach((button) => {
+        button.addEventListener('click', () => window.print());
+    });
+
+    document.querySelectorAll('[data-close-print]').forEach((button) => {
+        button.addEventListener('click', () => {
+            window.close();
+
+            if (!window.closed) {
+                window.history.back();
+            }
+        });
+    });
 });

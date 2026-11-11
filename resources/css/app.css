@@ -467,6 +467,128 @@ a {
     --bs-table-bg-state: #f8f9fb;
 }
 
+.announcement-body {
+    white-space: pre-line;
+}
+
+.print-page {
+    background: #eef2f6;
+}
+
+.print-toolbar {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.print-sheet {
+    max-width: 1120px;
+    margin: 0 auto 2rem;
+    padding: 2rem;
+    background: #fff;
+    border: 1px solid var(--library-border);
+}
+
+.print-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 2px solid var(--library-text);
+}
+
+.print-brand {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.print-school {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.print-tagline,
+.print-info {
+    color: var(--library-muted);
+    font-size: 0.8rem;
+}
+
+.print-info {
+    text-align: right;
+}
+
+.print-title {
+    margin: 1.25rem 0 0.5rem;
+    font-size: 1.4rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.print-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.35rem 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--library-muted);
+    font-size: 0.8rem;
+}
+
+.print-section-title {
+    margin: 1.25rem 0 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.print-table {
+    font-size: 0.8rem;
+}
+
+.print-table thead th {
+    background: #f2f4f7 !important;
+    color: #243244 !important;
+    font-size: 0.7rem;
+}
+
+.print-summary-table th {
+    width: 25%;
+    background: #f8f9fb;
+}
+
+.print-footer {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--library-border);
+}
+
+.print-footer-note {
+    color: var(--library-muted);
+    font-size: 0.72rem;
+}
+
+.print-signature {
+    width: 260px;
+    margin: 1.5rem 0 0 auto;
+    text-align: center;
+    font-size: 0.8rem;
+}
+
+.print-signature-space {
+    height: 3.5rem;
+}
+
+.print-signature-name {
+    font-weight: 700;
+    text-decoration: underline;
+}
+
 @media (max-width: 575.98px) {
     .auth-page {
         padding: 1rem;
@@ -474,6 +596,10 @@ a {
 
     .auth-card .card-body {
         padding: 1.5rem !important;
+    }
+
+    .print-sheet {
+        padding: 1rem;
     }
 }
 
@@ -500,5 +626,41 @@ a {
 
     .card {
         border: 1px solid #ccc;
+    }
+
+    .print-page {
+        background: #fff;
+        font-size: 10pt;
+    }
+
+    .print-toolbar {
+        display: none !important;
+    }
+
+    .print-sheet {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+
+    .print-table {
+        font-size: 8.5pt;
+    }
+
+    .print-table thead {
+        display: table-header-group;
+    }
+
+    .print-table tr,
+    .print-header,
+    .print-footer,
+    .print-signature {
+        break-inside: avoid;
+    }
+
+    .print-page a {
+        color: inherit !important;
+        text-decoration: none !important;
     }
 }
