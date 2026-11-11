@@ -47,16 +47,16 @@
                     </a>
 
                     <div class="sidebar-heading">Transaksi Peminjaman</div>
-                    <a class="nav-link disabled" href="#" aria-disabled="true">
+                    <a class="nav-link {{ request()->routeIs('admin.requests.*') ? 'active' : '' }}" href="{{ route('admin.requests.index') }}">
                         <i class="bi bi-inbox" aria-hidden="true"></i>Permintaan Peminjaman
                     </a>
-                    <a class="nav-link disabled" href="#" aria-disabled="true">
+                    <a class="nav-link {{ request()->routeIs('admin.loans.index') ? 'active' : '' }}" href="{{ route('admin.loans.index') }}">
                         <i class="bi bi-arrow-left-right" aria-hidden="true"></i>Peminjaman Aktif
                     </a>
-                    <a class="nav-link disabled" href="#" aria-disabled="true">
+                    <a class="nav-link {{ request()->routeIs('admin.returns.*') ? 'active' : '' }}" href="{{ route('admin.returns.index') }}">
                         <i class="bi bi-arrow-return-left" aria-hidden="true"></i>Pengembalian
                     </a>
-                    <a class="nav-link disabled" href="#" aria-disabled="true">
+                    <a class="nav-link {{ request()->routeIs('admin.loans.history', 'admin.loans.return') ? 'active' : '' }}" href="{{ route('admin.loans.history') }}">
                         <i class="bi bi-clock-history" aria-hidden="true"></i>Riwayat Transaksi
                     </a>
 
@@ -147,6 +147,7 @@
         </div>
     </div>
 
+    @include('partials.confirm-modal')
     @include('partials.flash')
     @stack('scripts')
 </body>

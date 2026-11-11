@@ -99,19 +99,24 @@
                             <a href="{{ route('admin.books.edit', $book) }}" class="btn btn-primary">
                                 <i class="bi bi-pencil-square me-2" aria-hidden="true"></i>Kelola Buku
                             </a>
-                        @elseif ($book->hasAvailableCopies())
-                            <button type="button" class="btn btn-primary btn-lg" disabled>
+                        @elseif ($eligibility && $eligibility['allowed'])
+                            <a href="{{ route('borrower.requests.create', $book) }}" class="btn btn-primary btn-lg">
                                 <i class="bi bi-journal-plus me-2" aria-hidden="true"></i>Ajukan Peminjaman
-                            </button>
+                            </a>
                             <div class="w-100 form-text">
-                                Fitur pengajuan peminjaman akan tersedia pada tahap sirkulasi berikutnya.
+                                Sisa kuota {{ $eligibility['remaining_quota'] }} eksemplar &middot; durasi pinjam {{ $eligibility['duration_days'] }} hari.
                             </div>
+                        @elseif ($eligibility && $eligibility['open_request'])
+                            <a href="{{ route('borrower.loans.index', ['tab' => $eligibility['open_request']->isApproved() ? 'disetujui' : 'menunggu']) }}" class="btn btn-outline-primary btn-lg">
+                                <i class="bi bi-clock-history me-2" aria-hidden="true"></i>Lihat Pengajuan
+                            </a>
+                            <div class="w-100 form-text">{{ $eligibility['reason'] }}</div>
                         @else
                             <button type="button" class="btn btn-secondary btn-lg" disabled>
                                 <i class="bi bi-x-circle me-2" aria-hidden="true"></i>Belum Dapat Diajukan
                             </button>
                             <div class="w-100 form-text">
-                                Semua eksemplar sedang dipinjam atau tidak tersedia.
+                                {{ $eligibility['reason'] ?? 'Pengajuan peminjaman belum tersedia untuk akun ini.' }}
                             </div>
                         @endif
                     @else

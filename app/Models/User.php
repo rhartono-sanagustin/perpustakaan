@@ -7,6 +7,7 @@ use App\Enums\UserStatus;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -90,6 +91,16 @@ class User extends Authenticatable
     public function statusLabel(): string
     {
         return $this->status->label();
+    }
+
+    public function loanRequests(): HasMany
+    {
+        return $this->hasMany(LoanRequest::class);
+    }
+
+    public function loans(): HasMany
+    {
+        return $this->hasMany(Loan::class);
     }
 
     public function scopeActive(Builder $query): Builder

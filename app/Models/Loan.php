@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Enums\BookCondition;
 use App\Enums\LoanStatus;
+use App\Enums\ReturnCondition;
 use Database\Factories\LoanFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -37,7 +37,7 @@ class Loan extends Model
             'due_at' => 'date',
             'returned_at' => 'date',
             'status' => LoanStatus::class,
-            'return_condition' => BookCondition::class,
+            'return_condition' => ReturnCondition::class,
             'duration_days' => 'integer',
             'quota_snapshot' => 'integer',
         ];
@@ -61,6 +61,11 @@ class Loan extends Model
     public function request(): BelongsTo
     {
         return $this->belongsTo(LoanRequest::class, 'loan_request_id');
+    }
+
+    public function getReferenceAttribute(): string
+    {
+        return 'LN-'.str_pad((string) $this->getKey(), 5, '0', STR_PAD_LEFT);
     }
 
     public function scopeActive(Builder $query): Builder
@@ -96,6 +101,15 @@ class Loan extends Model
         }
 
         return (int) $this->due_at->startOfDay()->diffInDays(today()->startOfDay());
+    }
+
+    public function daysUntilDue(): int
+    {
+        if (! $this->isActive()) {
+            return 0;
+        }
+
+        return (int) today()->startOfDay()->diffInDays($this->due_at->startOfDay());
     }
 
     public function statusLabel(): string

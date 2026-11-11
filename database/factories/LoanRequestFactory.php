@@ -49,4 +49,12 @@ class LoanRequestFactory extends Factory
             'rejection_reason' => 'Stok eksemplar sedang tidak tersedia.',
         ]);
     }
+
+    public function cancelled(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => LoanRequestStatus::Dibatalkan,
+            'cancelled_at' => now(),
+        ]);
+    }
 }

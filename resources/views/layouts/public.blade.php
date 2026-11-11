@@ -50,6 +50,7 @@
         </div>
     </footer>
 
+    @include('partials.confirm-modal')
     @include('partials.flash')
     @stack('scripts')
 </body>

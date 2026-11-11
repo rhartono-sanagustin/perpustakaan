@@ -61,9 +61,43 @@ class LoanRequest extends Model
         return $this->hasOne(Loan::class);
     }
 
+    public function getReferenceAttribute(): string
+    {
+        return 'PR-'.str_pad((string) $this->getKey(), 5, '0', STR_PAD_LEFT);
+    }
+
     public function scopePending(Builder $query): Builder
     {
         return $query->where('status', LoanRequestStatus::Menunggu);
+    }
+
+    /**
+     * Pengajuan yang masih dianggap aktif untuk perhitungan kuota.
+     */
+    public function scopeOpen(Builder $query): Builder
+    {
+        return $query->where(function (Builder $query) {
+            $query->where('status', LoanRequestStatus::Menunggu)
+                ->orWhere(function (Builder $query) {
+                    $query->where('status', LoanRequestStatus::Disetujui)
+                        ->where(function (Builder $query) {
+                            $query->whereNull('expires_at')
+                                ->orWhere('expires_at', '>', now());
+                        });
+                });
+        });
+    }
+
+    /**
+     * Persetujuan yang masih berlaku dan menahan stok secara logis.
+     */
+    public function scopeApprovedActive(Builder $query): Builder
+    {
+        return $query->where('status', LoanRequestStatus::Disetujui)
+            ->where(function (Builder $query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            });
     }
 
     public function scopeStatus(Builder $query, ?LoanRequestStatus $status): Builder
@@ -74,6 +108,16 @@ class LoanRequest extends Model
     public function isPending(): bool
     {
         return $this->status === LoanRequestStatus::Menunggu;
+    }
+
+    public function isApproved(): bool
+    {
+        return $this->status === LoanRequestStatus::Disetujui;
+    }
+
+    public function isOpen(): bool
+    {
+        return $this->isPending() || ($this->isApproved() && ! $this->isExpired());
     }
 
     public function canBeCancelled(): bool
@@ -88,11 +132,25 @@ class LoanRequest extends Model
 
     public function statusLabel(): string
     {
-        return $this->status->label();
+        return $this->displayStatusLabel();
     }
 
     public function statusVariant(): string
     {
-        return $this->status->badgeVariant();
+        return $this->displayStatusVariant();
+    }
+
+    public function displayStatusLabel(): string
+    {
+        return $this->isApproved() && $this->isExpired()
+            ? 'Kedaluwarsa'
+            : $this->status->label();
+    }
+
+    public function displayStatusVariant(): string
+    {
+        return $this->isApproved() && $this->isExpired()
+            ? 'danger'
+            : $this->status->badgeVariant();
     }
 }
