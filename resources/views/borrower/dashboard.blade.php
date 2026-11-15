@@ -32,6 +32,33 @@
         </div>
     </div>
 
+    @if ($announcements->isNotEmpty())
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h6 mb-0">
+                    <i class="bi bi-megaphone me-1" aria-hidden="true"></i>Pengumuman
+                </h2>
+                <span class="small text-muted">{{ $announcements->count() }} terbaru</span>
+            </div>
+            <div class="card-body">
+                @foreach ($announcements as $announcement)
+                    <article class="{{ $loop->last ? '' : 'border-bottom pb-3 mb-3' }}">
+                        <div class="d-flex flex-column flex-sm-row justify-content-between gap-1">
+                            <h3 class="h6 mb-1">{{ $announcement->title }}</h3>
+                            <span class="small text-muted">
+                                {{ $announcement->published_at?->locale('id')->translatedFormat('d M Y, H:i') ?? '-' }}
+                            </span>
+                        </div>
+                        <div class="announcement-body text-break">{{ $announcement->body }}</div>
+                        @if ($announcement->creator)
+                            <div class="small text-muted mt-2">Dipublikasikan oleh {{ $announcement->creator->name }}</div>
+                        @endif
+                    </article>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     <div class="row row-cols-1 row-cols-sm-3 g-3 mb-4">
         <x-kpi-card icon="arrow-left-right" :value="$activeLoansCount" label="Pinjaman Aktif" variant="primary" :href="route('borrower.loans.index')" />
         <x-kpi-card icon="hourglass-split" :value="$pendingRequestsCount" label="Menunggu Diproses" variant="warning" :href="route('borrower.loans.index', ['tab' => 'menunggu'])" />

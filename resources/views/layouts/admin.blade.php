@@ -61,27 +61,33 @@
                     </a>
 
                     <div class="sidebar-heading">Laporan</div>
-                    <a class="nav-link disabled" href="#" aria-disabled="true">
+                    <a class="nav-link {{ request()->routeIs('admin.reports.index') ? 'active' : '' }}" href="{{ route('admin.reports.index') }}">
                         <i class="bi bi-bar-chart" aria-hidden="true"></i>Ringkasan
                     </a>
-                    <a class="nav-link disabled" href="#" aria-disabled="true">
-                        <i class="bi bi-file-earmark-text" aria-hidden="true"></i>Peminjaman &amp; Pengembalian
+                    <a class="nav-link {{ request()->routeIs('admin.reports.loans') ? 'active' : '' }}" href="{{ route('admin.reports.loans') }}">
+                        <i class="bi bi-file-earmark-text" aria-hidden="true"></i>Peminjaman
                     </a>
-                    <a class="nav-link disabled" href="#" aria-disabled="true">
+                    <a class="nav-link {{ request()->routeIs('admin.reports.returns') ? 'active' : '' }}" href="{{ route('admin.reports.returns') }}">
+                        <i class="bi bi-arrow-return-left" aria-hidden="true"></i>Pengembalian
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('admin.reports.overdue') ? 'active' : '' }}" href="{{ route('admin.reports.overdue') }}">
                         <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>Keterlambatan
                     </a>
-                    <a class="nav-link disabled" href="#" aria-disabled="true">
+                    <a class="nav-link {{ request()->routeIs('admin.reports.inventory') ? 'active' : '' }}" href="{{ route('admin.reports.inventory') }}">
                         <i class="bi bi-box-seam" aria-hidden="true"></i>Inventaris
                     </a>
-                    <a class="nav-link disabled" href="#" aria-disabled="true">
+                    <a class="nav-link {{ request()->routeIs('admin.reports.popular') ? 'active' : '' }}" href="{{ route('admin.reports.popular') }}">
                         <i class="bi bi-star" aria-hidden="true"></i>Buku Populer
                     </a>
 
                     <div class="sidebar-heading">Manajemen</div>
-                    <a class="nav-link disabled" href="#" aria-disabled="true">
+                    <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
                         <i class="bi bi-people" aria-hidden="true"></i>Pengguna
                     </a>
-                    <a class="nav-link disabled" href="#" aria-disabled="true">
+                    <a class="nav-link {{ request()->routeIs('admin.announcements.*') ? 'active' : '' }}" href="{{ route('admin.announcements.index') }}">
+                        <i class="bi bi-megaphone" aria-hidden="true"></i>Pengumuman
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" href="{{ route('admin.settings.index') }}">
                         <i class="bi bi-gear" aria-hidden="true"></i>Pengaturan
                     </a>
                 </nav>

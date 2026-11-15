@@ -2,18 +2,22 @@
 
 namespace App\Providers;
 
+use App\Models\Announcement;
 use App\Models\Author;
 use App\Models\Book;
 use App\Models\BookCopy;
 use App\Models\Category;
+use App\Models\LibrarySetting;
 use App\Models\Loan;
 use App\Models\LoanRequest;
 use App\Models\Publisher;
 use App\Models\User;
+use App\Policies\AnnouncementPolicy;
 use App\Policies\AuthorPolicy;
 use App\Policies\BookCopyPolicy;
 use App\Policies\BookPolicy;
 use App\Policies\CategoryPolicy;
+use App\Policies\LibrarySettingPolicy;
 use App\Policies\LoanPolicy;
 use App\Policies\LoanRequestPolicy;
 use App\Policies\PublisherPolicy;
@@ -42,10 +46,14 @@ class AppServiceProvider extends ServiceProvider
 
         Carbon::setLocale(config('app.locale'));
 
+        Gate::define('view-reports', fn (User $user): bool => $user->isAdmin());
+
+        Gate::policy(Announcement::class, AnnouncementPolicy::class);
         Gate::policy(Author::class, AuthorPolicy::class);
         Gate::policy(Book::class, BookPolicy::class);
         Gate::policy(BookCopy::class, BookCopyPolicy::class);
         Gate::policy(Category::class, CategoryPolicy::class);
+        Gate::policy(LibrarySetting::class, LibrarySettingPolicy::class);
         Gate::policy(Loan::class, LoanPolicy::class);
         Gate::policy(LoanRequest::class, LoanRequestPolicy::class);
         Gate::policy(Publisher::class, PublisherPolicy::class);

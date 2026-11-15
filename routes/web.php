@@ -1,13 +1,17 @@
 <?php
 
+use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\BookCopyController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\LibrarySettingController;
 use App\Http\Controllers\Admin\LoanController as AdminLoanController;
 use App\Http\Controllers\Admin\LoanRequestController as AdminLoanRequestController;
 use App\Http\Controllers\Admin\PublisherController;
+use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Borrower\DashboardController as BorrowerDashboardController;
 use App\Http\Controllers\Borrower\LoanController as BorrowerLoanController;
@@ -74,6 +78,29 @@ Route::middleware(['auth', 'active', 'role:admin'])
         Route::get('/history', [AdminLoanController::class, 'history'])->name('loans.history');
         Route::get('/loans/{loan}/return', [AdminLoanController::class, 'returnForm'])->name('loans.return');
         Route::post('/loans/{loan}/return', [AdminLoanController::class, 'returnLoan'])->name('loans.return.store');
+
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/peminjaman', [ReportController::class, 'loans'])->name('reports.loans');
+        Route::get('/reports/pengembalian', [ReportController::class, 'returns'])->name('reports.returns');
+        Route::get('/reports/keterlambatan', [ReportController::class, 'overdue'])->name('reports.overdue');
+        Route::get('/reports/inventaris', [ReportController::class, 'inventory'])->name('reports.inventory');
+        Route::get('/reports/populer', [ReportController::class, 'popular'])->name('reports.popular');
+        Route::get('/reports/{report}/export', [ReportController::class, 'export'])
+            ->whereIn('report', ['ringkasan', 'peminjaman', 'pengembalian', 'keterlambatan', 'inventaris', 'populer'])
+            ->name('reports.export');
+        Route::get('/reports/{report}/print', [ReportController::class, 'print'])
+            ->whereIn('report', ['ringkasan', 'peminjaman', 'pengembalian', 'keterlambatan', 'inventaris', 'populer'])
+            ->name('reports.print');
+
+        Route::resource('users', UserController::class)->except(['show']);
+        Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
+        Route::post('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+
+        Route::get('/settings', [LibrarySettingController::class, 'index'])->name('settings.index');
+        Route::put('/settings', [LibrarySettingController::class, 'update'])->name('settings.update');
+
+        Route::resource('announcements', AnnouncementController::class)->except(['show']);
+        Route::post('/announcements/{announcement}/toggle', [AnnouncementController::class, 'toggle'])->name('announcements.toggle');
     });
 
 Route::middleware(['auth', 'active', 'role:guru,siswa'])
