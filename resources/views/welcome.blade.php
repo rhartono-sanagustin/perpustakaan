@@ -1,8 +1,11 @@
 @extends('layouts.public')
+@inject('identity', 'App\Services\LibraryIdentity')
 
 @section('title', 'Beranda')
 
 @section('content')
+    @include('partials.landing-carousel', ['carouselSlides' => $carouselSlides ?? collect()])
+
     <section class="container-xl py-4 py-lg-5">
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
@@ -11,7 +14,7 @@
                     Temukan buku, ajukan pinjaman, dan pantau koleksi dalam satu tempat.
                 </h1>
                 <p class="lead text-muted mb-4">
-                    {{ config('library.tagline') }} Kelola koleksi, peminjaman, dan laporan perpustakaan
+                    {{ $identity->tagline() }} Kelola koleksi, peminjaman, dan laporan perpustakaan
                     sekolah dengan alur yang jelas dan mudah digunakan.
                 </p>
                 <div class="d-flex flex-wrap gap-2">
@@ -30,10 +33,10 @@
             <div class="col-lg-6">
                 <div class="card p-4">
                     <div class="d-flex align-items-center gap-3 mb-4">
-                        <span class="brand-mark"><i class="bi bi-book-half" aria-hidden="true"></i></span>
+                        <x-library-logo size="md" />
                         <div>
-                            <div class="fw-semibold">{{ config('library.name') }}</div>
-                            <div class="small text-muted">{{ config('library.school_name') }}</div>
+                            <div class="fw-semibold">{{ $identity->libraryName() }}</div>
+                            <div class="small text-muted">{{ $identity->schoolName() }}</div>
                         </div>
                     </div>
 

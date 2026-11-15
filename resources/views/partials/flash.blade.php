@@ -18,7 +18,7 @@
 @endphp
 
 @if (count($flashMessages) > 0)
-    <div class="toast-container position-fixed top-0 end-0 p-3" aria-live="polite" aria-atomic="true">
+    <div class="toast-container position-fixed top-0 end-0 p-3" data-toast-container aria-live="polite" aria-atomic="true">
         @foreach ($flashMessages as $flash)
             @php($isWarning = $flash['variant'] === 'warning')
             <div class="toast align-items-center border-0 text-bg-{{ $flash['variant'] }}" role="alert" aria-live="assertive" aria-atomic="true">

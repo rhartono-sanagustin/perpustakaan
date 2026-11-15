@@ -27,6 +27,30 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        $today = now()->startOfDay();
+        $activityStart = $today->copy()->subDays(6);
+        $activityEnd = $today->copy()->endOfDay();
+
+        $borrowedPerDay = Loan::query()
+            ->whereBetween('borrowed_at', [$activityStart->toDateString(), $activityEnd->toDateString()])
+            ->get(['borrowed_at'])
+            ->countBy(fn (Loan $loan): string => $loan->borrowed_at->toDateString());
+
+        $loanActivity = collect(range(6, 0))
+            ->map(function (int $daysAgo) use ($borrowedPerDay, $today): array {
+                $date = $today->copy()->subDays($daysAgo);
+
+                return [
+                    'date' => $date,
+                    'label' => $date->locale('id')->translatedFormat('D'),
+                    'full_label' => $date->locale('id')->translatedFormat('d M Y'),
+                    'count' => (int) ($borrowedPerDay[$date->toDateString()] ?? 0),
+                ];
+            });
+
+        $activityTotal = (int) $loanActivity->sum('count');
+        $activityMax = max(1, (int) $loanActivity->max('count'));
+
         return view('admin.dashboard', [
             'totalBooks' => Book::active()->count(),
             'availableCopies' => BookCopy::available()->count(),
@@ -39,6 +63,9 @@ class DashboardController extends Controller
             ])->count(),
             'recentRequests' => $recentRequests,
             'overdueLoans' => $overdueLoans,
+            'loanActivity' => $loanActivity,
+            'activityTotal' => $activityTotal,
+            'activityMax' => $activityMax,
         ]);
     }
 }

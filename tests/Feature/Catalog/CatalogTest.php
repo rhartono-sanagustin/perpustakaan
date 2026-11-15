@@ -152,4 +152,24 @@ class CatalogTest extends TestCase
 
         $this->get(route('catalog.show', $book))->assertNotFound();
     }
+
+    public function test_catalog_filters_auto_submit_and_detail_page_offers_share_action(): void
+    {
+        $category = Category::factory()->create(['slug' => 'fiksi']);
+        $book = Book::factory()->create([
+            'category_id' => $category->id,
+            'title' => 'Buku Untuk Dibagikan',
+        ]);
+        BookCopy::factory()->create(['book_id' => $book->id]);
+
+        $index = $this->get(route('catalog.index'));
+
+        $index->assertOk();
+        $this->assertSame(2, substr_count($index->getContent(), 'data-auto-submit'));
+
+        $this->get(route('catalog.show', $book))
+            ->assertOk()
+            ->assertSee('data-share-url="'.route('catalog.show', $book).'"', false)
+            ->assertSee('Bagikan');
+    }
 }

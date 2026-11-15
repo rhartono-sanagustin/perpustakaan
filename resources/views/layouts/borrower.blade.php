@@ -1,21 +1,22 @@
+@inject('identity', 'App\Services\LibraryIdentity')
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Beranda') &mdash; {{ config('library.name') }}</title>
-    <link rel="icon" type="image/svg+xml" href="{{ asset(config('library.logo')) }}">
+    <title>@yield('title', 'Beranda') &mdash; {{ $identity->libraryName() }}</title>
+    <link rel="icon" href="{{ $identity->logoUrl() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg borrower-navbar sticky-top">
         <div class="container-xl">
             <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('borrower.dashboard') }}">
-                <span class="brand-mark brand-mark-sm"><i class="bi bi-book-half" aria-hidden="true"></i></span>
+                <x-library-logo size="sm" />
                 <span class="d-flex flex-column lh-sm">
-                    <span class="fw-semibold">{{ config('library.name') }}</span>
-                    <span class="small text-muted">{{ config('library.school_name') }}</span>
+                    <span class="fw-semibold">{{ $identity->libraryName() }}</span>
+                    <span class="small text-muted">{{ $identity->schoolName() }}</span>
                 </span>
             </a>
 
@@ -51,6 +52,22 @@
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('borrower.profile.*') ? 'active' : '' }}" href="{{ route('borrower.profile.edit') }}">Profil</a>
                         </li>
+                        <li class="nav-item dropdown" data-notifications data-mode="borrower" data-endpoint="{{ route('notifications.status') }}">
+                            <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifikasi">
+                                <i class="bi bi-bell" aria-hidden="true"></i>
+                                <span class="d-lg-none ms-1">Notifikasi</span>
+                                <span class="badge rounded-pill text-bg-danger d-none ms-1" data-notification-badge>0</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end notification-dropdown">
+                                <div class="notification-header">
+                                    <span class="fw-semibold">Notifikasi</span>
+                                </div>
+                                <div class="notification-body" data-notification-body>
+                                    <div class="notification-empty">Memuat notifikasi...</div>
+                                </div>
+                                <div class="notification-footer" data-notification-updated></div>
+                            </div>
+                        </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-person-circle" aria-hidden="true"></i>
@@ -85,8 +102,8 @@
 
     <footer class="border-top bg-white py-3 mt-auto">
         <div class="container-xl d-flex flex-column flex-sm-row justify-content-between gap-2 small text-muted">
-            <span>&copy; {{ date('Y') }} {{ config('library.school_name') }}</span>
-            <span>{{ config('library.name') }}</span>
+            <span>&copy; {{ date('Y') }} {{ $identity->schoolName() }}</span>
+            <span>{{ $identity->libraryName() }}</span>
         </div>
     </footer>
 

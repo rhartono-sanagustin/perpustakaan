@@ -127,6 +127,16 @@
                             Anda dapat melihat katalog tanpa login. Pengajuan pinjaman memerlukan akun guru atau siswa yang aktif.
                         </div>
                     @endauth
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-secondary btn-lg"
+                        data-share-url="{{ route('catalog.show', $book) }}"
+                        data-share-title="{{ $book->title }}"
+                        data-share-text="Lihat buku {{ $book->title }} di katalog perpustakaan."
+                    >
+                        <i class="bi bi-share me-2" aria-hidden="true"></i>Bagikan
+                    </button>
                 </div>
             </div>
         </div>

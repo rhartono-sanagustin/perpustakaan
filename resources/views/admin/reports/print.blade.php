@@ -1,13 +1,17 @@
 @extends('layouts.print')
+@inject('identity', 'App\Services\LibraryIdentity')
 
 @section('title', $data['title'])
 
 @section('content')
     <header class="print-header">
-        <div>
-            <div class="print-brand">{{ config('library.name') }}</div>
-            <div class="print-school">{{ config('library.school_name') }}</div>
-            <div class="print-tagline">{{ config('library.tagline') }}</div>
+        <div class="d-flex align-items-center gap-3">
+            <img src="{{ $identity->logoUrl() }}" alt="" class="print-logo">
+            <div>
+                <div class="print-brand">{{ $identity->libraryName() }}</div>
+                <div class="print-school">{{ $identity->schoolName() }}</div>
+                <div class="print-tagline">{{ $identity->tagline() }}</div>
+            </div>
         </div>
         <div class="print-info">
             <div>Dicetak: {{ $printedAt->locale('id')->translatedFormat('d F Y, H:i') }}</div>
@@ -271,11 +275,11 @@
 
     <footer class="print-footer">
         <div class="print-footer-note">
-            Dokumen ini dihasilkan otomatis oleh {{ config('library.name') }} pada
+            Dokumen ini dihasilkan otomatis oleh {{ $identity->libraryName() }} pada
             {{ $printedAt->locale('id')->translatedFormat('d F Y, H:i') }}.
         </div>
         <div class="print-signature">
-            <div>{{ config('library.school_name') }}, {{ $printedAt->locale('id')->translatedFormat('d F Y') }}</div>
+            <div>{{ $identity->schoolName() }}, {{ $printedAt->locale('id')->translatedFormat('d F Y') }}</div>
             <div>Petugas Perpustakaan</div>
             <div class="print-signature-space"></div>
             <div class="print-signature-name">{{ auth()->user()->name }}</div>

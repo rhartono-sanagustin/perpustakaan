@@ -4,8 +4,10 @@ use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\BookCopyController;
+use App\Http\Controllers\Admin\CarouselSlideController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\LibraryIdentityController;
 use App\Http\Controllers\Admin\LibrarySettingController;
 use App\Http\Controllers\Admin\LoanController as AdminLoanController;
 use App\Http\Controllers\Admin\LoanRequestController as AdminLoanRequestController;
@@ -19,13 +21,11 @@ use App\Http\Controllers\Borrower\LoanRequestController as BorrowerLoanRequestCo
 use App\Http\Controllers\Borrower\ProfileController as BorrowerProfileController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return auth()->check()
-        ? redirect()->route('dashboard')
-        : view('welcome');
-})->name('home');
+Route::get('/', HomeController::class)->name('home');
 
 Route::get('/katalog', [CatalogController::class, 'index'])->name('catalog.index');
 Route::get('/katalog/{book:slug}', [CatalogController::class, 'show'])->name('catalog.show');
@@ -48,6 +48,10 @@ Route::middleware(['auth', 'active', 'role:admin'])
     ->name('admin.')
     ->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+        Route::get('/notifications', [NotificationController::class, 'admin'])
+            ->middleware('throttle:60,1')
+            ->name('notifications');
 
         Route::get('/copies', [BookCopyController::class, 'all'])->name('copies.index');
 
@@ -99,12 +103,28 @@ Route::middleware(['auth', 'active', 'role:admin'])
         Route::get('/settings', [LibrarySettingController::class, 'index'])->name('settings.index');
         Route::put('/settings', [LibrarySettingController::class, 'update'])->name('settings.update');
 
+        Route::get('/settings/identity', [LibraryIdentityController::class, 'edit'])->name('settings.identity.edit');
+        Route::put('/settings/identity', [LibraryIdentityController::class, 'update'])->name('settings.identity.update');
+
+        Route::get('/settings/carousel', [CarouselSlideController::class, 'index'])->name('settings.carousel.index');
+        Route::get('/settings/carousel/create', [CarouselSlideController::class, 'create'])->name('settings.carousel.create');
+        Route::post('/settings/carousel', [CarouselSlideController::class, 'store'])->name('settings.carousel.store');
+        Route::get('/settings/carousel/{slide}/edit', [CarouselSlideController::class, 'edit'])->name('settings.carousel.edit');
+        Route::put('/settings/carousel/{slide}', [CarouselSlideController::class, 'update'])->name('settings.carousel.update');
+        Route::delete('/settings/carousel/{slide}', [CarouselSlideController::class, 'destroy'])->name('settings.carousel.destroy');
+        Route::post('/settings/carousel/{slide}/toggle', [CarouselSlideController::class, 'toggle'])->name('settings.carousel.toggle');
+        Route::post('/settings/carousel/{slide}/move', [CarouselSlideController::class, 'move'])->name('settings.carousel.move');
+
         Route::resource('announcements', AnnouncementController::class)->except(['show']);
         Route::post('/announcements/{announcement}/toggle', [AnnouncementController::class, 'toggle'])->name('announcements.toggle');
     });
 
 Route::middleware(['auth', 'active', 'role:guru,siswa'])
     ->group(function () {
+        Route::get('/notifications', [NotificationController::class, 'borrower'])
+            ->middleware('throttle:60,1')
+            ->name('notifications.status');
+
         Route::get('/beranda', [BorrowerDashboardController::class, 'index'])->name('borrower.dashboard');
 
         Route::get('/pinjaman', [BorrowerLoanController::class, 'index'])->name('borrower.loans.index');

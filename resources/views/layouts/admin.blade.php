@@ -1,11 +1,12 @@
+@inject('identity', 'App\Services\LibraryIdentity')
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Admin') &mdash; {{ config('library.name') }}</title>
-    <link rel="icon" type="image/svg+xml" href="{{ asset(config('library.logo')) }}">
+    <title>@yield('title', 'Admin') &mdash; {{ $identity->libraryName() }}</title>
+    <link rel="icon" href="{{ $identity->logoUrl() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
@@ -17,10 +18,10 @@
             </div>
             <div class="offcanvas-body d-flex flex-column">
                 <a href="{{ route('admin.dashboard') }}" class="sidebar-brand">
-                    <span class="brand-mark brand-mark-sm"><i class="bi bi-book-half" aria-hidden="true"></i></span>
+                    <x-library-logo size="sm" />
                     <span class="d-flex flex-column lh-sm min-w-0">
-                        <span class="fw-semibold text-truncate">{{ config('library.name') }}</span>
-                        <span class="small text-muted text-truncate">{{ config('library.school_name') }}</span>
+                        <span class="fw-semibold text-truncate">{{ $identity->libraryName() }}</span>
+                        <span class="small text-muted text-truncate">{{ $identity->schoolName() }}</span>
                     </span>
                 </a>
 
@@ -119,6 +120,25 @@
                     </nav>
                 </div>
 
+                <div class="dropdown" data-notifications data-mode="admin" data-endpoint="{{ route('admin.notifications') }}">
+                    <button class="btn btn-light border position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifikasi">
+                        <i class="bi bi-bell" aria-hidden="true"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger d-none" data-notification-badge>0</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end notification-dropdown">
+                        <div class="notification-header">
+                            <span class="fw-semibold">Notifikasi</span>
+                            <button type="button" class="btn btn-sm btn-link text-decoration-none p-0" data-notification-sound aria-pressed="true" aria-label="Matikan suara notifikasi">
+                                <i class="bi bi-volume-up" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="notification-body" data-notification-body>
+                            <div class="notification-empty">Memuat notifikasi...</div>
+                        </div>
+                        <div class="notification-footer" data-notification-updated></div>
+                    </div>
+                </div>
+
                 <div class="dropdown">
                     <button class="btn btn-light border dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-person-circle" aria-hidden="true"></i>
@@ -148,7 +168,7 @@
             </main>
 
             <footer class="px-3 px-lg-4 py-3 small text-muted border-top bg-white">
-                {{ config('library.name') }} &mdash; {{ config('library.school_name') }}
+                {{ $identity->libraryName() }} &mdash; {{ $identity->schoolName() }}
             </footer>
         </div>
     </div>

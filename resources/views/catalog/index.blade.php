@@ -35,7 +35,7 @@
 
                     <div class="col-12 col-sm-6 col-lg-3">
                         <label for="category" class="form-label">Kategori</label>
-                        <select id="category" name="category" class="form-select">
+                        <select id="category" name="category" class="form-select" data-auto-submit>
                             <option value="">Semua kategori</option>
                             @foreach ($categories as $category)
                                 <option value="{{ $category->slug }}" @selected($categorySlug === $category->slug)>
@@ -47,7 +47,7 @@
 
                     <div class="col-12 col-sm-6 col-lg-2">
                         <label for="availability" class="form-label">Ketersediaan</label>
-                        <select id="availability" name="availability" class="form-select">
+                        <select id="availability" name="availability" class="form-select" data-auto-submit>
                             <option value="">Semua</option>
                             <option value="tersedia" @selected($availability === 'tersedia')>Tersedia</option>
                             <option value="habis" @selected($availability === 'habis')>Tidak tersedia</option>

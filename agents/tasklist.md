@@ -1,8 +1,8 @@
 # Tasklist — Sistem Informasi Perpustakaan Sekolah
 
-**Terakhir diperbarui:** 11 November 2026  
-**Progress keseluruhan:** 87% (106 dari 122 task)  
-**Fase saat ini:** Fase 4 — Laporan & Manajemen (selesai; siap direview)
+**Terakhir diperbarui:** 15 November 2026  
+**Progress keseluruhan:** 95% (126 dari 132 task)  
+**Fase saat ini:** Fase 6 — Fitur Realtime & Interaksi (selesai; siap direview)
 
 > Catatan: progress dihitung dari jumlah checklist task, bukan estimasi jam kerja.
 > Setiap task selesai ditandai `[x] ✅` dan diberi catatan file yang dibuat/diubah.
@@ -142,7 +142,9 @@
 - [x] ✅ Task 4.15 - CRUD pesan sistem/announcement `[Sedang]` (Selesai)
   - File: `app/Http/Controllers/Admin/AnnouncementController.php`, `app/Http/Requests/Admin/AnnouncementRequest.php`, `resources/views/admin/announcements/*.blade.php`, `resources/views/borrower/dashboard.blade.php`, `routes/web.php`
   - Catatan: isi pengumuman berupa teks biasa yang di-escape saat ditampilkan; hanya pengumuman aktif, sudah terbit, dan sesuai audiens yang tampil di dashboard (maksimal tiga).
-- [ ] Task 4.16 - Endpoint polling notifikasi admin dan peminjam
+- [x] ✅ Task 4.16 - Endpoint polling notifikasi admin dan peminjam (Selesai)
+  - File: `app/Http/Controllers/NotificationController.php`, `routes/web.php`, `tests/Feature/NotificationTest.php`
+  - Catatan: endpoint JSON ringan untuk admin dan peminjam, dilindungi `auth`, `active`, `role`, dan `throttle:60,1`. Data diturunkan dari `loan_requests` dan `loans` tanpa tabel notifikasi baru; peminjam hanya menerima data miliknya.
 
 ---
 
@@ -245,13 +247,27 @@
 - [x] ✅ Task 7.5 - Modal konfirmasi reusable (Selesai)
   - File: `resources/views/partials/confirm-modal.blade.php`, `resources/js/app.js`, `resources/views/layouts/admin.blade.php`, `resources/views/layouts/borrower.blade.php`, `resources/views/layouts/public.blade.php`
   - Catatan: form `data-confirm` memakai modal Bootstrap; tombol loading tidak dinonaktifkan saat pengguna membatalkan konfirmasi.
-- [ ] Task 7.6 - Share detail buku (Web Share API + clipboard)
-- [ ] Task 7.7 - Polling notifikasi admin
-- [ ] Task 7.8 - Polling status pinjaman peminjam
-- [ ] Task 7.9 - Sound notification untuk permintaan baru
-- [ ] Task 7.10 - Filter katalog auto-submit
-- [ ] Task 7.11 - Grafik aktivitas dashboard
-- [ ] Task 7.12 - Dukungan `prefers-reduced-motion`
+- [x] ✅ Task 7.6 - Share detail buku (Web Share API + clipboard) (Selesai)
+  - File: `resources/js/share.js`, `resources/js/app.js`, `resources/js/toast.js`, `resources/views/catalog/show.blade.php`, `tests/Feature/Catalog/CatalogTest.php`
+  - Catatan: memakai Web Share API bila tersedia; fallback menyalin tautan ke clipboard lalu menampilkan toast “Tautan buku berhasil disalin.” Tombol tersedia untuk tamu maupun pengguna login.
+- [x] ✅ Task 7.7 - Polling notifikasi admin (Selesai)
+  - File: `resources/js/notifications.js`, `resources/js/toast.js`, `resources/views/layouts/admin.blade.php`, `resources/css/app.css`, `app/Http/Controllers/NotificationController.php`, `routes/web.php`
+  - Catatan: polling setiap 30 detik, berhenti saat tab tidak aktif, badge dan dropdown ringkasan permintaan menunggu/pinjaman terlambat; endpoint dibatasi role admin.
+- [x] ✅ Task 7.8 - Polling status pinjaman peminjam (Selesai)
+  - File: `resources/js/notifications.js`, `resources/views/layouts/borrower.blade.php`, `resources/css/app.css`, `app/Http/Controllers/NotificationController.php`, `routes/web.php`
+  - Catatan: hanya mengambil pengajuan dan pinjaman milik pengguna login; perubahan status pengajuan memunculkan toast otomatis dan badge memperbarui jumlah pengajuan menunggu/pinjaman terlambat.
+- [x] ✅ Task 7.9 - Sound notification untuk permintaan baru (Selesai)
+  - File: `resources/js/notifications.js`, `resources/views/layouts/admin.blade.php`
+  - Catatan: chime Web Audio API tanpa file audio; berbunyi hanya saat `latest_request_id` naik setelah polling pertama. Tombol mute/unmute tersimpan di `localStorage` dan audio diaktifkan setelah interaksi pertama pengguna.
+- [x] ✅ Task 7.10 - Filter katalog auto-submit (Selesai)
+  - File: `resources/views/catalog/index.blade.php`, `resources/js/app.js`, `tests/Feature/Catalog/CatalogTest.php`
+  - Catatan: select kategori dan ketersediaan memakai `data-auto-submit`; pencarian teks tetap dikirim lewat tombol/Enter agar tidak membanjiri server.
+- [x] ✅ Task 7.11 - Grafik aktivitas dashboard (Selesai)
+  - File: `app/Http/Controllers/Admin/DashboardController.php`, `resources/views/admin/dashboard.blade.php`, `resources/css/app.css`, `tests/Feature/Admin/DashboardTest.php`
+  - Catatan: grafik batang HTML/CSS tujuh hari terakhir dari agregasi `borrowed_at`, tanpa Chart.js; tersedia tabel alternatif untuk pembaca layar dan empty state bila belum ada transaksi.
+- [x] ✅ Task 7.12 - Dukungan `prefers-reduced-motion` (Selesai)
+  - File: `resources/css/app.css`
+  - Catatan: aturan global mematikan animasi/transisi dan smooth scroll saat pengguna meminta pengurangan gerak, melengkapi perilaku carousel yang sudah ada.
 
 ---
 
@@ -259,8 +275,12 @@
 
 - [x] ✅ Task 8.1 - Toast notifikasi sukses/gagal/info `[Mudah]` (Selesai)
   - File: `resources/views/partials/flash.blade.php`, `resources/js/app.js`
-- [ ] Task 8.2 - Sound notification permintaan peminjaman baru
-- [ ] Task 8.3 - Share detail buku
+- [x] ✅ Task 8.2 - Sound notification permintaan peminjaman baru (Selesai)
+  - File: `resources/js/notifications.js`, `resources/views/layouts/admin.blade.php`
+  - Catatan: nada singkat dua oktaf memakai Web Audio API; status mute disimpan di `localStorage` dan tombol suara tersedia di dropdown notifikasi admin.
+- [x] ✅ Task 8.3 - Share detail buku (Selesai)
+  - File: `resources/js/share.js`, `resources/js/app.js`, `resources/views/catalog/show.blade.php`
+  - Catatan: tombol “Bagikan” memakai Web Share API atau clipboard, dengan toast sukses dan fallback prompt bila clipboard tidak tersedia.
 - [x] ✅ Task 8.4 - Pesan sistem/announcement di dashboard peminjam `[Mudah]` (Selesai)
   - File: `resources/views/borrower/dashboard.blade.php`, `app/Http/Controllers/Borrower/DashboardController.php`
   - Catatan: maksimal tiga pengumuman aktif sesuai peran, dengan judul, isi, waktu terbit, dan nama pembuat.
@@ -321,6 +341,41 @@
 - [ ] Task 10.10 - Dokumentasi setup dan akun demo
 - [ ] Task 10.11 - Perbaikan bug hasil review
 - [ ] Task 10.12 - Checklist UAT akhir
+
+---
+
+## 11. Fase 5 — Identitas Sekolah & Carousel Beranda
+
+- [x] ✅ Task 11.1 - Layanan identitas sekolah berbasis database dengan fallback konfigurasi `[Sedang]` (Selesai)
+  - File: `app/Services/LibraryIdentity.php`, `config/library.php`, `app/Providers/AppServiceProvider.php`
+  - Catatan: kunci `school_name`, `library_name`, `tagline`, dan `logo_path` disimpan di `library_settings`; nilai `config/library.php` tetap menjadi fallback. Layanan didaftarkan sebagai singleton dan cache-nya dibersihkan setelah perubahan.
+- [x] ✅ Task 11.2 - Halaman pengaturan identitas sekolah dan validasi server-side `[Sedang]` (Selesai)
+  - File: `app/Http/Controllers/Admin/LibraryIdentityController.php`, `app/Http/Requests/Admin/UpdateLibraryIdentityRequest.php`, `resources/views/admin/settings/identity.blade.php`, `resources/views/admin/settings/_updated-at.blade.php`, `routes/web.php`
+  - Catatan: hanya admin; perubahan dicatat per kunci ke audit log dan nilai yang tidak berubah tidak diaudit.
+- [x] ✅ Task 11.3 - Unggah dan hapus logo sekolah dengan pembersihan file `[Sedang]` (Selesai)
+  - File: `app/Http/Controllers/Admin/LibraryIdentityController.php`, `app/Http/Requests/Admin/UpdateLibraryIdentityRequest.php`, `resources/views/components/library-logo.blade.php`, `resources/css/app.css`
+  - Catatan: JPG/PNG/WEBP maksimal 1 MB, SVG ditolak; logo lama dihapus saat diganti atau direset, dan file baru dibersihkan bila transaksi gagal.
+- [x] ✅ Task 11.4 - Terapkan identitas dan logo pada seluruh layout aplikasi `[Sedang]` (Selesai)
+  - File: `resources/views/layouts/admin.blade.php`, `resources/views/layouts/auth.blade.php`, `resources/views/layouts/public.blade.php`, `resources/views/layouts/borrower.blade.php`, `resources/views/layouts/print.blade.php`, `resources/views/errors/minimal.blade.php`, `resources/views/welcome.blade.php`, `resources/views/admin/reports/print.blade.php`
+  - Catatan: sidebar admin, halaman login, navbar publik/peminjam, footer, favicon, halaman cetak, dan halaman error memakai identitas yang sama.
+- [x] ✅ Task 11.5 - Skema, model, factory, dan policy carousel slide `[Sedang]` (Selesai)
+  - File: `database/migrations/2026_11_15_000001_create_carousel_slides_table.php`, `app/Models/CarouselSlide.php`, `database/factories/CarouselSlideFactory.php`, `app/Policies/CarouselSlidePolicy.php`, `app/Providers/AppServiceProvider.php`
+  - Catatan: kolom judul, keterangan, teks alternatif, path gambar, tautan, urutan, dan status aktif; scope `active()` dan `ordered()`; akses policy hanya admin.
+- [x] ✅ Task 11.6 - CRUD slide carousel di pengaturan admin `[Sedang]` (Selesai)
+  - File: `app/Http/Controllers/Admin/CarouselSlideController.php`, `app/Http/Requests/Admin/CarouselSlideRequest.php`, `resources/views/admin/settings/carousel/index.blade.php`, `resources/views/admin/settings/carousel/form.blade.php`, `routes/web.php`
+  - Catatan: gambar JPG/PNG/WEBP maksimal 2 MB; tautan hanya path internal `/...` atau URL http/https; gambar lama dihapus saat diganti/dihapus.
+- [x] ✅ Task 11.7 - Aktif/nonaktif, batas lima slide aktif, dan pengurutan slide `[Sedang]` (Selesai)
+  - File: `app/Http/Controllers/Admin/CarouselSlideController.php`, `resources/views/admin/settings/carousel/index.blade.php`, `config/library.php`
+  - Catatan: maksimal 5 slide aktif; tombol naik/turun menukar posisi dan menomori ulang urutan dalam transaksi database.
+- [x] ✅ Task 11.8 - Komponen carousel landing page dan empty state `[Sedang]` (Selesai)
+  - File: `app/Http/Controllers/HomeController.php`, `resources/views/partials/landing-carousel.blade.php`, `resources/views/welcome.blade.php`, `resources/css/app.css`, `routes/web.php`
+  - Catatan: hanya slide aktif yang tampil, berurutan; tautan eksternal memakai `target="_blank"` + `rel="noopener noreferrer"`; carousel disembunyikan bila tidak ada slide aktif.
+- [x] ✅ Task 11.9 - Auto-play, tombol jeda/putar, dan dukungan `prefers-reduced-motion` `[Sedang]` (Selesai)
+  - File: `resources/js/app.js`, `resources/css/app.css`, `resources/views/partials/landing-carousel.blade.php`
+  - Catatan: interval 6 detik, kontrol jeda/putar tersedia, dan animasi dimatikan otomatis saat pengguna meminta pengurangan gerak.
+- [x] ✅ Task 11.10 - Test fitur identitas, carousel, dan landing page `[Sedang]` (Selesai)
+  - File: `tests/Feature/Admin/LibraryIdentityTest.php`, `tests/Feature/Admin/CarouselSlideTest.php`, `tests/Feature/LandingCarouselTest.php`
+  - Catatan: 29 test mencakup otorisasi, validasi, unggah/ganti/hapus file, audit, batas slide aktif, pengurutan, escaping, tautan eksternal/internal, empty state, dan redirect pengguna login.
 
 ---
 
@@ -418,3 +473,69 @@
   - Isi pengumuman selalu di-escape; tidak ada HTML mentah yang dirender.
   - Ekspor CSV melindungi sel dari eksekusi formula saat dibuka di aplikasi spreadsheet.
 - Ditunda: polling notifikasi admin/peminjam, sound notification, share detail buku, auto-submit filter katalog, grafik dashboard, dukungan `prefers-reduced-motion`, checkout langsung tanpa pengajuan, perpanjangan pinjaman, denda, QA responsif/aksesibilitas menyeluruh, dokumentasi setup/UAT, dan test E2E satu alur penuh (Task 10.3).
+
+---
+
+## Catatan Fase 5
+
+- Fase 5 (identitas sekolah & carousel beranda) selesai dan siap direview sebelum masuk fitur realtime dan final polish.
+- Perintah verifikasi yang sudah dijalankan:
+  - `php artisan migrate --force` — migration `carousel_slides` diterapkan ke database dev.
+  - `php artisan test` — 139 test lulus, 773 assertion (29 test baru untuk Fase 5).
+  - `php artisan view:cache` — seluruh Blade berhasil dikompilasi.
+  - `npm run build` — berhasil.
+  - `php vendor/bin/pint --dirty` — berhasil (satu import tidak terpakai dirapikan).
+  - `php artisan route:list --path=admin/settings` — route identitas dan carousel terdaftar.
+  - Smoke test HTTP: `/`, `/login`, `/admin/settings/identity`, dan `/admin/settings/carousel` merespons normal.
+  - QA visual dengan Chrome headless pada 1440 px dan 390 px; slide contoh sementara dibuat untuk pratinjau lalu dihapus kembali.
+- Cakupan Fase 5:
+  - Identitas sekolah (nama sekolah, nama perpustakaan, tagline, logo) dapat diubah admin dan langsung dipakai di sidebar admin, login, navbar publik/peminjam, footer, favicon, halaman cetak, dan halaman error.
+  - Logo kustom disimpan di disk `public`; logo bawaan dipakai kembali saat logo kustom dihapus.
+  - Carousel landing page dikelola dari tab **Carousel Beranda**: tambah, edit, hapus, aktif/nonaktif, dan ubah urutan.
+  - Maksimal lima slide aktif; slide nonaktif tetap tersimpan tetapi tidak tampil di beranda.
+  - Carousel otomatis berganti setiap 6 detik, memiliki tombol jeda/putar, indikator, kontrol sebelumnya/berikutnya, serta menghormati `prefers-reduced-motion`.
+  - Tautan slide mendukung path internal dan URL eksternal; tautan eksternal dibuka di tab baru dengan `rel="noopener noreferrer"`.
+  - Bila belum ada slide aktif, area carousel tidak dirender sehingga landing page tetap rapi.
+- Aturan keamanan dan integritas yang diterapkan:
+  - Seluruh route pengaturan identitas dan carousel hanya untuk admin, dijaga middleware `role:admin`, policy, dan `authorize()` di controller.
+  - Validasi tipe file, MIME, dan ukuran; SVG ditolak untuk logo maupun gambar carousel.
+  - Judul, keterangan, teks alternatif, dan tautan di-escape saat dirender; skema tautan dibatasi `/`, `http`, dan `https`.
+  - Perubahan identitas dan seluruh aksi carousel dicatat ke audit log; file gambar lama dibersihkan saat diganti atau dihapus.
+  - Batas slide aktif diperiksa di server, bukan hanya di tampilan.
+- Catatan teknis:
+  - Kunci identitas memakai tabel `library_settings` yang sudah ada, sehingga tidak menambah tabel baru khusus identitas.
+  - Carousel memakai tabel `carousel_slides` tersendiri agar urutan, status, dan file gambar dapat dikelola per slide.
+  - Tab pengaturan menyatukan **Identitas Sekolah**, **Kebijakan Sirkulasi**, dan **Carousel Beranda** tanpa mengubah test pengaturan sirkulasi yang sudah ada.
+- Ditunda: pemotongan/resize gambar otomatis, pengurutan drag-and-drop, batas dimensi gambar, dukungan `prefers-reduced-motion` menyeluruh di luar carousel (Task 7.12), polling notifikasi, sound notification, share detail buku, grafik dashboard, dokumentasi setup/UAT, dan test E2E satu alur penuh (Task 10.3).
+
+---
+
+## Catatan Fase 6
+
+- Fase 6 (fitur realtime & interaksi) selesai dan siap direview sebelum finalisasi MVP.
+- Perintah verifikasi yang sudah dijalankan:
+  - `php artisan test` — 147 test lulus, 846 assertion (8 test baru: 5 notifikasi, 2 dashboard, 1 katalog/share).
+  - `php artisan view:cache` — seluruh Blade berhasil dikompilasi.
+  - `npm run build` — berhasil (63 modul).
+  - `php vendor/bin/pint --dirty` — berhasil.
+  - QA visual Chrome headless pada 1440 px dan 390 px untuk dashboard, dropdown notifikasi admin/peminjam, filter katalog, tombol share, dan toast; tanpa error console.
+- Cakupan Fase 6:
+  - Notifikasi admin dan peminjam memakai polling 30 detik; badge dan dropdown diperbarui tanpa reload.
+  - Polling berhenti saat tab tidak aktif dan langsung menyegarkan saat tab kembali terlihat.
+  - Admin menerima ringkasan permintaan menunggu, pinjaman terlambat, dan permintaan terbaru; peminjam menerima status pengajuan serta pinjaman miliknya.
+  - Perubahan status pengajuan peminjam memunculkan toast otomatis.
+  - Sound notification admin memakai Web Audio API, dengan tombol mute yang tersimpan di `localStorage`.
+  - Tombol bagikan pada detail buku memakai Web Share API, fallback clipboard, dan toast sukses.
+  - Filter kategori/ketersediaan katalog langsung mengirim form saat berubah; pencarian teks tetap manual.
+  - Dashboard admin menampilkan grafik batang aktivitas peminjaman tujuh hari terakhir dengan tabel alternatif untuk pembaca layar dan empty state.
+  - Aturan global `prefers-reduced-motion` mematikan animasi/transisi serta smooth scroll.
+- Aturan keamanan dan integritas:
+  - Endpoint notifikasi dilindungi `auth`, `active`, `role`, dan `throttle:60,1`.
+  - Peminjam hanya menerima data miliknya sendiri; tidak ada data pengguna lain di respons JSON.
+  - Tidak ada tabel notifikasi baru; seluruh angka diturunkan dari data transaksi nyata.
+  - Sound hanya dipicu oleh `latest_request_id` yang meningkat setelah polling pertama, bukan setiap polling.
+- Catatan teknis:
+  - `resources/js/notifications.js` menangani polling, badge, dropdown, toast perubahan status, dan chime; `resources/js/toast.js` menyediakan toast dinamis; `resources/js/share.js` menangani share/clipboard.
+  - Grafik memakai HTML/CSS tanpa Chart.js; data agregasi dihitung portabel di PHP agar tidak bergantung fungsi tanggal MySQL.
+  - Data contoh pinjaman untuk QA grafik dibuat sementara lalu dihapus kembali setelah pengujian.
+- Ditunda ke Fase 7: test E2E satu alur MVP, QA responsif 360/768/1024 px dan aksesibilitas menyeluruh, dokumentasi setup/akun demo, checklist UAT, perbaikan bug hasil review, serta opsional checkout langsung oleh admin (FR-LOAN-10).
