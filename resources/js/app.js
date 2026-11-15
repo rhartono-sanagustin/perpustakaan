@@ -1,4 +1,6 @@
 import * as bootstrap from 'bootstrap';
+import { initNotifications } from './notifications';
+import { initShareButtons } from './share';
 
 window.bootstrap = bootstrap;
 
@@ -129,6 +131,69 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!window.closed) {
                 window.history.back();
             }
+        });
+    });
+
+    document.querySelectorAll('[data-auto-submit]').forEach((field) => {
+        field.addEventListener('change', () => {
+            const form = field.closest('form');
+
+            if (!form) {
+                return;
+            }
+
+            if (typeof form.requestSubmit === 'function') {
+                form.requestSubmit();
+            } else {
+                form.submit();
+            }
+        });
+    });
+
+    initShareButtons();
+    initNotifications();
+
+    document.querySelectorAll('[data-carousel]').forEach((carouselElement) => {
+        const carousel = bootstrap.Carousel.getOrCreateInstance(carouselElement, {
+            interval: Number(carouselElement.dataset.interval) || 6000,
+            ride: false,
+            pause: false,
+        });
+
+        const pauseButton = carouselElement.querySelector('[data-carousel-toggle]');
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let paused = prefersReducedMotion;
+
+        const updatePauseButton = () => {
+            if (!pauseButton) {
+                return;
+            }
+
+            pauseButton.hidden = false;
+            pauseButton.setAttribute('aria-label', paused ? 'Putar carousel' : 'Jeda carousel');
+            pauseButton.innerHTML = paused
+                ? '<i class="bi bi-play-fill" aria-hidden="true"></i>'
+                : '<i class="bi bi-pause-fill" aria-hidden="true"></i>';
+        };
+
+        if (paused) {
+            carousel.pause();
+        } else {
+            carousel.cycle();
+        }
+
+        updatePauseButton();
+
+        pauseButton?.addEventListener('click', () => {
+            paused = !paused;
+
+            if (paused) {
+                carousel.pause();
+            } else {
+                carousel.cycle();
+            }
+
+            updatePauseButton();
         });
     });
 });

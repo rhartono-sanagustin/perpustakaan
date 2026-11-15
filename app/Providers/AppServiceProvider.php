@@ -6,6 +6,7 @@ use App\Models\Announcement;
 use App\Models\Author;
 use App\Models\Book;
 use App\Models\BookCopy;
+use App\Models\CarouselSlide;
 use App\Models\Category;
 use App\Models\LibrarySetting;
 use App\Models\Loan;
@@ -16,12 +17,14 @@ use App\Policies\AnnouncementPolicy;
 use App\Policies\AuthorPolicy;
 use App\Policies\BookCopyPolicy;
 use App\Policies\BookPolicy;
+use App\Policies\CarouselSlidePolicy;
 use App\Policies\CategoryPolicy;
 use App\Policies\LibrarySettingPolicy;
 use App\Policies\LoanPolicy;
 use App\Policies\LoanRequestPolicy;
 use App\Policies\PublisherPolicy;
 use App\Policies\UserPolicy;
+use App\Services\LibraryIdentity;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
@@ -34,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(LibraryIdentity::class);
     }
 
     /**
@@ -52,6 +55,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Author::class, AuthorPolicy::class);
         Gate::policy(Book::class, BookPolicy::class);
         Gate::policy(BookCopy::class, BookCopyPolicy::class);
+        Gate::policy(CarouselSlide::class, CarouselSlidePolicy::class);
         Gate::policy(Category::class, CategoryPolicy::class);
         Gate::policy(LibrarySetting::class, LibrarySettingPolicy::class);
         Gate::policy(Loan::class, LoanPolicy::class);

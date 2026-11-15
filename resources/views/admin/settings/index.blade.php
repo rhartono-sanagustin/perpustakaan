@@ -9,6 +9,8 @@
         subtitle="Atur kuota, durasi peminjaman, dan batas pengambilan buku."
     />
 
+    @include('admin.settings._nav')
+
     <div class="alert alert-info d-flex align-items-start gap-2" role="status">
         <i class="bi bi-info-circle mt-1" aria-hidden="true"></i>
         <div>

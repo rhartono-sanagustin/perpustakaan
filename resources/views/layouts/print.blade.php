@@ -1,10 +1,11 @@
+@inject('identity', 'App\Services\LibraryIdentity')
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Cetak Laporan') &mdash; {{ config('library.name') }}</title>
-    <link rel="icon" type="image/svg+xml" href="{{ asset(config('library.logo')) }}">
+    <title>@yield('title', 'Cetak Laporan') &mdash; {{ $identity->libraryName() }}</title>
+    <link rel="icon" href="{{ $identity->logoUrl() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         @page {

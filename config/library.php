@@ -6,8 +6,8 @@ return [
     | Identitas Perpustakaan
     |--------------------------------------------------------------------------
     |
-    | Nilai ini dipakai pada layout, halaman login, laporan, dan halaman cetak.
-    | Ubah melalui .env tanpa perlu mengubah kode Blade.
+    | Nilai ini dipakai sebagai fallback pada layout, halaman login, laporan,
+    | dan halaman cetak. Admin dapat menimpanya melalui pengaturan identitas.
     |
     */
 
@@ -90,5 +90,62 @@ return [
             'max' => 30,
             'suffix' => 'hari',
         ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Identitas Sekolah yang Dapat Diubah Admin
+    |--------------------------------------------------------------------------
+    |
+    | Nilai awal tetap memakai kunci identitas di atas. Baris library_settings
+    | dengan key yang sama akan menimpa nilai awal tersebut.
+    |
+    */
+
+    'identity_definitions' => [
+        'school_name' => [
+            'label' => 'Nama sekolah',
+            'description' => 'Nama sekolah yang tampil di sidebar, halaman login, dan halaman publik.',
+            'max' => 120,
+        ],
+        'library_name' => [
+            'label' => 'Nama perpustakaan',
+            'description' => 'Nama perpustakaan yang tampil sebagai judul utama.',
+            'max' => 100,
+        ],
+        'tagline' => [
+            'label' => 'Tagline',
+            'description' => 'Kalimat singkat yang tampil di landing page dan header cetak.',
+            'max' => 160,
+        ],
+        'logo_path' => [
+            'label' => 'Logo sekolah',
+            'description' => 'Unggah logo JPG, PNG, atau WEBP. Kosongkan untuk memakai logo bawaan.',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Penyimpanan Logo
+    |--------------------------------------------------------------------------
+    */
+
+    'branding' => [
+        'logo_max_kb' => 1024,
+        'disk' => 'public',
+        'path' => 'branding',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Carousel Landing Page
+    |--------------------------------------------------------------------------
+    */
+
+    'carousel' => [
+        'max_active' => 5,
+        'image_max_kb' => 2048,
+        'disk' => 'public',
+        'path' => 'carousel',
     ],
 ];

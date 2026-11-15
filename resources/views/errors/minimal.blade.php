@@ -1,10 +1,11 @@
+@inject('identity', 'App\Services\LibraryIdentity')
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Terjadi Kesalahan') &mdash; {{ config('library.name') }}</title>
-    <link rel="icon" type="image/svg+xml" href="{{ asset(config('library.logo')) }}">
+    <title>@yield('title', 'Terjadi Kesalahan') &mdash; {{ $identity->libraryName() }}</title>
+    <link rel="icon" href="{{ $identity->logoUrl() }}">
     <style>
         :root {
             --primary: #1f4e79;
@@ -121,7 +122,7 @@
             @endauth
         </div>
 
-        <div class="brand">{{ config('library.name') }} &mdash; {{ config('library.school_name') }}</div>
+        <div class="brand">{{ $identity->libraryName() }} &mdash; {{ $identity->schoolName() }}</div>
     </main>
 </body>
 </html>
