@@ -1,66 +1,155 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem Informasi Perpustakaan Sekolah
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi perpustakaan sekolah berbasis Laravel 12 dan Bootstrap 5 untuk mengelola katalog, pengajuan pinjaman, sirkulasi, laporan, kartu anggota, dan kunjungan perpustakaan. Seluruh antarmuka menggunakan Bahasa Indonesia dan desain flat Bootstrap tanpa Tailwind, Breeze, atau Jetstream.
 
-## About Laravel
+## Fitur utama
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Publik** — beranda dengan carousel, katalog buku, detail buku, pencarian/filter, dan tombol bagikan.
+- **Siswa dan guru** — login dengan email atau nomor induk, mengajukan pinjaman per judul, membatalkan pengajuan, memantau pinjaman aktif/terlambat, melihat riwayat, dan memperbarui profil.
+- **Admin** — dashboard dengan grafik peminjaman dan kunjungan, CRUD buku/eksemplar/kategori/penulis/penerbit, antrean pengajuan, checkout, pengembalian, laporan, CSV, halaman cetak, pengguna, pengaturan, pengumuman, dan audit log.
+- **Kartu anggota** — kartu ID-1 (85,6 × 54 mm) untuk guru dan siswa aktif dengan barcode Code 128 dari nomor induk; cetak tunggal atau massal hingga 8 kartu per lembar A4.
+- **Kunjungan** — scan barcode kartu anggota, ringkasan pinjaman anggota, pencatatan kunjungan hari ini, pembatalan kunjungan hari ini, dan grafik kunjungan 7 hari.
+- **Keamanan** — middleware role/status aktif, policy kepemilikan transaksi, CSRF, rate limit login, security headers, validasi unggahan, dan audit log tindakan admin.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Kebutuhan
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.2 atau lebih baru dengan ekstensi `pdo_mysql` (atau `pdo_sqlite`) dan `mbstring`.
+- Composer 2.
+- Node.js 20+ dan npm.
+- MySQL 8 (disarankan) atau SQLite.
+- Browser modern (Chrome, Edge, Firefox, Safari).
 
-## Learning Laravel
+## Instalasi
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```bash
+composer install
+npm install
+copy .env.example .env        # Windows
+# cp .env.example .env        # Linux/macOS
+php artisan key:generate
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Opsi A — MySQL (konfigurasi lokal proyek)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Buat database `perpustakaan`, lalu sesuaikan `.env`:
 
-## Laravel Sponsors
+```dotenv
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=perpustakaan
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Opsi B — SQLite
 
-### Premium Partners
+`.env.example` sudah memakai SQLite. Buat file database bila belum ada:
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+```bash
+type nul > database/database.sqlite   # Windows
+# touch database/database.sqlite      # Linux/macOS
+```
 
-## Contributing
+### Migrasi, seed, dan aset
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+php artisan storage:link
+php artisan migrate --seed
+npm run build
+```
 
-## Code of Conduct
+`php artisan migrate --seed` membuat akun demo, data master, dan transaksi contoh.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Akun demo
 
-## Security Vulnerabilities
+Semua akun memakai kata sandi **`password`**.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+| Peran | Nama | Email | Nomor induk | Status |
+|---|---|---|---|---|
+| Admin | Administrator Perpustakaan | `admin@perpus.test` | `ADM001` | Aktif |
+| Guru | Budi Santoso | `guru@perpus.test` | `NIP001` | Aktif |
+| Siswa | Siti Aminah | `siswa@perpus.test` | `NIS001` | Aktif |
+| Siswa | Akun Nonaktif | `nonaktif@perpus.test` | `NIS002` | Nonaktif |
 
-## License
+Login dapat memakai email **atau** nomor induk. Akun nonaktif tidak dapat login dan tidak dapat mengajukan pinjaman.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Menjalankan aplikasi
+
+Jalankan tiga proses berikut di terminal terpisah:
+
+```bash
+php artisan serve
+npm run dev
+php artisan queue:listen
+```
+
+Buka `http://localhost:8000`.
+
+> **Windows:** jangan memakai `composer dev` karena perintah tersebut menjalankan `php artisan pail`, yang membutuhkan ekstensi `pcntl` dan gagal di Windows. Gunakan `Get-Content storage/logs/laravel.log -Wait` untuk memantau log.
+
+## Pengujian
+
+```bash
+php artisan test
+php artisan test --filter=MvpFlowTest
+php vendor/bin/pint --dirty
+npm run build
+php artisan view:cache
+```
+
+Test memakai database MySQL khusus **`perpustakaan_test`** yang dikonfigurasi di `phpunit.xml`. Jangan mengarahkan `RefreshDatabase` ke database dev. Untuk menjalankan satu file:
+
+```bash
+php artisan test tests/Feature/MvpFlowTest.php
+```
+
+## Cetak kartu anggota
+
+1. Buka **Manajemen → Kartu Anggota**.
+2. Pilih filter peran/kelas, lalu **Cetak Massal** (maksimal 200 anggota per proses) atau **Cetak** pada baris anggota.
+3. Gunakan pengaturan cetak **A4 portrait, skala 100%**, dan aktifkan **Background graphics** bila browser meminta.
+4. Setiap lembar memuat maksimal 8 kartu (2 × 4). Halaman berikutnya dimulai otomatis.
+5. Barcode memakai Code 128 dan dapat dipindai dengan scanner USB yang mengirim Enter. Nomor induk yang dicetak sebagai barcode dibatasi 20 karakter agar modul barcode tetap terbaca; anggota dengan nomor induk lebih panjang akan dilewati dengan peringatan.
+
+Kunjungan dicatat di **Transaksi → Kunjungan**. Scan kartu pada kolom nomor induk. Scan berulang dalam 30 menit untuk anggota yang sama diabaikan. Hanya kunjungan hari ini yang dapat dibatalkan.
+
+## Laporan dan cetak
+
+- Enam laporan: ringkasan, peminjaman, pengembalian, keterlambatan, inventaris, dan buku populer.
+- Filter periode default adalah bulan berjalan.
+- Ekspor CSV memakai BOM UTF-8, delimiter `;`, dan perlindungan formula injection.
+- Halaman cetak laporan memakai A4 landscape dengan identitas sekolah dan tanda tangan petugas.
+
+## Tugas terjadwal
+
+```bash
+php artisan library:cleanup --dry-run
+php artisan library:cleanup
+php artisan schedule:work
+```
+
+`library:cleanup` membatalkan pengajuan disetujui yang melewati batas pengambilan. Schedule harian berjalan pukul 01.00 sesuai `routes/console.php`.
+
+## Struktur dokumentasi
+
+- `agents/prd.md` — kebutuhan produk, peran, aturan bisnis, dan cakupan MVP.
+- `agents/design.md` — pedoman UI Bootstrap, token warna, dan pola halaman.
+- `agents/task-instruction.md` — alur kerja pengerjaan dan kategori checklist.
+- `agents/tasklist.md` — status pengerjaan per fase.
+- `agents/uat-checklist.md` — skenario UAT akhir dan lembar tanda tangan.
+
+## Pemecahan masalah
+
+| Gejala | Penyebab umum | Solusi |
+|---|---|---|
+| `No application encryption key` | `APP_KEY` kosong | `php artisan key:generate` |
+| Logo hasil unggahan tidak tampil | Symlink storage belum dibuat | `php artisan storage:link` |
+| Halaman memakai aset lama | Build Vite belum diperbarui | `npm run build` atau jalankan `npm run dev` |
+| Test menyentuh database dev | `phpunit.xml` diubah | Pastikan `DB_DATABASE=perpustakaan_test` |
+| `composer dev` gagal di Windows | `php artisan pail` membutuhkan `pcntl` | Jalankan `php artisan serve`, `npm run dev`, dan `php artisan queue:listen` terpisah |
+| Barcode tidak terbaca | Cetak tidak 100% atau nomor induk terlalu panjang | Cetak A4 100%, gunakan nomor induk maksimal 20 karakter |
+
+## Lisensi
+
+Aplikasi ini dibangun di atas Laravel dan Bootstrap 5. Laravel berlisensi MIT; Bootstrap berlisensi MIT.

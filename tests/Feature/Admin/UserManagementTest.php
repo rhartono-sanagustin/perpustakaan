@@ -4,6 +4,7 @@ namespace Tests\Feature\Admin;
 
 use App\Enums\UserStatus;
 use App\Models\AuditLog;
+use App\Models\LibraryVisit;
 use App\Models\Loan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -184,6 +185,25 @@ class UserManagementTest extends TestCase
             'action' => 'user.deactivated',
             'entity_id' => $target->id,
         ]);
+    }
+
+    public function test_user_with_visit_history_is_deactivated_instead_of_deleted(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $target = User::factory()->siswa()->create();
+
+        LibraryVisit::factory()->for($target)->create([
+            'recorded_by' => $admin->id,
+        ]);
+
+        $this->actingAs($admin)
+            ->delete(route('admin.users.destroy', $target))
+            ->assertRedirect(route('admin.users.index'))
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('users', ['id' => $target->id]);
+        $this->assertSame(UserStatus::Nonaktif, $target->fresh()->status);
+        $this->assertDatabaseHas('library_visits', ['user_id' => $target->id]);
     }
 
     public function test_user_with_audit_trail_is_deactivated_instead_of_deleted(): void

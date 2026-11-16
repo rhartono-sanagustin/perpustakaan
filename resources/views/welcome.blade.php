@@ -7,7 +7,7 @@
     @include('partials.landing-carousel', ['carouselSlides' => $carouselSlides ?? collect()])
 
     <section class="container-xl py-4 py-lg-5">
-        <div class="row align-items-center g-5">
+        <div class="row align-items-center g-4 g-xl-5">
             <div class="col-lg-6">
                 <span class="badge text-bg-light border mb-3">Sistem Informasi Perpustakaan Sekolah</span>
                 <h1 class="display-5 fw-bold mb-3">

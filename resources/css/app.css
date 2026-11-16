@@ -20,7 +20,9 @@
     --bs-warning: #b7791f;
     --bs-warning-rgb: 183, 121, 31;
     --bs-link-color: var(--library-primary);
+    --bs-link-color-rgb: 31, 78, 121;
     --bs-link-hover-color: var(--library-primary-hover);
+    --bs-link-hover-color-rgb: 23, 59, 92;
     --bs-body-color: var(--library-text);
     --bs-body-bg: var(--library-app-bg);
     --bs-border-color: var(--library-border);
@@ -54,6 +56,13 @@ h6,
 
 a {
     text-decoration: none;
+}
+
+.btn-outline-secondary {
+    --bs-btn-color: #565e64;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-color: #fff;
+    --bs-btn-disabled-color: #6c757d;
 }
 
 .card {
@@ -668,6 +677,10 @@ a {
     transition: height 0.25s ease;
 }
 
+.activity-chart-fill--visits {
+    background: var(--library-secondary);
+}
+
 .activity-chart-fill--empty {
     background: transparent;
 }
@@ -837,6 +850,163 @@ a {
     text-decoration: underline;
 }
 
+.member-card-page {
+    background: #eef2f6;
+}
+
+.member-card-sheet-wrap {
+    max-width: 1120px;
+    margin: 0 auto 2rem;
+    padding: 2rem;
+    overflow-x: auto;
+}
+
+.member-card-sheets {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6mm;
+}
+
+.member-card-sheet {
+    display: grid;
+    grid-template-columns: repeat(2, 85.6mm);
+    justify-content: center;
+    justify-content: safe center;
+    gap: 4mm;
+}
+
+.member-card-sheet--single {
+    grid-template-columns: 85.6mm;
+}
+
+.member-card {
+    display: flex;
+    flex-direction: column;
+    width: 85.6mm;
+    height: 54mm;
+    padding: 3.5mm 4mm;
+    overflow: hidden;
+    color: var(--library-text);
+    background: #fff;
+    border: 1px solid var(--library-border);
+    border-radius: var(--library-radius);
+}
+
+.member-card-header {
+    display: flex;
+    align-items: center;
+    gap: 2mm;
+    padding-bottom: 1.5mm;
+    border-bottom: 1px solid var(--library-border);
+}
+
+.member-card-logo {
+    flex-shrink: 0;
+    width: 8mm;
+    height: 8mm;
+    object-fit: contain;
+}
+
+.member-card-brand {
+    min-width: 0;
+}
+
+.member-card-school {
+    overflow: hidden;
+    font-size: 6.5pt;
+    font-weight: 600;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.member-card-library {
+    overflow: hidden;
+    color: var(--library-muted);
+    font-size: 6pt;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.member-card-title {
+    margin: 1.2mm 0 0.8mm;
+    color: var(--library-primary);
+    font-size: 5.8pt;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.member-card-body {
+    min-width: 0;
+}
+
+.member-card-name {
+    overflow: hidden;
+    font-size: 9.5pt;
+    font-weight: 700;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.member-card-meta {
+    display: flex;
+    gap: 3mm;
+    margin: 1mm 0 0;
+}
+
+.member-card-meta div {
+    min-width: 0;
+}
+
+.member-card-meta dt {
+    color: var(--library-muted);
+    font-size: 5pt;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.member-card-meta dd {
+    max-width: 26mm;
+    margin: 0;
+    overflow: hidden;
+    font-size: 6pt;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.member-card-footer {
+    margin-top: auto;
+    text-align: center;
+}
+
+.member-card-barcode-wrap {
+    display: flex;
+    justify-content: center;
+}
+
+.member-card-barcode {
+    width: auto;
+    max-width: 100%;
+    height: 9mm;
+}
+
+.member-card-number {
+    font-size: 6.5pt;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+}
+
+.member-card-note {
+    color: var(--library-muted);
+    font-size: 5pt;
+}
+
 @media (max-width: 575.98px) {
     .auth-page {
         padding: 1rem;
@@ -872,7 +1042,8 @@ a {
     .admin-topbar,
     .borrower-navbar,
     .no-print,
-    footer,
+    body > footer,
+    .admin-main > footer,
     .toast-container {
         display: none !important;
     }
@@ -922,5 +1093,36 @@ a {
     .print-page a {
         color: inherit !important;
         text-decoration: none !important;
+    }
+
+    .member-card-page {
+        background: #fff;
+    }
+
+    .member-card-sheet-wrap {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        overflow: visible;
+    }
+
+    .member-card-sheets {
+        display: block;
+    }
+
+    .member-card-sheet {
+        break-after: page;
+        margin: 0 auto;
+    }
+
+    .member-card-sheet:last-child {
+        break-after: auto;
+    }
+
+    .member-card {
+        break-inside: avoid;
+        border-color: #999;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
     }
 }

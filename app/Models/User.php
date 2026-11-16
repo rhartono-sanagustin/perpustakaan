@@ -103,6 +103,11 @@ class User extends Authenticatable
         return $this->hasMany(Loan::class);
     }
 
+    public function visits(): HasMany
+    {
+        return $this->hasMany(LibraryVisit::class);
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', UserStatus::Aktif);
