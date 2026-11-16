@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\PublisherController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VisitController;
+use App\Http\Controllers\Admin\VisitSettingController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Borrower\DashboardController as BorrowerDashboardController;
 use App\Http\Controllers\Borrower\LoanController as BorrowerLoanController;
@@ -25,12 +26,21 @@ use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\VisitKioskController;
+use App\Http\Middleware\EnsureVisitKioskIsEnabled;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 
 Route::get('/katalog', [CatalogController::class, 'index'])->name('catalog.index');
 Route::get('/katalog/{book:slug}', [CatalogController::class, 'show'])->name('catalog.show');
+
+Route::get('/kunjungan', [VisitKioskController::class, 'index'])
+    ->middleware([EnsureVisitKioskIsEnabled::class, 'throttle:60,1'])
+    ->name('visits.kiosk');
+Route::post('/kunjungan', [VisitKioskController::class, 'store'])
+    ->middleware([EnsureVisitKioskIsEnabled::class, 'throttle:60,1'])
+    ->name('visits.kiosk.store');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->name('login');
@@ -115,6 +125,9 @@ Route::middleware(['auth', 'active', 'role:admin'])
 
         Route::get('/settings/identity', [LibraryIdentityController::class, 'edit'])->name('settings.identity.edit');
         Route::put('/settings/identity', [LibraryIdentityController::class, 'update'])->name('settings.identity.update');
+
+        Route::get('/settings/visits', [VisitSettingController::class, 'edit'])->name('settings.visits.edit');
+        Route::put('/settings/visits', [VisitSettingController::class, 'update'])->name('settings.visits.update');
 
         Route::get('/settings/carousel', [CarouselSlideController::class, 'index'])->name('settings.carousel.index');
         Route::get('/settings/carousel/create', [CarouselSlideController::class, 'create'])->name('settings.carousel.create');

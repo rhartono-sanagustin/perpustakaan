@@ -1,4 +1,5 @@
 import * as bootstrap from 'bootstrap';
+import { initKiosk } from './kiosk';
 import { initNotifications } from './notifications';
 import { initShareButtons } from './share';
 
@@ -174,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initShareButtons();
     initNotifications();
+    initKiosk();
 
     document.querySelectorAll('[data-carousel]').forEach((carouselElement) => {
         const carousel = bootstrap.Carousel.getOrCreateInstance(carouselElement, {

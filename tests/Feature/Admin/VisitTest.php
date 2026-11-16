@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Enums\VisitSource;
 use App\Models\LibraryVisit;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -37,6 +38,7 @@ class VisitTest extends TestCase
 
         $this->assertSame($student->id, $visit->user_id);
         $this->assertSame($admin->id, $visit->recorded_by);
+        $this->assertSame(VisitSource::Admin, $visit->source);
         $this->assertTrue($visit->visit_date->isToday());
 
         $this->assertDatabaseHas('audit_logs', [
@@ -180,5 +182,29 @@ class VisitTest extends TestCase
             ->assertSee('Anggota yang Baru Dipindai')
             ->assertSee('Siti Aminah')
             ->assertSee('Pinjaman aktif');
+    }
+
+    public function test_admin_can_filter_visits_by_source(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $adminScanned = User::factory()->siswa()->create(['name' => 'Anggota Scan Admin']);
+        $selfService = User::factory()->siswa()->create(['name' => 'Anggota Scan Mandiri']);
+
+        LibraryVisit::factory()->for($adminScanned)->create([
+            'visit_date' => now()->toDateString(),
+            'visited_at' => now()->subMinutes(2),
+        ]);
+
+        LibraryVisit::factory()->for($selfService)->mandiri()->create([
+            'visit_date' => now()->toDateString(),
+            'visited_at' => now()->subMinute(),
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.visits.index', ['sumber' => 'mandiri']))
+            ->assertOk()
+            ->assertSee('Anggota Scan Mandiri')
+            ->assertDontSee('Anggota Scan Admin')
+            ->assertSee('text-bg-info', false);
     }
 }

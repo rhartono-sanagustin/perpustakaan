@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CarouselSlide;
+use App\Models\LibrarySetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -16,6 +17,7 @@ class HomeController extends Controller
 
         return view('welcome', [
             'carouselSlides' => CarouselSlide::query()->active()->ordered()->get(),
+            'visitKioskEnabled' => (bool) LibrarySetting::getValue('visit_kiosk_enabled', true),
         ]);
     }
 }

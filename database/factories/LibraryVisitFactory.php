@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\VisitSource;
 use App\Models\LibraryVisit;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -20,7 +21,19 @@ class LibraryVisitFactory extends Factory
             'visit_date' => $visitedAt->format('Y-m-d'),
             'visited_at' => $visitedAt,
             'recorded_by' => User::factory()->admin(),
+            'source' => VisitSource::Admin,
             'catatan' => null,
         ];
+    }
+
+    /**
+     * Kunjungan yang dicatat sendiri oleh pengunjung melalui kiosk.
+     */
+    public function mandiri(): static
+    {
+        return $this->state(fn (): array => [
+            'recorded_by' => null,
+            'source' => VisitSource::Mandiri,
+        ]);
     }
 }

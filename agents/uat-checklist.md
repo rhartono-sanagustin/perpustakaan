@@ -1,8 +1,8 @@
 # Checklist UAT — Sistem Informasi Perpustakaan Sekolah
 
-**Versi dokumen:** 1.0  
+**Versi dokumen:** 1.1  
 **Terakhir diperbarui:** 16 November 2026  
-**Cakupan:** MVP Fase 1–7 (autentikasi, katalog, sirkulasi, laporan, pengguna, pengaturan, pengumuman, notifikasi, kartu anggota, kunjungan)  
+**Cakupan:** MVP Fase 1–8 (autentikasi, katalog, sirkulasi, laporan, pengguna, pengaturan, pengumuman, notifikasi, kartu anggota, kunjungan, kiosk kunjungan mandiri)  
 **Lingkungan acuan:** Laravel 12.71, PHP 8.2.26, Bootstrap 5, MySQL `perpustakaan` (dev) / `perpustakaan_test` (test)
 
 ---
@@ -54,6 +54,7 @@ Semua akun memakai kata sandi **`password`**. Login dapat memakai email **atau**
 - Scanner barcode USB (mode keyboard + Enter) atau aplikasi pemindai barcode pada ponsel.
 - Data contoh dari `php artisan migrate --seed`; jangan memakai database produksi.
 - Untuk pengujian kunjungan, siapkan minimal satu kartu anggota tercetak atau nomor induk anggota aktif.
+- Untuk pengujian kiosk, buka `http://localhost:8000/kunjungan` di browser desktop dan mobile; pastikan kiosk aktif di **Pengaturan → Kunjungan**.
 
 ### 2.4 Cara mengisi checklist
 
@@ -71,13 +72,15 @@ Verifikasi berikut sudah dijalankan pada 16 November 2026 dan menjadi bukti pend
 
 | Pemeriksaan | Perintah/metode | Hasil |
 |---|---|---|
-| Test suite lengkap | `php artisan test` | **170 test lulus, 1039 assertion** |
+| Test suite lengkap | `php artisan test` | **185 test lulus, 1178 assertion** |
 | Test E2E alur MVP | `php artisan test tests/Feature/MvpFlowTest.php` | 1 test, **102 assertion** (katalog → pengajuan → setujui → checkout → kembali → laporan/CSV → kartu → kunjungan → audit) |
-| Build produksi | `npm run build` | Berhasil, 63 modul |
+| Test kiosk kunjungan | `php artisan test tests/Feature/VisitKioskTest.php tests/Feature/Admin/VisitSettingTest.php` | 14 test, menangkap alur publik, duplikat, kode tidak valid, toggle, audit, dan rate limit |
+| Build produksi | `npm run build` | Berhasil, 64 modul |
 | Kompilasi Blade | `php artisan view:cache` | Seluruh template berhasil |
 | Format kode | `php vendor/bin/pint --dirty` | Lulus |
-| QA responsif | Chrome DevTools Protocol, 20 halaman × 5 lebar (360/390/768/1024/1440) | **100 kombinasi, 0 horizontal overflow** |
-| QA aksesibilitas | axe-core WCAG 2.1 A/AA pada halaman utama desktop + mobile | **0 pelanggaran** |
+| QA responsif | Chrome DevTools Protocol, 5 halaman × 5 lebar (360/390/768/1024/1440) | **25 kombinasi, 0 horizontal overflow** |
+| QA aksesibilitas | axe-core WCAG 2.1 A/AA pada 4 halaman × desktop/mobile | **0 pelanggaran** |
+| QA kiosk | Chrome headless, autofocus, jam, submit `NIS001`, panel konfirmasi | Fokus kembali ke input; nama/kelas/waktu tampil; tanpa error console |
 | Cetak kartu massal | PDF 10 kartu | **2 halaman A4 portrait**, 8 kartu/lembar |
 | Keterbacaan barcode | Dekode PDF dengan zxing-cpp | **10/10 barcode terbaca sebagai Code 128** |
 | Cetak laporan | PDF laporan peminjaman | **A4 landscape**, footer tanda tangan tampil |
@@ -188,7 +191,20 @@ Verifikasi berikut sudah dijalankan pada 16 November 2026 dan menjadi bukti pend
 | UAT-VIS-05 | Grafik kunjungan | Buka dashboard admin setelah beberapa kunjungan | Grafik 7 hari dan angka kunjungan hari ini sesuai data; tabel alternatif tersedia | ⬜ | |
 | UAT-VIS-06 | Otorisasi kunjungan | Login siswa/guru, buka `/admin/kunjungan` langsung | Ditolak (403); tidak ada data kunjungan yang tampil | ⬜ | |
 
-### 4.9 Realtime, UX, dan responsif
+### 4.9 Kiosk kunjungan mandiri (Fase 8)
+
+| ID | Skenario | Langkah singkat | Hasil yang diharapkan | Status | Catatan |
+|---|---|---|---|---|---|
+| UAT-KIOS-01 | Akses kiosk tanpa login | Buka beranda, klik **Kunjungan** atau **Buka Kiosk Kunjungan**; buka `/kunjungan` langsung | Halaman kiosk tampil tanpa login, memuat identitas perpustakaan, jam sekolah yang berjalan, dan kolom nomor induk yang otomatis fokus | ⬜ | |
+| UAT-KIOS-02 | Catat kunjungan via scan | Scan kartu siswa/guru aktif atau ketik nomor induk, submit | Panel konfirmasi menampilkan nama, peran, kelas/unit, dan waktu; kunjungan tersimpan dengan sumber **Mandiri**, `recorded_by` kosong, dan audit `visit.recorded` | ⬜ | |
+| UAT-KIOS-03 | Scan berulang | Scan anggota yang sama dua kali dalam <30 menit | Panel informasi **Sudah Tercatat** tampil; tidak ada kunjungan ganda | ⬜ | |
+| UAT-KIOS-04 | Kode tidak valid | Coba nomor induk tidak dikenal, akun nonaktif, dan nomor induk admin | Masing-masing menampilkan pesan yang sesuai; tidak ada kunjungan yang tersimpan | ⬜ | |
+| UAT-KIOS-05 | Toggle kiosk | Nonaktifkan kiosk di **Pengaturan → Kunjungan**, lalu aktifkan kembali | Saat nonaktif `/kunjungan` 404 dan tautan beranda hilang; saat aktif halaman dan tautan kembali tersedia; perubahan tercatat di audit | ⬜ | |
+| UAT-KIOS-06 | Sumber kunjungan admin | Catat kunjungan dari admin dan kiosk, lalu buka **Transaksi → Kunjungan** | Badge sumber **Admin**/**Mandiri** tampil; filter sumber hanya menampilkan data yang dipilih | ⬜ | |
+| UAT-KIOS-07 | Responsif dan aksesibilitas | Buka kiosk, beranda, pengaturan, dan daftar kunjungan pada 360/390/768/1024/1440 px; jalankan axe | Tidak ada horizontal overflow; input tetap fokus setelah konfirmasi; 0 pelanggaran WCAG 2.1 A/AA | ⬜ | |
+| UAT-KIOS-08 | Cache, indeks, dan rate limit | Periksa header respons `/kunjungan`, meta robots, dan kirim >60 permintaan per menit | `Cache-Control: no-store`, `X-Robots-Tag: noindex, nofollow`, meta robots noindex, dan permintaan ke-61 mendapat 429 | ⬜ | |
+
+### 4.10 Realtime, UX, dan responsif
 
 | ID | Skenario | Langkah singkat | Hasil yang diharapkan | Status | Catatan |
 |---|---|---|---|---|---|
@@ -197,12 +213,12 @@ Verifikasi berikut sudah dijalankan pada 16 November 2026 dan menjadi bukti pend
 | UAT-RT-03 | Toast, loading, konfirmasi | Simpan form, klik aksi destruktif, batalkan konfirmasi | Toast sukses/gagal tampil; tombol menampilkan loading dan tidak terklik ganda; pembatalan konfirmasi tidak mengunci tombol | ⬜ | |
 | UAT-RT-04 | Share fallback | Nonaktifkan Web Share API (atau gunakan browser desktop), klik Bagikan | Tautan tersalin ke clipboard dan toast sukses tampil | ⬜ | |
 | UAT-RT-05 | Kurangi gerak | Aktifkan **prefers-reduced-motion** di OS/browser | Animasi, transisi, smooth scroll, dan auto-play carousel dimatikan/dikendalikan | ⬜ | |
-| UAT-QA-01 | Responsif | Buka 20 halaman utama pada 360, 390, 768, 1024, dan 1440 px | Tidak ada scroll horizontal; tabel dapat digeser; sidebar menjadi offcanvas di mobile | ⬜ | |
+| UAT-QA-01 | Responsif | Buka halaman utama (termasuk kiosk kunjungan) pada 360, 390, 768, 1024, dan 1440 px | Tidak ada scroll horizontal; tabel dapat digeser; sidebar menjadi offcanvas di mobile | ⬜ | |
 | UAT-QA-02 | Keyboard dan fokus | Tab melalui navigasi, form, tabel, dan tombol; gunakan Enter/Space | Urutan fokus logis; fokus terlihat; tabel/region yang dapat digeser dapat difokuskan; modal dapat ditutup keyboard | ⬜ | |
 | UAT-QA-03 | Kontras dan status non-warna | Periksa teks, tombol outline, badge status | Kontras teks memenuhi WCAG AA; status selalu disertai teks/label, bukan hanya warna | ⬜ | |
 | UAT-QA-04 | Cetak di perangkat nyata | Cetak satu lembar kartu dan satu laporan di printer sekolah | Skala 100%; barcode tajam dan terbaca; footer kartu/tanda tangan laporan tidak terpotong | ⬜ | |
 
-### 4.10 Operasional
+### 4.11 Operasional
 
 | ID | Skenario | Langkah singkat | Hasil yang diharapkan | Status | Catatan |
 |---|---|---|---|---|---|
@@ -224,9 +240,10 @@ Verifikasi berikut sudah dijalankan pada 16 November 2026 dan menjadi bukti pend
 | Admin — laporan | 5 | | | |
 | Admin — pengguna & pengaturan | 10 | | | |
 | Kartu anggota & kunjungan | 11 | | | |
+| Kiosk kunjungan mandiri | 8 | | | |
 | Realtime, UX, responsif | 9 | | | |
 | Operasional | 3 | | | |
-| **Total** | **74** | | | |
+| **Total** | **82** | | | |
 
 ---
 

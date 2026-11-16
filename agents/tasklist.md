@@ -1,8 +1,8 @@
 # Tasklist — Sistem Informasi Perpustakaan Sekolah
 
 **Terakhir diperbarui:** 16 November 2026  
-**Progress keseluruhan:** 100% (142 dari 142 task)  
-**Fase saat ini:** Fase 7 — Kartu Anggota, Kunjungan & Finalisasi MVP (selesai; siap direview)
+**Progress keseluruhan:** 100% (152 dari 152 task)  
+**Fase saat ini:** Fase 8 — Kiosk Kunjungan Mandiri (selesai; siap direview)
 
 > Catatan: progress dihitung dari jumlah checklist task, bukan estimasi jam kerja.
 > Setiap task selesai ditandai `[x] ✅` dan diberi catatan file yang dibuat/diubah.
@@ -426,6 +426,41 @@
 
 ---
 
+## 13. Fase 8 — Kiosk Kunjungan Mandiri
+
+- [x] ✅ Task 13.1 - Skema sumber kunjungan, enum, hasil, dan service pencatat bersama `[Sedang]` (Selesai)
+  - File: `database/migrations/2026_11_16_000001_add_source_to_library_visits_table.php`, `app/Enums/VisitSource.php`, `app/Enums/VisitRecordingStatus.php`, `app/Support/VisitRecordingResult.php`, `app/Services/VisitRecorder.php`, `app/Models/LibraryVisit.php`, `database/factories/LibraryVisitFactory.php`
+  - Catatan: kolom `source` default `admin`; enum `admin`/`mandiri`; lookup anggota, validasi peran/status, deteksi duplikat 30 menit, transaksi + lock baris, dan audit `visit.recorded` dipusatkan di `VisitRecorder`.
+- [x] ✅ Task 13.2 - Refactor pencatatan admin, filter sumber, dan badge sumber `[Sedang]` (Selesai)
+  - File: `app/Http/Controllers/Admin/VisitController.php`, `resources/views/admin/visits/index.blade.php`, `tests/Feature/Admin/VisitTest.php`
+  - Catatan: alur admin memakai `VisitRecorder` dengan sumber `admin`; daftar kunjungan hari ini menampilkan badge **Admin**/**Mandiri**, filter sumber, dan tetap menghitung KPI seluruh kunjungan hari ini.
+- [x] ✅ Task 13.3 - Controller, request, rute, dan middleware kiosk publik `[Sedang]` (Selesai)
+  - File: `app/Http/Controllers/VisitKioskController.php`, `app/Http/Requests/RecordPublicVisitRequest.php`, `app/Http/Middleware/EnsureVisitKioskIsEnabled.php`, `routes/web.php`
+  - Catatan: `GET/POST /kunjungan` tanpa login; middleware menolak 404 saat dinonaktifkan, mengatur `Cache-Control: no-store`, dan `X-Robots-Tag: noindex, nofollow`; rate limit 60 permintaan/menit; CSRF tetap aktif.
+- [x] ✅ Task 13.4 - Layout, halaman kiosk, CSS, dan JavaScript `[Sedang]` (Selesai)
+  - File: `resources/views/layouts/kiosk.blade.php`, `resources/views/visits/kiosk.blade.php`, `resources/css/app.css`, `resources/js/kiosk.js`, `resources/js/app.js`
+  - Catatan: tampilan kiosk penuh dengan jam sekolah berzona `Asia/Jakarta`, input autofocus, panel konfirmasi nama/peran/kelas/waktu, status berhasil/duplikat/gagal, dan layout responsif 360–1440 px.
+- [x] ✅ Task 13.5 - Integrasi tautan dan CTA kiosk di beranda `[Mudah]` (Selesai)
+  - File: `app/Http/Controllers/HomeController.php`, `app/Http/Controllers/CatalogController.php`, `resources/views/layouts/public.blade.php`, `resources/views/welcome.blade.php`
+  - Catatan: tautan navbar **Kunjungan** dan kartu ajakan **Buka Kiosk Kunjungan** hanya tampil saat kiosk aktif; katalog publik juga membawa flag yang sama.
+- [x] ✅ Task 13.6 - Pengaturan kiosk, navigasi pengaturan, dan seeder `[Sedang]` (Selesai)
+  - File: `app/Http/Controllers/Admin/VisitSettingController.php`, `app/Http/Requests/Admin/UpdateVisitSettingsRequest.php`, `resources/views/admin/settings/visits.blade.php`, `resources/views/admin/settings/_nav.blade.php`, `database/seeders/LibrarySettingSeeder.php`, `routes/web.php`
+  - Catatan: toggle boolean `visit_kiosk_enabled` default aktif; halaman status menampilkan alamat kiosk dan editor terakhir; perubahan dicatat sebagai `library_setting.updated`.
+- [x] ✅ Task 13.7 - Test kiosk, pengaturan, filter sumber, dan rate limit `[Sedang]` (Selesai)
+  - File: `tests/Feature/VisitKioskTest.php`, `tests/Feature/Admin/VisitSettingTest.php`, `tests/Feature/Admin/VisitTest.php`
+  - Catatan: 15 test baru (139 assertion) mencakup akses tamu/login, pencatatan mandiri, audit tanpa aktor, duplikat, kode tidak valid/nonaktif/admin, validasi, toggle + audit, tautan beranda, filter sumber, dan 429 pada permintaan ke-61.
+- [x] ✅ Task 13.8 - QA responsif, aksesibilitas, kontras, dan perbaikan UI `[Sedang]` (Selesai)
+  - File: `resources/views/admin/visits/index.blade.php`, `resources/views/admin/settings/visits.blade.php`, `resources/css/app.css`
+  - Catatan: 5 halaman × 5 lebar = 25 kombinasi tanpa overflow; 8 pemeriksaan axe WCAG 2.1 A/AA tanpa pelanggaran; overflow tabel kunjungan diperbaiki dengan `overflow-hidden`; kontras `<code>` alamat kiosk diperbaiki; autofocus, jam, dan panel konfirmasi diverifikasi di Chrome headless.
+- [x] ✅ Task 13.9 - Dokumentasi kiosk dan pembaruan UAT `[Mudah]` (Selesai)
+  - File: `README.md`, `agents/uat-checklist.md`
+  - Catatan: README menjelaskan alur kiosk, toggle, keamanan cache/indeks/rate limit, dan troubleshooting 404; UAT menjadi 82 skenario dengan 8 skenario kiosk.
+- [x] ✅ Task 13.10 - Verifikasi akhir Fase 8 dan pembaruan tasklist `[Sedang]` (Selesai)
+  - File: `agents/tasklist.md`
+  - Catatan: 185 test lulus (1178 assertion), build 64 modul, Blade cache, Pint, dan route kunjungan/kiosk terverifikasi.
+
+---
+
 ## Catatan Fase 1
 
 - Fase 1 selesai dan siap direview sebelum masuk Fase 2.
@@ -624,3 +659,33 @@
   - `README.md` — setup MySQL/SQLite, akun demo, perintah dev/test, cetak kartu, laporan, scheduler, dan troubleshooting.
   - `agents/uat-checklist.md` — 74 skenario UAT per peran/modul, ringkasan verifikasi otomatis, kriteria lulus, lembar tanda tangan, dan format defect.
 - Ditunda/opsional: checkout langsung oleh admin tanpa pengajuan (FR-LOAN-10), perpanjangan pinjaman (FR-LOAN-09), denda (FR-SET-03), pengurutan carousel drag-and-drop, dan pemotongan/resize gambar otomatis.
+
+## Catatan Fase 8
+
+- Fase 8 (kiosk kunjungan mandiri) selesai dan siap direview. Seluruh checklist task mencapai **100% (152/152)**.
+- Perintah verifikasi yang sudah dijalankan:
+  - `php artisan test` — **185 test lulus, 1178 assertion** (15 test baru: 10 kiosk publik, 4 pengaturan kiosk, 1 filter sumber admin).
+  - `npm run build` — berhasil (64 modul).
+  - `php artisan view:cache` — seluruh Blade berhasil dikompilasi.
+  - `php vendor/bin/pint --dirty` — berhasil.
+  - `php artisan route:list --path=kunjungan` — 5 route terdaftar (3 admin + 2 kiosk publik).
+- Cakupan Fase 8:
+  - Halaman kiosk publik `GET/POST /kunjungan` tanpa login, dapat dibuka dari tautan navbar **Kunjungan** dan kartu ajakan di beranda.
+  - Scan barcode kartu anggota atau input nomor induk manual; input otomatis fokus dan siap menerima scanner USB.
+  - Panel konfirmasi menampilkan nama, peran, kelas/unit, dan waktu kunjungan untuk status berhasil, duplikat, nonaktif, bukan anggota, dan tidak ditemukan.
+  - Pencatatan dipusatkan di `VisitRecorder`: validasi peran/status, deteksi duplikat 30 menit, transaksi + row lock, dan audit `visit.recorded`.
+  - Kunjungan mandiri menyimpan `source = mandiri` dan `recorded_by = null`; daftar admin menampilkan badge **Admin**/**Mandiri** serta filter sumber.
+  - Toggle `visit_kiosk_enabled` di **Pengaturan → Kunjungan** (default aktif); saat nonaktif `/kunjungan` 404 dan tautan beranda disembunyikan.
+  - Keamanan kiosk: CSRF aktif, rate limit 60 permintaan/menit, `Cache-Control: no-store`, `X-Robots-Tag: noindex, nofollow`, dan meta robots noindex.
+- Hasil QA:
+  - 5 halaman (beranda, katalog, kiosk, pengaturan kunjungan, daftar kunjungan) × 5 lebar (360/390/768/1024/1440) = **25 kombinasi, tanpa horizontal overflow**.
+  - axe-core WCAG 2.1 A/AA: **8 pemeriksaan, 0 pelanggaran**.
+  - Chrome headless: autofocus kolom nomor induk, jam sekolah berjalan, submit `NIS001` menampilkan nama/kelas/waktu, dan fokus kembali ke input setelah konfirmasi.
+  - Tidak ada error console; data uji kunjungan kiosk dihapus dari database dev.
+- Bug yang ditemukan dan diperbaiki saat QA:
+  - Tabel kunjungan admin meluber horizontal di 360/390 px karena `.table-responsive` tidak memotong kartu; kartu diberi `overflow-hidden`.
+  - Kontras alamat kiosk `<code>` di halaman pengaturan hanya 4,19:1; ditambahkan `text-body` hingga memenuhi ambang 4,5:1.
+- Dokumentasi:
+  - `README.md` — alur kiosk, toggle pengaturan, keamanan cache/indeks/rate limit, dan troubleshooting 404.
+  - `agents/uat-checklist.md` — versi 1.1, **82 skenario** (8 skenario kiosk baru), ringkasan verifikasi otomatis diperbarui, dan total kategori disesuaikan.
+- Ditunda/opsional: tampilan riwayat kunjungan mandiri per anggota, notifikasi kunjungan realtime, dan mode layar penuh/kilat khusus tablet kiosk.

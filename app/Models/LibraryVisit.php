@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\VisitSource;
 use Database\Factories\LibraryVisitFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,6 +19,7 @@ class LibraryVisit extends Model
         'visit_date',
         'visited_at',
         'recorded_by',
+        'source',
         'catatan',
     ];
 
@@ -26,6 +28,7 @@ class LibraryVisit extends Model
         return [
             'visit_date' => 'date',
             'visited_at' => 'datetime',
+            'source' => VisitSource::class,
         ];
     }
 

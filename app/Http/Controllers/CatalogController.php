@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\BookCopyStatus;
 use App\Models\Book;
 use App\Models\Category;
+use App\Models\LibrarySetting;
 use App\Services\CirculationService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -55,6 +56,7 @@ class CatalogController extends Controller
             'categorySlug' => $categorySlug,
             'availability' => $availability,
             'selectedCategory' => $selectedCategory,
+            'visitKioskEnabled' => (bool) LibrarySetting::getValue('visit_kiosk_enabled', true),
         ]);
     }
 
@@ -101,6 +103,7 @@ class CatalogController extends Controller
             'shelfLocations' => $shelfLocations,
             'relatedBooks' => $relatedBooks,
             'eligibility' => $eligibility,
+            'visitKioskEnabled' => (bool) LibrarySetting::getValue('visit_kiosk_enabled', true),
         ]);
     }
 

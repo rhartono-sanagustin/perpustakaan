@@ -66,6 +66,14 @@ class LibrarySettingSeeder extends Seeder
                 'label' => 'Denda per hari',
                 'description' => 'Nominal denda keterlambatan per hari dalam rupiah.',
             ],
+            [
+                'key' => 'visit_kiosk_enabled',
+                'value' => '1',
+                'type' => 'boolean',
+                'group_name' => 'kunjungan',
+                'label' => 'Kiosk kunjungan mandiri',
+                'description' => 'Izinkan pengunjung mencatat kunjungan sendiri melalui halaman kiosk publik.',
+            ],
         ];
 
         foreach ($settings as $setting) {

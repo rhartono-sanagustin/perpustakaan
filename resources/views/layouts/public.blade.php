@@ -27,6 +27,13 @@
                     <span class="d-none d-sm-inline">Katalog</span>
                 </a>
 
+                @if ($visitKioskEnabled ?? false)
+                    <a href="{{ route('visits.kiosk') }}" class="nav-link {{ request()->routeIs('visits.kiosk') ? 'active' : '' }}" aria-label="Kunjungan">
+                        <i class="bi bi-upc-scan d-sm-none" aria-hidden="true"></i>
+                        <span class="d-none d-sm-inline">Kunjungan</span>
+                    </a>
+                @endif
+
                 @auth
                     <a href="{{ route('dashboard') }}" class="btn btn-primary btn-sm px-3">
                         <i class="bi bi-speedometer2 me-1" aria-hidden="true"></i>Dashboard

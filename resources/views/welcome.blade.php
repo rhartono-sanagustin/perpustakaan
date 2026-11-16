@@ -75,6 +75,28 @@
         </div>
     </section>
 
+    @if ($visitKioskEnabled ?? false)
+        <section class="container-xl pb-4" aria-labelledby="kiosk-heading">
+            <div class="card border-primary">
+                <div class="card-body d-flex flex-column flex-lg-row align-items-lg-center gap-3 gap-lg-4">
+                    <span class="kpi-icon text-bg-primary flex-shrink-0" aria-hidden="true">
+                        <i class="bi bi-upc-scan"></i>
+                    </span>
+                    <div class="flex-grow-1">
+                        <h2 class="h5 mb-1" id="kiosk-heading">Berkunjung ke perpustakaan?</h2>
+                        <p class="text-muted mb-0">
+                            Scan kartu anggota atau ketik nomor induk di kiosk kunjungan untuk mencatat kehadiran
+                            tanpa perlu login.
+                        </p>
+                    </div>
+                    <a href="{{ route('visits.kiosk') }}" class="btn btn-primary flex-shrink-0">
+                        <i class="bi bi-upc-scan me-1" aria-hidden="true"></i>Buka Kiosk Kunjungan
+                    </a>
+                </div>
+            </div>
+        </section>
+    @endif
+
     <section id="fitur" class="container-xl py-4">
         <div class="text-center mb-4">
             <h2 class="h4 mb-1">Dirancang untuk seluruh warga sekolah</h2>
