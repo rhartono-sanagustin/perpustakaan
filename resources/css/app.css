@@ -541,6 +541,104 @@ a {
     background: var(--library-primary);
 }
 
+.kiosk-body {
+    background: var(--library-app-bg);
+}
+
+.kiosk-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.kiosk-header {
+    background: var(--library-surface);
+    border-top: 4px solid var(--library-primary);
+    border-bottom: 1px solid var(--library-border);
+}
+
+.kiosk-footer {
+    background: var(--library-surface);
+    border-top: 1px solid var(--library-border);
+}
+
+.kiosk-clock-time {
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.kiosk-clock-date {
+    margin-top: 0.25rem;
+    color: var(--library-muted);
+    font-size: 0.8rem;
+}
+
+.kiosk-card {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.kiosk-scan-card .card-body {
+    padding: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.kiosk-scan-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border-radius: var(--library-radius);
+    background: var(--library-primary-soft);
+    color: var(--library-primary);
+    font-size: 2.25rem;
+}
+
+.kiosk-input {
+    padding: 0.75rem 1rem;
+    font-size: clamp(1.15rem, 3vw, 1.6rem);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+.kiosk-result {
+    margin-bottom: 1rem;
+    border-left: 4px solid currentColor;
+}
+
+.kiosk-result-icon {
+    flex-shrink: 0;
+    font-size: 1.75rem;
+    line-height: 1;
+}
+
+.kiosk-result-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.kiosk-result-name {
+    margin-top: 0.15rem;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.kiosk-result-meta {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.kiosk-help .bi {
+    color: var(--library-primary);
+}
+
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -1014,6 +1112,22 @@ a {
 
     .auth-card .card-body {
         padding: 1.5rem !important;
+    }
+
+    .kiosk-header .container-xl {
+        align-items: flex-start !important;
+    }
+
+    .kiosk-clock {
+        text-align: left !important;
+    }
+
+    .kiosk-clock-time {
+        font-size: 1.75rem;
+    }
+
+    .kiosk-scan-card .card-body {
+        padding: 1.25rem;
     }
 
     .landing-carousel .carousel-caption {

@@ -171,10 +171,23 @@
         </div>
     @endif
 
-    <div class="card">
+    <div class="card overflow-hidden">
         <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
             <h2 class="h6 mb-0">Kunjungan Hari Ini</h2>
-            <span class="small text-muted">{{ now()->locale('id')->translatedFormat('l, d F Y') }}</span>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <form method="GET" action="{{ route('admin.visits.index') }}" class="d-flex align-items-center gap-2">
+                    <label for="sumber" class="form-label mb-0 small text-muted">Sumber</label>
+                    <select id="sumber" name="sumber" class="form-select form-select-sm" data-auto-submit>
+                        <option value="">Semua sumber</option>
+                        @foreach (\App\Enums\VisitSource::cases() as $source)
+                            <option value="{{ $source->value }}" @selected($sourceFilter === $source->value)>
+                                {{ $source->label() }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+                <span class="small text-muted">{{ now()->locale('id')->translatedFormat('l, d F Y') }}</span>
+            </div>
         </div>
 
         @if ($visits->isEmpty())
@@ -194,6 +207,7 @@
                             <th scope="col">Nama</th>
                             <th scope="col">Nomor Induk</th>
                             <th scope="col">Peran</th>
+                            <th scope="col">Sumber</th>
                             <th scope="col">Kelas / Unit</th>
                             <th scope="col">Dicatat oleh</th>
                             <th scope="col" class="text-end">Aksi</th>
@@ -207,6 +221,9 @@
                                 <td>{{ $visit->user->nomor_induk }}</td>
                                 <td>
                                     <span class="badge text-bg-light border">{{ $visit->user->roleLabel() }}</span>
+                                </td>
+                                <td>
+                                    <x-status-badge :label="$visit->source->label()" :variant="$visit->source->badgeVariant()" />
                                 </td>
                                 <td class="small text-muted">{{ $visit->user->kelas ?? $visit->user->unit_kerja ?? '-' }}</td>
                                 <td class="small text-muted">{{ $visit->recorder?->name ?? '-' }}</td>

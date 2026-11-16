@@ -4,11 +4,11 @@ Aplikasi perpustakaan sekolah berbasis Laravel 12 dan Bootstrap 5 untuk mengelol
 
 ## Fitur utama
 
-- **Publik** — beranda dengan carousel, katalog buku, detail buku, pencarian/filter, dan tombol bagikan.
+- **Publik** — beranda dengan carousel, katalog buku, detail buku, pencarian/filter, tombol bagikan, dan kiosk kunjungan mandiri tanpa login.
 - **Siswa dan guru** — login dengan email atau nomor induk, mengajukan pinjaman per judul, membatalkan pengajuan, memantau pinjaman aktif/terlambat, melihat riwayat, dan memperbarui profil.
 - **Admin** — dashboard dengan grafik peminjaman dan kunjungan, CRUD buku/eksemplar/kategori/penulis/penerbit, antrean pengajuan, checkout, pengembalian, laporan, CSV, halaman cetak, pengguna, pengaturan, pengumuman, dan audit log.
 - **Kartu anggota** — kartu ID-1 (85,6 × 54 mm) untuk guru dan siswa aktif dengan barcode Code 128 dari nomor induk; cetak tunggal atau massal hingga 8 kartu per lembar A4.
-- **Kunjungan** — scan barcode kartu anggota, ringkasan pinjaman anggota, pencatatan kunjungan hari ini, pembatalan kunjungan hari ini, dan grafik kunjungan 7 hari.
+- **Kunjungan** — scan barcode kartu anggota, ringkasan pinjaman anggota, pencatatan kunjungan hari ini, pembatalan kunjungan hari ini, grafik kunjungan 7 hari, dan kiosk mandiri untuk pengunjung.
 - **Keamanan** — middleware role/status aktif, policy kepemilikan transaksi, CSRF, rate limit login, security headers, validasi unggahan, dan audit log tindakan admin.
 
 ## Kebutuhan
@@ -114,6 +114,19 @@ php artisan test tests/Feature/MvpFlowTest.php
 
 Kunjungan dicatat di **Transaksi → Kunjungan**. Scan kartu pada kolom nomor induk. Scan berulang dalam 30 menit untuk anggota yang sama diabaikan. Hanya kunjungan hari ini yang dapat dibatalkan.
 
+## Kiosk kunjungan mandiri
+
+Kiosk publik tersedia di `http://localhost:8000/kunjungan` dan dapat dibuka dari tautan **Kunjungan** atau kartu ajakan di beranda.
+
+1. Buka **Manajemen → Pengaturan → Kunjungan**.
+2. Aktifkan atau nonaktifkan **Kiosk kunjungan mandiri**.
+3. Saat aktif, pengunjung dapat memindai barcode kartu anggota atau mengetik nomor induk tanpa login.
+4. Konfirmasi menampilkan nama, peran, kelas/unit, dan waktu kunjungan. Data tersimpan dengan sumber **Mandiri** dan `recorded_by` kosong.
+5. Hanya guru/siswa aktif yang diterima; akun admin dan akun nonaktif ditolak. Scan berulang dalam 30 menit dianggap kunjungan yang sama.
+6. Halaman kiosk memakai `Cache-Control: no-store`, `X-Robots-Tag: noindex, nofollow`, dan rate limit 60 permintaan per menit.
+
+Saat kiosk dinonaktifkan, halaman `/kunjungan` mengembalikan 404 dan tautan di beranda disembunyikan. Perubahan pengaturan dicatat di audit log sebagai `library_setting.updated`.
+
 ## Laporan dan cetak
 
 - Enam laporan: ringkasan, peminjaman, pengembalian, keterlambatan, inventaris, dan buku populer.
@@ -149,6 +162,7 @@ php artisan schedule:work
 | Test menyentuh database dev | `phpunit.xml` diubah | Pastikan `DB_DATABASE=perpustakaan_test` |
 | `composer dev` gagal di Windows | `php artisan pail` membutuhkan `pcntl` | Jalankan `php artisan serve`, `npm run dev`, dan `php artisan queue:listen` terpisah |
 | Barcode tidak terbaca | Cetak tidak 100% atau nomor induk terlalu panjang | Cetak A4 100%, gunakan nomor induk maksimal 20 karakter |
+| Halaman `/kunjungan` 404 | Kiosk kunjungan dinonaktifkan admin | Buka **Pengaturan → Kunjungan**, aktifkan kiosk |
 
 ## Lisensi
 

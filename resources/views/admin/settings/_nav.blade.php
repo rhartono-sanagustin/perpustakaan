@@ -10,6 +10,11 @@
         </a>
     </li>
     <li class="nav-item">
+        <a class="nav-link {{ request()->routeIs('admin.settings.visits.*') ? 'active' : '' }}" href="{{ route('admin.settings.visits.edit') }}">
+            <i class="bi bi-upc-scan me-1" aria-hidden="true"></i>Kunjungan
+        </a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link {{ request()->routeIs('admin.settings.carousel.*') ? 'active' : '' }}" href="{{ route('admin.settings.carousel.index') }}">
             <i class="bi bi-images me-1" aria-hidden="true"></i>Carousel Beranda
         </a>
