@@ -60,6 +60,9 @@
                     <a class="nav-link {{ request()->routeIs('admin.loans.history', 'admin.loans.return') ? 'active' : '' }}" href="{{ route('admin.loans.history') }}">
                         <i class="bi bi-clock-history" aria-hidden="true"></i>Riwayat Transaksi
                     </a>
+                    <a class="nav-link {{ request()->routeIs('admin.visits.*') ? 'active' : '' }}" href="{{ route('admin.visits.index') }}">
+                        <i class="bi bi-upc-scan" aria-hidden="true"></i>Kunjungan
+                    </a>
 
                     <div class="sidebar-heading">Laporan</div>
                     <a class="nav-link {{ request()->routeIs('admin.reports.index') ? 'active' : '' }}" href="{{ route('admin.reports.index') }}">
@@ -82,6 +85,9 @@
                     </a>
 
                     <div class="sidebar-heading">Manajemen</div>
+                    <a class="nav-link {{ request()->routeIs('admin.member-cards.*') ? 'active' : '' }}" href="{{ route('admin.member-cards.index') }}">
+                        <i class="bi bi-person-vcard" aria-hidden="true"></i>Kartu Anggota
+                    </a>
                     <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
                         <i class="bi bi-people" aria-hidden="true"></i>Pengguna
                     </a>
@@ -140,7 +146,7 @@
                 </div>
 
                 <div class="dropdown">
-                    <button class="btn btn-light border dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-light border dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menu akun {{ auth()->user()->name }}">
                         <i class="bi bi-person-circle" aria-hidden="true"></i>
                         <span class="d-none d-sm-inline">{{ auth()->user()->name }}</span>
                     </button>

@@ -150,6 +150,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    const syncScrollableRegions = () => {
+        document.querySelectorAll('.table-responsive, [data-scrollable-region]').forEach((region) => {
+            if (region.scrollWidth > region.clientWidth + 1) {
+                region.setAttribute('tabindex', '0');
+            } else {
+                region.removeAttribute('tabindex');
+            }
+        });
+    };
+
+    syncScrollableRegions();
+    window.addEventListener('resize', syncScrollableRegions);
+    window.addEventListener('load', syncScrollableRegions);
+
+    if ('ResizeObserver' in window) {
+        const scrollRegionObserver = new ResizeObserver(syncScrollableRegions);
+
+        document.querySelectorAll('.table-responsive, [data-scrollable-region]').forEach((region) => {
+            scrollRegionObserver.observe(region);
+        });
+    }
+
     initShareButtons();
     initNotifications();
 

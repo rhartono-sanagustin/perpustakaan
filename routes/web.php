@@ -11,9 +11,11 @@ use App\Http\Controllers\Admin\LibraryIdentityController;
 use App\Http\Controllers\Admin\LibrarySettingController;
 use App\Http\Controllers\Admin\LoanController as AdminLoanController;
 use App\Http\Controllers\Admin\LoanRequestController as AdminLoanRequestController;
+use App\Http\Controllers\Admin\MemberCardController;
 use App\Http\Controllers\Admin\PublisherController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\VisitController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Borrower\DashboardController as BorrowerDashboardController;
 use App\Http\Controllers\Borrower\LoanController as BorrowerLoanController;
@@ -83,6 +85,10 @@ Route::middleware(['auth', 'active', 'role:admin'])
         Route::get('/loans/{loan}/return', [AdminLoanController::class, 'returnForm'])->name('loans.return');
         Route::post('/loans/{loan}/return', [AdminLoanController::class, 'returnLoan'])->name('loans.return.store');
 
+        Route::get('/kunjungan', [VisitController::class, 'index'])->name('visits.index');
+        Route::post('/kunjungan', [VisitController::class, 'store'])->name('visits.store');
+        Route::delete('/kunjungan/{visit}', [VisitController::class, 'destroy'])->name('visits.destroy');
+
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
         Route::get('/reports/peminjaman', [ReportController::class, 'loans'])->name('reports.loans');
         Route::get('/reports/pengembalian', [ReportController::class, 'returns'])->name('reports.returns');
@@ -97,8 +103,12 @@ Route::middleware(['auth', 'active', 'role:admin'])
             ->name('reports.print');
 
         Route::resource('users', UserController::class)->except(['show']);
+        Route::get('/users/{user}/kartu', [MemberCardController::class, 'show'])->name('users.card');
         Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
         Route::post('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+
+        Route::get('/member-cards', [MemberCardController::class, 'index'])->name('member-cards.index');
+        Route::get('/member-cards/print', [MemberCardController::class, 'print'])->name('member-cards.print');
 
         Route::get('/settings', [LibrarySettingController::class, 'index'])->name('settings.index');
         Route::put('/settings', [LibrarySettingController::class, 'update'])->name('settings.update');

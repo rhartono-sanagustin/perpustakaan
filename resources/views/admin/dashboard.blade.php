@@ -128,52 +128,107 @@
         </div>
     </div>
 
-    <div class="card mt-3">
-        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
-            <h2 class="h6 mb-0">Aktivitas Peminjaman</h2>
-            <span class="small text-muted">7 hari terakhir &middot; {{ $activityTotal }} peminjaman</span>
-        </div>
-        <div class="card-body">
-            @if ($activityTotal === 0)
-                <x-empty-state
-                    icon="bar-chart"
-                    title="Belum ada aktivitas"
-                    message="Grafik akan terisi setelah admin mencatat peminjaman buku."
-                />
-            @else
-                <div class="activity-chart" aria-hidden="true">
-                    @foreach ($loanActivity as $day)
-                        <div class="activity-chart-bar">
-                            <span class="activity-chart-value">{{ $day['count'] }}</span>
-                            <div class="activity-chart-track">
-                                <div
-                                    class="activity-chart-fill {{ $day['count'] === 0 ? 'activity-chart-fill--empty' : '' }}"
-                                    style="height: {{ $day['count'] === 0 ? 0 : max(6, round($day['count'] / $activityMax * 100)) }}%"
-                                ></div>
-                            </div>
-                            <span class="activity-chart-label">{{ $day['label'] }}</span>
-                        </div>
-                    @endforeach
+    <div class="row g-3 mt-3">
+        <div class="col-12 col-xl-6">
+            <div class="card h-100">
+                <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <h2 class="h6 mb-0">Aktivitas Peminjaman</h2>
+                    <span class="small text-muted">7 hari terakhir &middot; {{ $activityTotal }} peminjaman</span>
                 </div>
+                <div class="card-body">
+                    @if ($activityTotal === 0)
+                        <x-empty-state
+                            icon="bar-chart"
+                            title="Belum ada aktivitas"
+                            message="Grafik akan terisi setelah admin mencatat peminjaman buku."
+                        />
+                    @else
+                        <div class="activity-chart" aria-hidden="true">
+                            @foreach ($loanActivity as $day)
+                                <div class="activity-chart-bar">
+                                    <span class="activity-chart-value">{{ $day['count'] }}</span>
+                                    <div class="activity-chart-track">
+                                        <div
+                                            class="activity-chart-fill {{ $day['count'] === 0 ? 'activity-chart-fill--empty' : '' }}"
+                                            style="height: {{ $day['count'] === 0 ? 0 : max(6, round($day['count'] / $activityMax * 100)) }}%"
+                                        ></div>
+                                    </div>
+                                    <span class="activity-chart-label">{{ $day['label'] }}</span>
+                                </div>
+                            @endforeach
+                        </div>
 
-                <table class="visually-hidden">
-                    <caption>Aktivitas peminjaman 7 hari terakhir</caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">Tanggal</th>
-                            <th scope="col">Jumlah peminjaman</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($loanActivity as $day)
-                            <tr>
-                                <th scope="row">{{ $day['full_label'] }}</th>
-                                <td>{{ $day['count'] }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @endif
+                        <table class="visually-hidden">
+                            <caption>Aktivitas peminjaman 7 hari terakhir</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Tanggal</th>
+                                    <th scope="col">Jumlah peminjaman</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($loanActivity as $day)
+                                    <tr>
+                                        <th scope="row">{{ $day['full_label'] }}</th>
+                                        <td>{{ $day['count'] }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-6">
+            <div class="card h-100">
+                <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <h2 class="h6 mb-0">Kunjungan Perpustakaan</h2>
+                    <span class="small text-muted">7 hari terakhir &middot; {{ $visitTotal }} kunjungan &middot; hari ini {{ $todayVisits }}</span>
+                </div>
+                <div class="card-body">
+                    @if ($visitTotal === 0)
+                        <x-empty-state
+                            icon="person-check"
+                            title="Belum ada kunjungan"
+                            message="Grafik akan terisi setelah admin mencatat kunjungan anggota."
+                        />
+                    @else
+                        <div class="activity-chart" aria-hidden="true">
+                            @foreach ($visitActivity as $day)
+                                <div class="activity-chart-bar">
+                                    <span class="activity-chart-value">{{ $day['count'] }}</span>
+                                    <div class="activity-chart-track">
+                                        <div
+                                            class="activity-chart-fill activity-chart-fill--visits {{ $day['count'] === 0 ? 'activity-chart-fill--empty' : '' }}"
+                                            style="height: {{ $day['count'] === 0 ? 0 : max(6, round($day['count'] / $visitMax * 100)) }}%"
+                                        ></div>
+                                    </div>
+                                    <span class="activity-chart-label">{{ $day['label'] }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <table class="visually-hidden">
+                            <caption>Kunjungan perpustakaan 7 hari terakhir</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Tanggal</th>
+                                    <th scope="col">Jumlah kunjungan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($visitActivity as $day)
+                                    <tr>
+                                        <th scope="row">{{ $day['full_label'] }}</th>
+                                        <td>{{ $day['count'] }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
 

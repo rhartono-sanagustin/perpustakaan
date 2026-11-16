@@ -156,6 +156,12 @@
                             <dd class="col-7 mb-2">{{ $user->exists ? $user->statusLabel() : 'Aktif' }}</dd>
                         </dl>
 
+                        @if ($user->exists && $user->isBorrower() && $user->isActive())
+                            <a href="{{ route('admin.users.card', $user) }}" target="_blank" rel="noopener" class="btn btn-outline-primary w-100 mb-2">
+                                <i class="bi bi-person-vcard me-1" aria-hidden="true"></i>Cetak Kartu Anggota
+                            </a>
+                        @endif
+
                         <button type="submit" class="btn btn-primary w-100" data-loading-text="Menyimpan...">
                             <i class="bi bi-save me-1" aria-hidden="true"></i>Simpan
                         </button>
