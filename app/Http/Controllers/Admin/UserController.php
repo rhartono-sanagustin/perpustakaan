@@ -186,6 +186,7 @@ class UserController extends Controller
     {
         return $user->loans()->exists()
             || $user->loanRequests()->exists()
+            || $user->visits()->exists()
             || Loan::query()->where('processed_by', $user->id)->exists()
             || LoanRequest::query()->where('processed_by', $user->id)->exists()
             || AuditLog::query()->where('actor_id', $user->id)->exists()

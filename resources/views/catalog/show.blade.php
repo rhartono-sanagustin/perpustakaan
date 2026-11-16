@@ -12,7 +12,7 @@
             </ol>
         </nav>
 
-        <div class="row g-4 g-lg-5">
+        <div class="row g-4 g-xl-5">
             <div class="col-12 col-md-4 col-lg-3">
                 <div class="card">
                     <img src="{{ $book->cover_url }}" alt="Sampul {{ $book->title }}" class="card-img-top book-cover">

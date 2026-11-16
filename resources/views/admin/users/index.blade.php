@@ -138,6 +138,13 @@
                                         <span class="badge text-bg-light border">Akun Anda</span>
                                     @else
                                         <div class="d-flex justify-content-end gap-1">
+                                            @if ($user->isBorrower() && $user->isActive())
+                                                <a href="{{ route('admin.users.card', $user) }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary" title="Cetak kartu anggota">
+                                                    <i class="bi bi-person-vcard" aria-hidden="true"></i>
+                                                    <span class="visually-hidden">Cetak kartu {{ $user->name }}</span>
+                                                </a>
+                                            @endif
+
                                             @can('update', $user)
                                                 <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-primary" title="Edit pengguna">
                                                     <i class="bi bi-pencil" aria-hidden="true"></i>

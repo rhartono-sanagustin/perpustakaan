@@ -1,8 +1,8 @@
 # Tasklist — Sistem Informasi Perpustakaan Sekolah
 
-**Terakhir diperbarui:** 15 November 2026  
-**Progress keseluruhan:** 95% (126 dari 132 task)  
-**Fase saat ini:** Fase 6 — Fitur Realtime & Interaksi (selesai; siap direview)
+**Terakhir diperbarui:** 16 November 2026  
+**Progress keseluruhan:** 100% (142 dari 142 task)  
+**Fase saat ini:** Fase 7 — Kartu Anggota, Kunjungan & Finalisasi MVP (selesai; siap direview)
 
 > Catatan: progress dihitung dari jumlah checklist task, bukan estimasi jam kerja.
 > Setiap task selesai ditandai `[x] ✅` dan diberi catatan file yang dibuat/diubah.
@@ -326,9 +326,15 @@
   - File: `tests/Feature/Auth/LoginTest.php`
 - [x] ✅ Task 10.2 - Test security headers dan factory state `[Mudah]` (Selesai)
   - File: `tests/Feature/SecurityHeadersTest.php`
-- [ ] Task 10.3 - Test lengkap alur MVP (katalog, pengajuan, checkout, return, laporan)
-- [ ] Task 10.4 - QA responsif 360/390/768/1024/1440 px
-- [ ] Task 10.5 - QA aksesibilitas (label, fokus, kontras, status non-warna)
+- [x] ✅ Task 10.3 - Test lengkap alur MVP (katalog, pengajuan, checkout, return, laporan) `[Sedang]` (Selesai)
+  - File: `tests/Feature/MvpFlowTest.php`
+  - Catatan: satu alur penuh dengan 102 assertion; mencakup katalog publik, login siswa/admin, pengajuan, persetujuan, checkout, pengembalian, laporan/CSV, kartu anggota, kunjungan, grafik dashboard, dan audit log.
+- [x] ✅ Task 10.4 - QA responsif 360/390/768/1024/1440 px `[Sedang]` (Selesai)
+  - File: `resources/views/welcome.blade.php`, `resources/views/catalog/show.blade.php`, `resources/css/app.css`
+  - Catatan: audit 20 halaman × 5 lebar (100 kombinasi) memakai Chrome DevTools Protocol; tidak ada horizontal overflow. Overflow 12 px pada beranda/detail katalog diperbaiki dengan `g-4 g-xl-5`.
+- [x] ✅ Task 10.5 - QA aksesibilitas (label, fokus, kontras, status non-warna) `[Sedang]` (Selesai)
+  - File: `resources/css/app.css`, `resources/js/app.js`, `resources/views/layouts/admin.blade.php`, `resources/views/layouts/print-card.blade.php`
+  - Catatan: axe-core WCAG 2.1 A/AA pada halaman utama desktop/mobile menghasilkan 0 pelanggaran; perbaikan kontras link/tombol outline, `aria-label` menu akun, dan region tabel/pratinjau yang dapat difokus keyboard.
 - [x] ✅ Task 10.6 - Format kode dengan Pint `[Mudah]` (Selesai)
   - Perintah: `php vendor/bin/pint --dirty`
 - [x] ✅ Task 10.7 - Build Vite produksi `[Mudah]` (Selesai)
@@ -338,9 +344,15 @@
   - Akun: `admin@perpus.test`, `guru@perpus.test`, `siswa@perpus.test`, `nonaktif@perpus.test` — password `password`.
 - [x] ✅ Task 10.9 - Update tasklist dan progress `[Mudah]` (Selesai)
   - File: `agents/tasklist.md`
-- [ ] Task 10.10 - Dokumentasi setup dan akun demo
-- [ ] Task 10.11 - Perbaikan bug hasil review
-- [ ] Task 10.12 - Checklist UAT akhir
+- [x] ✅ Task 10.10 - Dokumentasi setup dan akun demo `[Mudah]` (Selesai)
+  - File: `README.md`
+  - Catatan: kebutuhan sistem, instalasi MySQL/SQLite, akun demo, perintah dev/test, cetak kartu, laporan, scheduler, dan troubleshooting.
+- [x] ✅ Task 10.11 - Perbaikan bug hasil review `[Sedang]` (Selesai)
+  - File: `resources/css/app.css`, `resources/views/admin/member-cards/print.blade.php`, `app/Support/MemberBarcode.php`, `app/Http/Controllers/Admin/UserController.php`, `resources/views/layouts/admin.blade.php`, `resources/js/app.js`
+  - Catatan: footer/barcode kartu tidak lagi hilang saat cetak, kartu dipenggal per 8 per halaman, nomor induk barcode dibatasi 20 karakter, overflow 12 px diperbaiki, kontras dan nama aksesibel tombol akun diperbaiki, dan pengguna dengan riwayat kunjungan dinonaktifkan (bukan dihapus).
+- [x] ✅ Task 10.12 - Checklist UAT akhir `[Mudah]` (Selesai)
+  - File: `agents/uat-checklist.md`
+  - Catatan: 74 skenario per peran/modul, ringkasan verifikasi otomatis, kriteria lulus, lembar tanda tangan, dan format pencatatan defect.
 
 ---
 
@@ -376,6 +388,41 @@
 - [x] ✅ Task 11.10 - Test fitur identitas, carousel, dan landing page `[Sedang]` (Selesai)
   - File: `tests/Feature/Admin/LibraryIdentityTest.php`, `tests/Feature/Admin/CarouselSlideTest.php`, `tests/Feature/LandingCarouselTest.php`
   - Catatan: 29 test mencakup otorisasi, validasi, unggah/ganti/hapus file, audit, batas slide aktif, pengurutan, escaping, tautan eksternal/internal, empty state, dan redirect pengguna login.
+
+---
+
+## 12. Fase 7 — Kartu Anggota, Kunjungan & Finalisasi MVP
+
+- [x] ✅ Task 12.1 - Skema, model, factory, dan relasi kunjungan perpustakaan `[Sedang]` (Selesai)
+  - File: `database/migrations/2026_11_15_000002_create_library_visits_table.php`, `app/Models/LibraryVisit.php`, `database/factories/LibraryVisitFactory.php`, `app/Models/User.php`
+  - Catatan: kunjungan menyimpan anggota, waktu/tanggal kunjungan, dan admin pencatat; beberapa kunjungan per hari diizinkan.
+- [x] ✅ Task 12.2 - Generator barcode Code 128 untuk nomor induk `[Sedang]` (Selesai)
+  - File: `app/Support/MemberBarcode.php`, `composer.json`, `composer.lock`, `tests/Unit/MemberBarcodeTest.php`
+  - Catatan: memakai `picqer/php-barcode-generator` 2.4.2, menghasilkan SVG inline; hanya ASCII, maksimal 20 karakter agar modul barcode tetap terbaca.
+- [x] ✅ Task 12.3 - Halaman daftar kartu anggota dengan filter dan cetak massal `[Sedang]` (Selesai)
+  - File: `app/Http/Controllers/Admin/MemberCardController.php`, `resources/views/admin/member-cards/index.blade.php`, `routes/web.php`, `tests/Feature/Admin/MemberCardTest.php`
+  - Catatan: hanya guru/siswa aktif dengan nomor induk; filter peran/kelas/pencarian; maksimal 200 kartu per proses; anggota yang dilewati dilaporkan.
+- [x] ✅ Task 12.4 - Komponen kartu ID-1 dan layout cetak A4 8 kartu per lembar `[Sedang]` (Selesai)
+  - File: `resources/views/components/member-card.blade.php`, `resources/views/admin/member-cards/print.blade.php`, `resources/views/layouts/print-card.blade.php`, `resources/css/app.css`
+  - Catatan: kartu 85,6 × 54 mm, grid 2 × 4 per A4 portrait, dipenggal per 8 kartu; aturan cetak hanya menyembunyikan footer halaman sehingga barcode/footer kartu tetap tercetak.
+- [x] ✅ Task 12.5 - Pencatatan kunjungan via scan barcode dan ringkasan anggota `[Sedang]` (Selesai)
+  - File: `app/Http/Controllers/Admin/VisitController.php`, `resources/views/admin/visits/index.blade.php`, `routes/web.php`, `tests/Feature/Admin/VisitTest.php`
+  - Catatan: scan/paste nomor induk, beberapa kunjungan per hari, scan berulang <30 menit diabaikan, ringkasan pinjaman aktif/terlambat, dan pembatalan hanya untuk kunjungan hari ini.
+- [x] ✅ Task 12.6 - Audit log kunjungan dan guard penghapusan pengguna `[Sedang]` (Selesai)
+  - File: `app/Http/Controllers/Admin/VisitController.php`, `app/Http/Controllers/Admin/UserController.php`, `tests/Feature/Admin/UserManagementTest.php`
+  - Catatan: audit `visit.recorded` dan `visit.deleted`; pengguna dengan riwayat kunjungan dinonaktifkan, bukan dihapus, agar jejak audit tetap utuh.
+- [x] ✅ Task 12.7 - Grafik kunjungan 7 hari di dashboard admin `[Sedang]` (Selesai)
+  - File: `app/Http/Controllers/Admin/DashboardController.php`, `resources/views/admin/dashboard.blade.php`, `resources/css/app.css`, `tests/Feature/Admin/VisitTest.php`
+  - Catatan: agregasi tujuh hari, memakai ulang `.activity-chart` dengan warna teal, berdampingan dengan grafik peminjaman pada layar xl, dan tabel alternatif untuk pembaca layar.
+- [x] ✅ Task 12.8 - Menu sidebar, tombol cetak kartu, dan navigasi `[Mudah]` (Selesai)
+  - File: `resources/views/layouts/admin.blade.php`, `resources/views/admin/users/index.blade.php`, `resources/views/admin/users/form.blade.php`, `routes/web.php`
+  - Catatan: menu **Kunjungan** dan **Kartu Anggota** di sidebar; tombol cetak kartu pada daftar dan formulir pengguna.
+- [x] ✅ Task 12.9 - Test Fase 7 dan test E2E alur MVP `[Sedang]` (Selesai)
+  - File: `tests/Unit/MemberBarcodeTest.php`, `tests/Feature/Admin/MemberCardTest.php`, `tests/Feature/Admin/VisitTest.php`, `tests/Feature/Admin/UserManagementTest.php`, `tests/Feature/MvpFlowTest.php`
+  - Catatan: 23 test baru sejak Fase 6; E2E MVP memuat 102 assertion dari katalog sampai audit.
+- [x] ✅ Task 12.10 - QA cetak/responsif/aksesibilitas, dokumentasi, dan UAT `[Sedang]` (Selesai)
+  - File: `README.md`, `agents/uat-checklist.md`, `resources/css/app.css`, `resources/js/app.js`, `resources/views/welcome.blade.php`, `resources/views/catalog/show.blade.php`, `resources/views/admin/member-cards/print.blade.php`, `resources/views/layouts/print-card.blade.php`
+  - Catatan: 100 kombinasi halaman/lebar tanpa overflow, 0 pelanggaran axe; PDF 10 kartu = 2 halaman A4 dengan 10 barcode Code 128 terdekode; laporan A4 landscape dengan tanda tangan; dokumentasi setup dan 74 skenario UAT.
 
 ---
 
@@ -539,3 +586,41 @@
   - Grafik memakai HTML/CSS tanpa Chart.js; data agregasi dihitung portabel di PHP agar tidak bergantung fungsi tanggal MySQL.
   - Data contoh pinjaman untuk QA grafik dibuat sementara lalu dihapus kembali setelah pengujian.
 - Ditunda ke Fase 7: test E2E satu alur MVP, QA responsif 360/768/1024 px dan aksesibilitas menyeluruh, dokumentasi setup/akun demo, checklist UAT, perbaikan bug hasil review, serta opsional checkout langsung oleh admin (FR-LOAN-10).
+
+---
+
+## Catatan Fase 7
+
+- Fase 7 (kartu anggota, kunjungan, dan finalisasi MVP) selesai dan siap direview. Seluruh checklist task mencapai **100% (142/142)**.
+- Perintah verifikasi yang sudah dijalankan:
+  - `php artisan test` — **170 test lulus, 1039 assertion** (23 test baru sejak Fase 6: barcode, kartu anggota, kunjungan, guard pengguna, dan E2E MVP).
+  - `npm run build` — berhasil (63 modul).
+  - `php artisan view:cache` — seluruh Blade berhasil dikompilasi.
+  - `php vendor/bin/pint --dirty` — berhasil.
+  - `php artisan route:list --path=admin/kunjungan` — 3 route terdaftar (index, store, destroy).
+  - `php artisan route:list --path=admin/member-cards` — 2 route terdaftar (index, print).
+- Cakupan Fase 7:
+  - Kartu anggota ID-1 85,6 × 54 mm untuk guru/siswa aktif dengan barcode Code 128 dari nomor induk.
+  - Cetak tunggal dan massal (maksimal 200 anggota), 8 kartu per lembar A4 portrait, halaman berikutnya otomatis.
+  - Filter peran/kelas/pencarian pada daftar kartu; anggota tanpa nomor induk atau nomor >20 karakter dilewati dengan peringatan.
+  - Kunjungan dicatat admin dengan scan/paste nomor induk; beberapa kunjungan per hari diizinkan; scan berulang <30 menit diabaikan.
+  - Ringkasan anggota (pinjaman aktif/terlambat) tampil setelah scan; hanya kunjungan hari ini yang dapat dibatalkan.
+  - Audit `visit.recorded` dan `visit.deleted`; pengguna dengan riwayat kunjungan dinonaktifkan, bukan dihapus.
+  - Grafik kunjungan 7 hari di dashboard admin, berdampingan dengan grafik peminjaman pada layar xl.
+  - Menu sidebar **Kunjungan** dan **Kartu Anggota**, serta tombol cetak kartu di daftar/form pengguna.
+- Hasil QA:
+  - 20 halaman × 5 lebar (360/390/768/1024/1440) = **100 kombinasi, tanpa horizontal overflow**.
+  - axe-core WCAG 2.1 A/AA: **0 pelanggaran** pada halaman utama desktop dan mobile.
+  - PDF 10 kartu = **2 halaman A4 portrait** (8 kartu/lembar); seluruh **10 barcode terdekode sebagai Code 128**.
+  - PDF laporan peminjaman = **1 halaman A4 landscape**; footer tanda tangan tampil.
+- Bug yang ditemukan dan diperbaiki saat QA:
+  - Aturan cetak global menyembunyikan semua `<footer>` sehingga barcode/footer kartu hilang; selektor dipersempit ke footer halaman.
+  - Kartu massal terpotong antar halaman; lembar dipenggal eksplisit per 8 kartu dengan `break-after: page`.
+  - Nomor induk panjang membuat barcode terlalu rapat; panjang payload dibatasi 20 karakter dengan validasi dan test.
+  - Overflow 12 px pada beranda/detail katalog di 768/1024 px; gutter dibuat `g-4 g-xl-5`.
+  - Kontras link/tombol outline, nama aksesibel dropdown akun, dan region scroll yang dapat difokus keyboard diperbaiki.
+  - Pengguna dengan riwayat kunjungan sebelumnya dapat terhapus; guard penghapusan diperluas dan diuji.
+- Dokumentasi:
+  - `README.md` — setup MySQL/SQLite, akun demo, perintah dev/test, cetak kartu, laporan, scheduler, dan troubleshooting.
+  - `agents/uat-checklist.md` — 74 skenario UAT per peran/modul, ringkasan verifikasi otomatis, kriteria lulus, lembar tanda tangan, dan format defect.
+- Ditunda/opsional: checkout langsung oleh admin tanpa pengajuan (FR-LOAN-10), perpanjangan pinjaman (FR-LOAN-09), denda (FR-SET-03), pengurutan carousel drag-and-drop, dan pemotongan/resize gambar otomatis.
