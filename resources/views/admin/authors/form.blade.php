@@ -9,62 +9,49 @@
         :subtitle="$author->exists ? 'Perbarui data penulis.' : 'Tambahkan penulis baru ke basis data perpustakaan.'"
     >
         <x-slot:actions>
-            <a href="{{ route('admin.authors.index') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Kembali
-            </a>
+            <flux:button variant="outline" icon="arrow-left" href="{{ route('admin.authors.index') }}">
+                Kembali
+            </flux:button>
         </x-slot:actions>
     </x-page-header>
 
-    @if ($errors->any())
-        <div class="alert alert-danger" role="alert">
-            <ul class="mb-0 ps-3">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    <x-form-errors title="Periksa kembali data berikut:" />
 
     <form method="POST" action="{{ $author->exists ? route('admin.authors.update', $author) : route('admin.authors.store') }}" data-loading>
         @csrf
         @method($author->exists ? 'PUT' : 'POST')
 
-        <div class="row g-3">
-            <div class="col-12 col-lg-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="h6 mb-0">Data Penulis</h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Nama penulis <span class="text-danger">*</span></label>
-                            <input type="text" id="name" name="name" value="{{ old('name', $author->name) }}" class="form-control @error('name') is-invalid @enderror" maxlength="150" required>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <label for="bio" class="form-label">Biografi</label>
-                            <textarea id="bio" name="bio" rows="6" class="form-control @error('bio') is-invalid @enderror" maxlength="2000">{{ old('bio', $author->bio) }}</textarea>
-                            @error('bio')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
+        <div class="grid gap-4 xl:grid-cols-3">
+            <flux:card class="p-0! xl:col-span-2">
+                <div class="border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+                    <flux:heading size="lg" level="2">Data Penulis</flux:heading>
                 </div>
-            </div>
+                <div class="space-y-5 p-5">
+                    <flux:field>
+                        <flux:label for="name">Nama penulis <span class="text-rose-600">*</span></flux:label>
+                        <flux:input type="text" id="name" name="name" value="{{ old('name', $author->name) }}" maxlength="150" required autofocus />
+                        <flux:error name="name" />
+                    </flux:field>
 
-            <div class="col-12 col-lg-4">
-                <div class="card">
-                    <div class="card-body">
-                        <button type="submit" class="btn btn-primary w-100" data-loading-text="Menyimpan...">
-                            <i class="bi bi-save me-1" aria-hidden="true"></i>Simpan
-                        </button>
-                        <a href="{{ route('admin.authors.index') }}" class="btn btn-outline-secondary w-100 mt-2">Batal</a>
-                    </div>
+                    <flux:field>
+                        <flux:label for="bio">Biografi</flux:label>
+                        <flux:textarea id="bio" name="bio" rows="6" maxlength="2000">{{ old('bio', $author->bio) }}</flux:textarea>
+                        <flux:description>Ringkasan latar belakang penulis, maksimal 2.000 karakter.</flux:description>
+                        <flux:error name="bio" />
+                    </flux:field>
                 </div>
-            </div>
+            </flux:card>
+
+            <flux:card class="h-fit">
+                <div class="flex flex-col gap-2">
+                    <flux:button type="submit" variant="primary" icon="check" data-loading-text="Menyimpan...">
+                        Simpan
+                    </flux:button>
+                    <flux:button variant="outline" href="{{ route('admin.authors.index') }}">
+                        Batal
+                    </flux:button>
+                </div>
+            </flux:card>
         </div>
     </form>
 @endsection

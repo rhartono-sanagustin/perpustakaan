@@ -1,6 +1,6 @@
 # Sistem Informasi Perpustakaan Sekolah
 
-Aplikasi perpustakaan sekolah berbasis Laravel 12 dan Bootstrap 5 untuk mengelola katalog, pengajuan pinjaman, sirkulasi, laporan, kartu anggota, dan kunjungan perpustakaan. Seluruh antarmuka menggunakan Bahasa Indonesia dan desain flat Bootstrap tanpa Tailwind, Breeze, atau Jetstream.
+Aplikasi perpustakaan sekolah berbasis Laravel 12, Flux UI, Livewire, dan Tailwind CSS 4 untuk mengelola katalog, pengajuan pinjaman, sirkulasi, laporan, kartu anggota, dan kunjungan perpustakaan. Seluruh antarmuka menggunakan Bahasa Indonesia, sidebar dengan grup menu yang dapat dilipat, serta pilihan tema terang/gelap/sistem.
 
 ## Fitur utama
 
@@ -9,6 +9,7 @@ Aplikasi perpustakaan sekolah berbasis Laravel 12 dan Bootstrap 5 untuk mengelol
 - **Admin** — dashboard dengan grafik peminjaman dan kunjungan, CRUD buku/eksemplar/kategori/penulis/penerbit, antrean pengajuan, checkout, pengembalian, laporan, CSV, halaman cetak, pengguna, pengaturan, pengumuman, dan audit log.
 - **Kartu anggota** — kartu ID-1 (85,6 × 54 mm) untuk guru dan siswa aktif dengan barcode Code 128 dari nomor induk; cetak tunggal atau massal hingga 8 kartu per lembar A4.
 - **Kunjungan** — scan barcode kartu anggota, ringkasan pinjaman anggota, pencatatan kunjungan hari ini, pembatalan kunjungan hari ini, grafik kunjungan 7 hari, dan kiosk mandiri untuk pengunjung.
+- **Tampilan** — Flux UI dengan sidebar accordion untuk semua peran, tema terang/gelap/sistem, komponen Blade yang konsisten, dan halaman kiosk/cetak yang selalu terang.
 - **Keamanan** — middleware role/status aktif, policy kepemilikan transaksi, CSRF, rate limit login, security headers, validasi unggahan, dan audit log tindakan admin.
 
 ## Kebutuhan
@@ -147,7 +148,7 @@ php artisan schedule:work
 ## Struktur dokumentasi
 
 - `agents/prd.md` — kebutuhan produk, peran, aturan bisnis, dan cakupan MVP.
-- `agents/design.md` — pedoman UI Bootstrap, token warna, dan pola halaman.
+- `agents/design.md` — pedoman UI Flux, token tema, dan pola halaman.
 - `agents/task-instruction.md` — alur kerja pengerjaan dan kategori checklist.
 - `agents/tasklist.md` — status pengerjaan per fase.
 - `agents/uat-checklist.md` — skenario UAT akhir dan lembar tanda tangan.
@@ -166,4 +167,4 @@ php artisan schedule:work
 
 ## Lisensi
 
-Aplikasi ini dibangun di atas Laravel dan Bootstrap 5. Laravel berlisensi MIT; Bootstrap berlisensi MIT.
+Aplikasi ini dibangun di atas Laravel, Livewire, Flux UI, dan Tailwind CSS. Laravel, Livewire, Flux UI, dan Tailwind CSS berlisensi MIT.

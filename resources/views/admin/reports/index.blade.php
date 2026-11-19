@@ -13,12 +13,12 @@
         :subtitle="'Ringkasan koleksi dan aktivitas perpustakaan periode '.$filters->periodLabel().'.'"
     >
         <x-slot:actions>
-            <a href="{{ route('admin.reports.export', $exportQuery) }}" class="btn btn-outline-secondary">
-                <i class="bi bi-file-earmark-spreadsheet me-1" aria-hidden="true"></i>Ekspor CSV
-            </a>
-            <a href="{{ route('admin.reports.print', $exportQuery) }}" target="_blank" rel="noopener" class="btn btn-outline-primary">
-                <i class="bi bi-printer me-1" aria-hidden="true"></i>Cetak
-            </a>
+            <flux:button variant="outline" icon="document-text" href="{{ route('admin.reports.export', $exportQuery) }}">
+                Ekspor CSV
+            </flux:button>
+            <flux:button variant="outline" icon="printer" href="{{ route('admin.reports.print', $exportQuery) }}" target="_blank" rel="noopener">
+                Cetak
+            </flux:button>
         </x-slot:actions>
     </x-page-header>
 
@@ -32,7 +32,7 @@
         'resetUrl' => route('admin.reports.index'),
     ])
 
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3 mb-4">
+    <div class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <x-kpi-card icon="journal-bookmark" :value="$summary['total_books']" label="Total Judul Aktif" variant="primary" />
         <x-kpi-card icon="collection" :value="$summary['total_copies']" label="Total Eksemplar" variant="info" />
         <x-kpi-card icon="arrow-left-right" :value="$summary['active_loans']" label="Peminjaman Aktif" variant="primary" />
@@ -43,96 +43,84 @@
         <x-kpi-card icon="arrow-return-left" :value="$summary['returns_in_period']" label="Pengembalian pada Periode" variant="success" />
     </div>
 
-    <div class="card mb-3">
-        <div class="card-header">
-            <h2 class="h6 mb-0">Ringkasan Eksemplar per Status</h2>
+    <flux:card class="mb-4 p-0!">
+        <div class="border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+            <flux:heading size="lg" level="2">Ringkasan Eksemplar per Status</flux:heading>
         </div>
-        <div class="card-body">
-            <div class="row row-cols-2 row-cols-md-3 row-cols-xl-5 g-2">
-                @foreach ($copyStatuses as $copyStatus)
-                    <div class="col">
-                        <div class="border rounded p-3 h-100">
-                            <div class="small text-muted">{{ $copyStatus->label() }}</div>
-                            <div class="fs-4 fw-semibold">{{ $summary['copies_by_status'][$copyStatus->value] ?? 0 }}</div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
-
-    <div class="row g-3">
-        <div class="col-12 col-xl-6">
-            <div class="card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h2 class="h6 mb-0">Rekap Kategori</h2>
-                    <span class="small text-muted">{{ $summary['categories']->count() }} kategori</span>
+        <div class="grid grid-cols-2 gap-2 p-5 md:grid-cols-3 xl:grid-cols-5">
+            @foreach ($copyStatuses as $copyStatus)
+                <div class="rounded-lg border border-zinc-200 p-3 dark:border-zinc-700">
+                    <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $copyStatus->label() }}</div>
+                    <div class="text-xl font-semibold">{{ $summary['copies_by_status'][$copyStatus->value] ?? 0 }}</div>
                 </div>
-
-                @if ($summary['categories']->isEmpty())
-                    <div class="card-body">
-                        <x-empty-state icon="tags" title="Belum ada kategori" message="Tambahkan kategori untuk melihat rekap koleksi." />
-                    </div>
-                @else
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Kategori</th>
-                                    <th scope="col" class="text-end">Judul Aktif</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($summary['categories'] as $category)
-                                    <tr>
-                                        <td>{{ $category->name }}</td>
-                                        <td class="text-end">{{ $category->active_books_count }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
-            </div>
+            @endforeach
         </div>
+    </flux:card>
 
-        <div class="col-12 col-xl-6">
-            <div class="card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h2 class="h6 mb-0">Buku Paling Populer</h2>
-                    <a href="{{ route('admin.reports.popular', $filters->query()) }}" class="small">Lihat laporan</a>
+    <div class="grid gap-3 xl:grid-cols-2">
+        <flux:card class="p-0!">
+            <div class="flex items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+                <flux:heading size="lg" level="2">Rekap Kategori</flux:heading>
+                <flux:badge color="zinc" size="sm">{{ $summary['categories']->count() }} kategori</flux:badge>
+            </div>
+
+            @if ($summary['categories']->isEmpty())
+                <x-empty-state icon="tags" title="Belum ada kategori" message="Tambahkan kategori untuk melihat rekap koleksi." />
+            @else
+                <div class="overflow-x-auto" data-scrollable-region>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Kategori</th>
+                                <th scope="col" class="text-end">Judul Aktif</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($summary['categories'] as $category)
+                                <tr>
+                                    <td>{{ $category->name }}</td>
+                                    <td class="text-end">{{ $category->active_books_count }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
+            @endif
+        </flux:card>
 
-                @if ($summary['top_books']->isEmpty())
-                    <div class="card-body">
-                        <x-empty-state icon="star" title="Belum ada data peminjaman" message="Tidak ada peminjaman pada periode ini." />
-                    </div>
-                @else
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Judul</th>
-                                    <th scope="col" class="text-end">Checkout</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($summary['top_books'] as $index => $book)
-                                    <tr>
-                                        <td class="text-muted">{{ $index + 1 }}</td>
-                                        <td>
-                                            <div>{{ $book->title }}</div>
-                                            <div class="small text-muted">{{ $book->category?->name ?? 'Tanpa kategori' }}</div>
-                                        </td>
-                                        <td class="text-end fw-semibold">{{ $book->checkout_count }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
+        <flux:card class="p-0!">
+            <div class="flex items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+                <flux:heading size="lg" level="2">Buku Paling Populer</flux:heading>
+                <flux:link href="{{ route('admin.reports.popular', $filters->query()) }}" class="text-sm">Lihat laporan</flux:link>
             </div>
-        </div>
+
+            @if ($summary['top_books']->isEmpty())
+                <x-empty-state icon="star" title="Belum ada data peminjaman" message="Tidak ada peminjaman pada periode ini." />
+            @else
+                <div class="overflow-x-auto" data-scrollable-region>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Judul</th>
+                                <th scope="col" class="text-end">Checkout</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($summary['top_books'] as $index => $book)
+                                <tr>
+                                    <td class="text-zinc-500 dark:text-zinc-400">{{ $index + 1 }}</td>
+                                    <td>
+                                        <div>{{ $book->title }}</div>
+                                        <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $book->category?->name ?? 'Tanpa kategori' }}</div>
+                                    </td>
+                                    <td class="text-end font-semibold">{{ $book->checkout_count }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </flux:card>
     </div>
 @endsection

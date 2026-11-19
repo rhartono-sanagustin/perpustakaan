@@ -9,65 +9,58 @@
         subtitle="Kelola gambar yang tampil pada carousel di landing page."
     >
         <x-slot:actions>
-            <a href="{{ route('admin.settings.carousel.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Tambah Slide
-            </a>
+            <flux:button variant="primary" icon="plus" href="{{ route('admin.settings.carousel.create') }}">
+                Tambah Slide
+            </flux:button>
         </x-slot:actions>
     </x-page-header>
 
     @include('admin.settings._nav')
 
-    <div class="alert alert-info d-flex align-items-start gap-2" role="status">
-        <i class="bi bi-info-circle mt-1" aria-hidden="true"></i>
-        <div>
-            <div class="fw-semibold">{{ $activeCount }} dari {{ $maxActive }} slide aktif</div>
-            <div class="small">Slide nonaktif tetap tersimpan, tetapi tidak tampil di beranda. Urutan slide dapat diubah dengan tombol naik/turun.</div>
-        </div>
-    </div>
+    <flux:callout icon="information-circle" class="mb-4">
+        <flux:callout.heading>{{ $activeCount }} dari {{ $maxActive }} slide aktif</flux:callout.heading>
+        <flux:callout.text>Slide nonaktif tetap tersimpan, tetapi tidak tampil di beranda. Urutan slide dapat diubah dengan tombol naik/turun.</flux:callout.text>
+    </flux:callout>
 
     @if ($slides->isEmpty())
-        <x-empty-state
-            icon="images"
-            title="Belum ada slide carousel"
-            message="Tambahkan gambar untuk ditampilkan di landing page."
-        >
-            <a href="{{ route('admin.settings.carousel.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Tambah Slide
-            </a>
-        </x-empty-state>
+        <flux:card>
+            <x-empty-state
+                icon="images"
+                title="Belum ada slide carousel"
+                message="Tambahkan gambar untuk ditampilkan di landing page."
+            >
+                <flux:button variant="primary" icon="plus" href="{{ route('admin.settings.carousel.create') }}">Tambah Slide</flux:button>
+            </x-empty-state>
+        </flux:card>
     @else
-        <div class="card">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+        <flux:card class="p-0!">
+            <div class="overflow-x-auto" data-scrollable-region>
+                <table class="data-table">
                     <thead>
                         <tr>
-                            <th scope="col" class="text-center" style="width: 80px;">Urutan</th>
-                            <th scope="col" style="width: 150px;">Gambar</th>
+                            <th scope="col" class="w-20 text-center">Urutan</th>
+                            <th scope="col" class="w-36">Gambar</th>
                             <th scope="col">Informasi Slide</th>
-                            <th scope="col" style="width: 110px;">Status</th>
-                            <th scope="col" class="text-end" style="width: 320px;">Aksi</th>
+                            <th scope="col" class="w-28">Status</th>
+                            <th scope="col" class="text-end">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($slides as $slide)
                             <tr>
                                 <td class="text-center">
-                                    <div class="d-flex flex-column align-items-center gap-1">
-                                        <span class="fw-semibold">{{ $loop->iteration }}</span>
-                                        <div class="btn-group btn-group-sm" role="group" aria-label="Ubah urutan slide">
+                                    <div class="flex flex-col items-center gap-1">
+                                        <span class="font-semibold">{{ $loop->iteration }}</span>
+                                        <div class="inline-flex overflow-hidden rounded-md border border-zinc-200 dark:border-zinc-700">
                                             <form method="POST" action="{{ route('admin.settings.carousel.move', $slide) }}">
                                                 @csrf
                                                 <input type="hidden" name="direction" value="up">
-                                                <button type="submit" class="btn btn-outline-secondary" aria-label="Naikkan slide {{ $loop->iteration }}" @disabled($loop->first)>
-                                                    <i class="bi bi-arrow-up" aria-hidden="true"></i>
-                                                </button>
+                                                <flux:button type="submit" size="xs" variant="subtle" icon="arrow-up" aria-label="Naikkan slide {{ $loop->iteration }}" :disabled="$loop->first" class="rounded-none border-0" />
                                             </form>
                                             <form method="POST" action="{{ route('admin.settings.carousel.move', $slide) }}">
                                                 @csrf
                                                 <input type="hidden" name="direction" value="down">
-                                                <button type="submit" class="btn btn-outline-secondary" aria-label="Turunkan slide {{ $loop->iteration }}" @disabled($loop->last)>
-                                                    <i class="bi bi-arrow-down" aria-hidden="true"></i>
-                                                </button>
+                                                <flux:button type="submit" size="xs" variant="subtle" icon="arrow-down" aria-label="Turunkan slide {{ $loop->iteration }}" :disabled="$loop->last" class="rounded-none border-0" />
                                             </form>
                                         </div>
                                     </div>
@@ -76,51 +69,46 @@
                                     <img
                                         src="{{ $slide->imageUrl() }}"
                                         alt=""
-                                        class="border"
-                                        style="width: 130px; height: 73px; object-fit: cover;"
+                                        class="h-[73px] w-[130px] rounded-md border border-zinc-200 object-cover dark:border-zinc-700"
                                     >
                                 </td>
                                 <td>
-                                    <div class="fw-semibold">{{ $slide->title ?: 'Tanpa judul' }}</div>
+                                    <div class="font-semibold">{{ $slide->title ?: 'Tanpa judul' }}</div>
                                     @if ($slide->caption)
-                                        <div class="small text-muted text-truncate" style="max-width: 420px;">{{ $slide->caption }}</div>
+                                        <div class="max-w-md truncate text-xs text-zinc-500 dark:text-zinc-400">{{ $slide->caption }}</div>
                                     @endif
                                     @if ($slide->link_url)
-                                        <div class="small text-muted text-truncate" style="max-width: 420px;">
-                                            <i class="bi bi-link-45deg" aria-hidden="true"></i>{{ $slide->link_url }}
+                                        <div class="mt-1 flex max-w-md items-center gap-1 truncate text-xs text-zinc-500 dark:text-zinc-400">
+                                            <flux:icon.link class="size-3.5 shrink-0" />{{ $slide->link_url }}
                                         </div>
                                     @endif
                                 </td>
                                 <td>
                                     @if ($slide->is_active)
-                                        <span class="badge text-bg-success">Aktif</span>
+                                        <flux:badge color="green" size="sm">Aktif</flux:badge>
                                     @else
-                                        <span class="badge text-bg-secondary">Nonaktif</span>
+                                        <flux:badge color="zinc" size="sm">Nonaktif</flux:badge>
                                     @endif
                                 </td>
                                 <td>
-                                    <div class="d-flex flex-wrap justify-content-end gap-1">
-                                        <a href="{{ route('admin.settings.carousel.edit', $slide) }}" class="btn btn-outline-primary btn-sm">
-                                            <i class="bi bi-pencil me-1" aria-hidden="true"></i>Edit
-                                        </a>
+                                    <div class="flex flex-wrap justify-end gap-1">
+                                        <flux:button size="sm" variant="outline" icon="pencil" href="{{ route('admin.settings.carousel.edit', $slide) }}">
+                                            Edit
+                                        </flux:button>
 
                                         <form method="POST" action="{{ route('admin.settings.carousel.toggle', $slide) }}">
                                             @csrf
-                                            <button type="submit" class="btn btn-outline-secondary btn-sm">
-                                                @if ($slide->is_active)
-                                                    <i class="bi bi-pause-circle me-1" aria-hidden="true"></i>Nonaktifkan
-                                                @else
-                                                    <i class="bi bi-play-circle me-1" aria-hidden="true"></i>Aktifkan
-                                                @endif
-                                            </button>
+                                            <flux:button type="submit" size="sm" variant="outline" :icon="$slide->is_active ? 'pause-circle' : 'play-circle'">
+                                                {{ $slide->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                                            </flux:button>
                                         </form>
 
                                         <form method="POST" action="{{ route('admin.settings.carousel.destroy', $slide) }}" data-confirm="Hapus slide &quot;{{ $slide->title ?: 'Tanpa judul' }}&quot;? Gambar juga akan dihapus.">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger btn-sm">
-                                                <i class="bi bi-trash me-1" aria-hidden="true"></i>Hapus
-                                            </button>
+                                            <flux:button type="submit" size="sm" variant="danger" icon="trash">
+                                                Hapus
+                                            </flux:button>
                                         </form>
                                     </div>
                                 </td>
@@ -129,6 +117,6 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+        </flux:card>
     @endif
 @endsection

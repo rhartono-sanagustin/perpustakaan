@@ -5,7 +5,7 @@
 
 @section('content')
     <header class="print-header">
-        <div class="d-flex align-items-center gap-3">
+        <div class="flex items-center gap-3">
             <img src="{{ $identity->logoUrl() }}" alt="" class="print-logo">
             <div>
                 <div class="print-brand">{{ $identity->libraryName() }}</div>
@@ -46,7 +46,7 @@
 
     @if ($report === 'ringkasan')
         @php($summary = $data['summary'])
-        <table class="table table-sm print-table print-summary-table">
+        <table class="print-table print-summary-table">
             <tbody>
                 <tr>
                     <th scope="row">Total judul aktif</th>
@@ -86,7 +86,7 @@
         </table>
 
         <h2 class="print-section-title">Rekap Kategori</h2>
-        <table class="table table-sm print-table">
+        <table class="print-table">
             <thead>
                 <tr>
                     <th scope="col">Kategori</th>
@@ -101,14 +101,14 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="2" class="text-center text-muted">Belum ada kategori.</td>
+                        <td colspan="2" class="text-center print-muted">Belum ada kategori.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
 
         <h2 class="print-section-title">Buku Paling Populer</h2>
-        <table class="table table-sm print-table">
+        <table class="print-table">
             <thead>
                 <tr>
                     <th scope="col">#</th>
@@ -127,14 +127,14 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="text-center text-muted">Tidak ada peminjaman pada periode ini.</td>
+                        <td colspan="4" class="text-center print-muted">Tidak ada peminjaman pada periode ini.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     @elseif (in_array($report, ['peminjaman', 'pengembalian'], true))
         @php($isReturn = $report === 'pengembalian')
-        <table class="table table-sm print-table">
+        <table class="print-table">
             <thead>
                 <tr>
                     <th scope="col">No. Transaksi</th>
@@ -167,13 +167,13 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="text-center text-muted">Tidak ada data untuk filter periode ini.</td>
+                        <td colspan="9" class="text-center print-muted">Tidak ada data untuk filter periode ini.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     @elseif ($report === 'keterlambatan')
-        <table class="table table-sm print-table">
+        <table class="print-table">
             <thead>
                 <tr>
                     <th scope="col">No. Transaksi</th>
@@ -202,7 +202,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="text-center text-muted">Tidak ada pinjaman terlambat saat ini.</td>
+                        <td colspan="9" class="text-center print-muted">Tidak ada pinjaman terlambat saat ini.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -214,7 +214,7 @@
             @endforeach
         </div>
 
-        <table class="table table-sm print-table">
+        <table class="print-table">
             <thead>
                 <tr>
                     <th scope="col">Kode Inventaris</th>
@@ -239,13 +239,13 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center text-muted">Tidak ada eksemplar yang cocok dengan filter.</td>
+                        <td colspan="7" class="text-center print-muted">Tidak ada eksemplar yang cocok dengan filter.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     @elseif ($report === 'populer')
-        <table class="table table-sm print-table">
+        <table class="print-table">
             <thead>
                 <tr>
                     <th scope="col">Peringkat</th>
@@ -266,7 +266,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="text-center text-muted">Tidak ada data checkout pada periode ini.</td>
+                        <td colspan="5" class="text-center print-muted">Tidak ada data checkout pada periode ini.</td>
                     </tr>
                 @endforelse
             </tbody>

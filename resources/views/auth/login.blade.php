@@ -3,96 +3,73 @@
 @section('title', 'Masuk')
 
 @section('content')
-    <div class="mb-4">
-        <h1 class="h4 mb-1">Masuk ke Perpustakaan</h1>
-        <p class="text-muted mb-0">Gunakan email atau nomor induk yang terdaftar.</p>
+    <div class="mb-6">
+        <flux:heading size="lg">Masuk ke Perpustakaan</flux:heading>
+        <flux:text class="mt-1">Gunakan email atau nomor induk yang terdaftar.</flux:text>
     </div>
 
-    @if ($errors->any())
-        <div class="alert alert-danger" role="alert">
-            <div class="d-flex gap-2">
-                <i class="bi bi-exclamation-triangle-fill mt-1" aria-hidden="true"></i>
-                <div>
-                    <strong>Periksa kembali data Anda.</strong>
-                    <ul class="mb-0 ps-3">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
-        </div>
-    @endif
+    <x-form-errors title="Periksa kembali data Anda." />
 
-    <form method="POST" action="{{ route('login') }}" data-loading>
+    <form method="POST" action="{{ route('login') }}" data-loading class="space-y-4">
         @csrf
 
-        <div class="mb-3">
-            <label for="login" class="form-label">Email atau Nomor Induk</label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-person" aria-hidden="true"></i></span>
-                <input
-                    id="login"
-                    name="login"
-                    type="text"
-                    class="form-control @error('login') is-invalid @enderror"
-                    value="{{ old('login') }}"
-                    placeholder="nama@sekolah.sch.id / NIS"
-                    required
-                    autofocus
-                    autocomplete="username"
-                    aria-describedby="login-help"
-                >
-            </div>
-            @error('login')
-                <div class="invalid-feedback d-block">{{ $message }}</div>
-            @enderror
-            <div id="login-help" class="form-text">Gunakan akun yang diberikan oleh admin perpustakaan.</div>
-        </div>
+        <flux:field>
+            <flux:label for="login">Email atau Nomor Induk</flux:label>
+            <flux:input
+                id="login"
+                name="login"
+                type="text"
+                value="{{ old('login') }}"
+                placeholder="nama@sekolah.sch.id / NIS"
+                icon="user"
+                required
+                autofocus
+                autocomplete="username"
+                aria-describedby="login-help"
+            />
+            <flux:description id="login-help">Gunakan akun yang diberikan oleh admin perpustakaan.</flux:description>
+            <flux:error name="login" />
+        </flux:field>
 
-        <div class="mb-3">
-            <label for="password" class="form-label">Kata Sandi</label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-lock" aria-hidden="true"></i></span>
-                <input
+        <flux:field>
+            <flux:label for="password">Kata Sandi</flux:label>
+            <div class="relative">
+                <flux:input
                     id="password"
                     name="password"
                     type="password"
-                    class="form-control @error('password') is-invalid @enderror"
                     placeholder="Masukkan kata sandi"
+                    icon="lock-closed"
+                    class="pe-12"
                     required
                     autocomplete="current-password"
-                >
+                />
                 <button
-                    class="btn btn-outline-secondary"
                     type="button"
+                    class="absolute end-1 top-1/2 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-white/10 dark:hover:text-white"
                     data-toggle-password="#password"
                     aria-label="Tampilkan kata sandi"
                 >
-                    <i class="bi bi-eye" aria-hidden="true"></i>
+                    <flux:icon.eye data-password-show variant="mini" class="size-4" />
+                    <flux:icon.eye-slash data-password-hide variant="mini" class="hidden size-4" />
                 </button>
             </div>
-            @error('password')
-                <div class="invalid-feedback d-block">{{ $message }}</div>
-            @enderror
+            <flux:error name="password" />
+        </flux:field>
+
+        <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+            <flux:checkbox name="remember" value="1" :checked="(bool) old('remember')" label="Ingat saya" />
+            <span class="text-xs text-zinc-500 dark:text-zinc-400">Lupa kata sandi? Hubungi admin.</span>
         </div>
 
-        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-4">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="remember" id="remember" value="1" @checked(old('remember'))>
-                <label class="form-check-label" for="remember">Ingat saya</label>
-            </div>
-            <span class="small text-muted">Lupa kata sandi? Hubungi admin.</span>
-        </div>
-
-        <button type="submit" class="btn btn-primary w-100 py-2" data-loading-text="Memproses...">
-            <i class="bi bi-box-arrow-in-right me-2" aria-hidden="true"></i>Masuk
-        </button>
+        <flux:button type="submit" variant="primary" icon="arrow-right-start-on-rectangle" class="w-full" data-loading-text="Memproses...">
+            Masuk
+        </flux:button>
     </form>
 
-    <hr class="my-4">
+    <flux:separator class="my-6" />
 
-    <p class="small text-muted text-center mb-0">
+    <p class="text-center text-xs text-zinc-500 dark:text-zinc-400">
         Belum punya akun? Hubungi admin perpustakaan untuk pendaftaran.
     </p>
 @endsection

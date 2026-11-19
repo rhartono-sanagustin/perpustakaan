@@ -17,16 +17,16 @@
 <body class="print-page">
     <div class="print-toolbar no-print">
         <div>
-            <div class="fw-semibold">Pratinjau Cetak</div>
-            <div class="small text-muted">Gunakan dialog cetak browser untuk menyimpan sebagai PDF atau mencetak.</div>
+            <div class="font-semibold">Pratinjau Cetak</div>
+            <div class="text-xs text-slate-500">Gunakan dialog cetak browser untuk menyimpan sebagai PDF atau mencetak.</div>
         </div>
-        <div class="d-flex gap-2">
-            <button type="button" class="btn btn-primary" data-print>
-                <i class="bi bi-printer me-1" aria-hidden="true"></i>Cetak
-            </button>
-            <button type="button" class="btn btn-outline-secondary" data-close-print>
-                <i class="bi bi-x-lg me-1" aria-hidden="true"></i>Tutup
-            </button>
+        <div class="flex gap-2">
+            <flux:button type="button" variant="primary" icon="printer" data-print>
+                Cetak
+            </flux:button>
+            <flux:button type="button" variant="outline" icon="x-mark" data-close-print>
+                Tutup
+            </flux:button>
         </div>
     </div>
 

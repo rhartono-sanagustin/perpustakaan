@@ -6,70 +6,69 @@
 @section('content')
     <x-page-header title="Permintaan Peminjaman" subtitle="Proses pengajuan guru dan siswa sebelum buku diserahkan.">
         <x-slot:actions>
-            <a href="{{ route('admin.loans.index') }}" class="btn btn-outline-primary">
-                <i class="bi bi-arrow-left-right me-1" aria-hidden="true"></i>Peminjaman Aktif
-            </a>
+            <flux:button variant="outline" icon="arrows-right-left" href="{{ route('admin.loans.index') }}">
+                Peminjaman Aktif
+            </flux:button>
         </x-slot:actions>
     </x-page-header>
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <form method="GET" action="{{ route('admin.requests.index') }}" class="row g-2 align-items-end">
-                <div class="col-12 col-lg-4">
-                    <label for="q" class="form-label">Cari</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-search" aria-hidden="true"></i></span>
-                        <input type="search" id="q" name="q" value="{{ $search }}" class="form-control" placeholder="Nama, nomor induk, judul, atau ISBN">
-                    </div>
-                </div>
+    <flux:card class="mb-4">
+        <form method="GET" action="{{ route('admin.requests.index') }}" class="grid items-end gap-3 md:grid-cols-2 xl:grid-cols-12">
+            <div class="xl:col-span-4">
+                <flux:field>
+                    <flux:label for="q">Cari</flux:label>
+                    <flux:input type="search" id="q" name="q" value="{{ $search }}" icon="magnifying-glass" placeholder="Nama, nomor induk, judul, atau ISBN" />
+                </flux:field>
+            </div>
 
-                <div class="col-6 col-lg-2">
-                    <label for="status" class="form-label">Status</label>
-                    <select id="status" name="status" class="form-select">
+            <div class="xl:col-span-2">
+                <flux:field>
+                    <flux:label for="status">Status</flux:label>
+                    <flux:select id="status" name="status">
                         @foreach ($statuses as $requestStatus)
                             <option value="{{ $requestStatus->value }}" @selected($status === $requestStatus->value)>
                                 {{ $requestStatus->label() }} ({{ $counts[$requestStatus->value] ?? 0 }})
                             </option>
                         @endforeach
                         <option value="all" @selected($status === 'all')>Semua status</option>
-                    </select>
-                </div>
+                    </flux:select>
+                </flux:field>
+            </div>
 
-                <div class="col-6 col-lg-2">
-                    <label for="date_from" class="form-label">Dari tanggal</label>
-                    <input type="date" id="date_from" name="date_from" value="{{ $dateFrom }}" class="form-control">
-                </div>
+            <div class="xl:col-span-2">
+                <flux:field>
+                    <flux:label for="date_from">Dari tanggal</flux:label>
+                    <flux:input type="date" id="date_from" name="date_from" value="{{ $dateFrom }}" />
+                </flux:field>
+            </div>
 
-                <div class="col-6 col-lg-2">
-                    <label for="date_to" class="form-label">Sampai tanggal</label>
-                    <input type="date" id="date_to" name="date_to" value="{{ $dateTo }}" class="form-control">
-                </div>
+            <div class="xl:col-span-2">
+                <flux:field>
+                    <flux:label for="date_to">Sampai tanggal</flux:label>
+                    <flux:input type="date" id="date_to" name="date_to" value="{{ $dateTo }}" />
+                </flux:field>
+            </div>
 
-                <div class="col-6 col-lg-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-grow-1">Terapkan</button>
-                    @if ($search !== '' || $status !== 'menunggu' || $dateFrom || $dateTo)
-                        <a href="{{ route('admin.requests.index') }}" class="btn btn-outline-secondary" aria-label="Reset filter">
-                            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                        </a>
-                    @endif
-                </div>
-            </form>
-        </div>
-    </div>
+            <div class="flex gap-2 xl:col-span-2">
+                <flux:button type="submit" variant="primary" class="flex-1">Terapkan</flux:button>
+                @if ($search !== '' || $status !== 'menunggu' || $dateFrom || $dateTo)
+                    <flux:button variant="outline" href="{{ route('admin.requests.index') }}" icon="arrow-path" aria-label="Reset filter" />
+                @endif
+            </div>
+        </form>
+    </flux:card>
 
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h6 mb-0">Antrean Permintaan</h2>
-            <span class="small text-muted">{{ $requests->total() }} data</span>
+    <flux:card class="p-0!">
+        <div class="flex items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+            <flux:heading size="lg" level="2">Antrean Permintaan</flux:heading>
+            <flux:badge color="zinc" size="sm">{{ $requests->total() }} data</flux:badge>
         </div>
 
         @if ($requests->isEmpty())
-            <div class="card-body">
-                <x-empty-state icon="inbox" title="Tidak ada permintaan" message="Tidak ada permintaan yang sesuai dengan filter saat ini." />
-            </div>
+            <x-empty-state icon="inbox" title="Tidak ada permintaan" message="Tidak ada permintaan yang sesuai dengan filter saat ini." />
         @else
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+            <div class="overflow-x-auto" data-scrollable-region>
+                <table class="data-table">
                     <thead>
                         <tr>
                             <th scope="col">Peminjam</th>
@@ -83,8 +82,8 @@
                         @foreach ($requests as $loanRequest)
                             <tr>
                                 <td>
-                                    <div class="fw-semibold">{{ $loanRequest->user->name }}</div>
-                                    <div class="small text-muted">
+                                    <div class="font-semibold">{{ $loanRequest->user->name }}</div>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">
                                         {{ $loanRequest->user->roleLabel() }} &middot; {{ $loanRequest->user->nomor_induk }}
                                         @if ($loanRequest->user->kelas)
                                             &middot; {{ $loanRequest->user->kelas }}
@@ -95,24 +94,24 @@
                                 </td>
                                 <td>
                                     <div>{{ $loanRequest->book->title }}</div>
-                                    <div class="small text-muted">{{ $loanRequest->book->authors_label ?: 'Penulis tidak diketahui' }}</div>
-                                    <div class="small text-muted">#{{ $loanRequest->reference }}</div>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $loanRequest->book->authors_label ?: 'Penulis tidak diketahui' }}</div>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">#{{ $loanRequest->reference }}</div>
                                 </td>
-                                <td class="small text-muted">
+                                <td class="text-xs whitespace-nowrap text-zinc-500 dark:text-zinc-400">
                                     {{ $loanRequest->requested_at->locale('id')->translatedFormat('d M Y, H:i') }}
                                 </td>
                                 <td>
                                     <x-status-badge :label="$loanRequest->statusLabel()" :variant="$loanRequest->statusVariant()" />
                                     @if ($loanRequest->isApproved() && ! $loanRequest->isExpired())
-                                        <div class="small text-muted mt-1">
+                                        <div class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
                                             Ambil s.d. {{ $loanRequest->expires_at?->locale('id')->translatedFormat('d M Y, H:i') }}
                                         </div>
                                     @endif
                                 </td>
                                 <td class="text-end">
-                                    <a href="{{ route('admin.requests.show', $loanRequest) }}" class="btn btn-sm btn-outline-primary">
+                                    <flux:button size="sm" variant="outline" href="{{ route('admin.requests.show', $loanRequest) }}">
                                         {{ $loanRequest->isPending() ? 'Proses' : 'Detail' }}
-                                    </a>
+                                    </flux:button>
                                 </td>
                             </tr>
                         @endforeach
@@ -120,10 +119,10 @@
                 </table>
             </div>
 
-            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <span class="small text-muted">Menampilkan {{ $requests->firstItem() }}&ndash;{{ $requests->lastItem() }} dari {{ $requests->total() }} permintaan</span>
+            <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 px-5 py-4 dark:border-white/10">
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">Menampilkan {{ $requests->firstItem() }}&ndash;{{ $requests->lastItem() }} dari {{ $requests->total() }} permintaan</span>
                 {{ $requests->links() }}
             </div>
         @endif
-    </div>
+    </flux:card>
 @endsection

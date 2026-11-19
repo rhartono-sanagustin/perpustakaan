@@ -13,12 +13,12 @@
         subtitle="Daftar pinjaman aktif yang melewati tanggal jatuh tempo saat ini."
     >
         <x-slot:actions>
-            <a href="{{ route('admin.reports.export', $exportQuery) }}" class="btn btn-outline-secondary">
-                <i class="bi bi-file-earmark-spreadsheet me-1" aria-hidden="true"></i>Ekspor CSV
-            </a>
-            <a href="{{ route('admin.reports.print', $exportQuery) }}" target="_blank" rel="noopener" class="btn btn-outline-primary">
-                <i class="bi bi-printer me-1" aria-hidden="true"></i>Cetak
-            </a>
+            <flux:button variant="outline" icon="document-text" href="{{ route('admin.reports.export', $exportQuery) }}">
+                Ekspor CSV
+            </flux:button>
+            <flux:button variant="outline" icon="printer" href="{{ route('admin.reports.print', $exportQuery) }}" target="_blank" rel="noopener">
+                Cetak
+            </flux:button>
         </x-slot:actions>
     </x-page-header>
 
@@ -31,31 +31,26 @@
         'resetUrl' => route('admin.reports.overdue'),
     ])
 
-    <div class="alert alert-warning d-flex align-items-start gap-2" role="status">
-        <i class="bi bi-info-circle mt-1" aria-hidden="true"></i>
-        <div>
-            <div class="fw-semibold">{{ $loans->total() }} pinjaman terlambat</div>
-            <div class="small">Laporan ini menampilkan kondisi saat ini, bukan dibatasi periode tanggal.</div>
-        </div>
-    </div>
+    <flux:callout variant="warning" icon="information-circle" class="mb-4">
+        <flux:callout.heading>{{ $loans->total() }} pinjaman terlambat</flux:callout.heading>
+        <flux:callout.text>Laporan ini menampilkan kondisi saat ini, bukan dibatasi periode tanggal.</flux:callout.text>
+    </flux:callout>
 
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h6 mb-0">Pinjaman Terlambat</h2>
-            <span class="small text-muted">Diurutkan dari jatuh tempo terlama</span>
+    <flux:card class="p-0!">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+            <flux:heading size="lg" level="2">Pinjaman Terlambat</flux:heading>
+            <span class="text-xs text-zinc-500 dark:text-zinc-400">Diurutkan dari jatuh tempo terlama</span>
         </div>
 
         @if ($loans->isEmpty())
-            <div class="card-body">
-                <x-empty-state
-                    icon="check2-circle"
-                    title="Tidak ada pinjaman terlambat"
-                    message="Semua pinjaman aktif saat ini masih dalam masa tenggat."
-                />
-            </div>
+            <x-empty-state
+                icon="check2-circle"
+                title="Tidak ada pinjaman terlambat"
+                message="Semua pinjaman aktif saat ini masih dalam masa tenggat."
+            />
         @else
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+            <div class="overflow-x-auto" data-scrollable-region>
+                <table class="data-table">
                     <thead>
                         <tr>
                             <th scope="col">Transaksi</th>
@@ -70,32 +65,32 @@
                         @foreach ($loans as $loan)
                             <tr>
                                 <td>
-                                    <div class="fw-semibold">#{{ $loan->reference }}</div>
-                                    <div class="small text-muted">Dipinjam {{ $loan->borrowed_at->locale('id')->translatedFormat('d M Y') }}</div>
+                                    <div class="font-semibold">#{{ $loan->reference }}</div>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">Dipinjam {{ $loan->borrowed_at->locale('id')->translatedFormat('d M Y') }}</div>
                                 </td>
                                 <td>
-                                    <div class="fw-semibold">{{ $loan->user->name }}</div>
-                                    <div class="small text-muted">
+                                    <div class="font-semibold">{{ $loan->user->name }}</div>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">
                                         {{ $loan->user->roleLabel() }} &middot; {{ $loan->user->nomor_induk }}
                                     </div>
-                                    <div class="small text-muted">
-                                        <i class="bi bi-telephone me-1" aria-hidden="true"></i>{{ $loan->user->no_telepon ?? 'Nomor telepon belum diisi' }}
+                                    <div class="mt-0.5 flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
+                                        <flux:icon.phone variant="mini" class="size-3.5" />{{ $loan->user->no_telepon ?? 'Nomor telepon belum diisi' }}
                                     </div>
                                 </td>
                                 <td>
                                     <div>{{ $loan->copy->book->title }}</div>
-                                    <div class="small text-muted">{{ $loan->copy->inventory_code }}</div>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $loan->copy->inventory_code }}</div>
                                 </td>
-                                <td class="small text-muted">
+                                <td class="text-xs text-zinc-500 dark:text-zinc-400">
                                     {{ $loan->due_at->locale('id')->translatedFormat('d M Y') }}
                                 </td>
                                 <td>
-                                    <span class="badge text-bg-danger">{{ $loan->daysOverdue() }} hari</span>
+                                    <flux:badge color="red">{{ $loan->daysOverdue() }} hari</flux:badge>
                                 </td>
                                 <td class="text-end">
-                                    <a href="{{ route('admin.loans.return', $loan) }}" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-arrow-return-left me-1" aria-hidden="true"></i>Tindak Lanjut
-                                    </a>
+                                    <flux:button size="sm" variant="outline" icon="arrow-uturn-left" href="{{ route('admin.loans.return', $loan) }}">
+                                        Tindak Lanjut
+                                    </flux:button>
                                 </td>
                             </tr>
                         @endforeach
@@ -103,10 +98,10 @@
                 </table>
             </div>
 
-            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <span class="small text-muted">Menampilkan {{ $loans->firstItem() }}&ndash;{{ $loans->lastItem() }} dari {{ $loans->total() }} pinjaman</span>
+            <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 px-5 py-4 dark:border-white/10">
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">Menampilkan {{ $loans->firstItem() }}&ndash;{{ $loans->lastItem() }} dari {{ $loans->total() }} pinjaman</span>
                 {{ $loans->links() }}
             </div>
         @endif
-    </div>
+    </flux:card>
 @endsection

@@ -9,78 +9,70 @@
         :subtitle="$category->exists ? 'Perbarui nama dan deskripsi kategori.' : 'Buat kategori baru untuk koleksi perpustakaan.'"
     >
         <x-slot:actions>
-            <a href="{{ route('admin.categories.index') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Kembali
-            </a>
+            <flux:button variant="outline" icon="arrow-left" href="{{ route('admin.categories.index') }}">
+                Kembali
+            </flux:button>
         </x-slot:actions>
     </x-page-header>
 
-    @if ($errors->any())
-        <div class="alert alert-danger" role="alert">
-            <ul class="mb-0 ps-3">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    <x-form-errors title="Periksa kembali data berikut:" />
 
     <form method="POST" action="{{ $category->exists ? route('admin.categories.update', $category) : route('admin.categories.store') }}" data-loading>
         @csrf
         @method($category->exists ? 'PUT' : 'POST')
 
-        <div class="row g-3">
-            <div class="col-12 col-lg-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="h6 mb-0">Data Kategori</h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Nama kategori <span class="text-danger">*</span></label>
-                            <input type="text" id="name" name="name" value="{{ old('name', $category->name) }}" class="form-control @error('name') is-invalid @enderror" maxlength="100" required>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            @if ($category->exists)
-                                <div class="form-text">Slug saat ini: <code>{{ $category->slug }}</code></div>
-                            @endif
-                        </div>
-
-                        <div>
-                            <label for="description" class="form-label">Deskripsi</label>
-                            <textarea id="description" name="description" rows="5" class="form-control @error('description') is-invalid @enderror" maxlength="1000">{{ old('description', $category->description) }}</textarea>
-                            @error('description')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
+        <div class="grid gap-4 xl:grid-cols-3">
+            <flux:card class="p-0! xl:col-span-2">
+                <div class="border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+                    <flux:heading size="lg" level="2">Data Kategori</flux:heading>
                 </div>
-            </div>
+                <div class="space-y-5 p-5">
+                    <flux:field>
+                        <flux:label for="name">Nama kategori <span class="text-rose-600">*</span></flux:label>
+                        <flux:input type="text" id="name" name="name" value="{{ old('name', $category->name) }}" maxlength="100" required autofocus />
+                        @if ($category->exists)
+                            <flux:description>Slug saat ini: <code class="rounded bg-zinc-100 px-1.5 py-0.5 text-xs dark:bg-white/10">{{ $category->slug }}</code></flux:description>
+                        @endif
+                        <flux:error name="name" />
+                    </flux:field>
 
-            <div class="col-12 col-lg-4">
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h2 class="h6 mb-0">Status</h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-check form-switch">
-                            <input type="hidden" name="is_active" value="0">
-                            <input type="checkbox" id="is_active" name="is_active" value="1" class="form-check-input" @checked(old('is_active', $category->is_active ?? true))>
-                            <label for="is_active" class="form-check-label">Aktif</label>
-                        </div>
-                        <div class="form-text">Kategori nonaktif tidak muncul sebagai pilihan filter katalog publik.</div>
-                    </div>
+                    <flux:field>
+                        <flux:label for="description">Deskripsi</flux:label>
+                        <flux:textarea id="description" name="description" rows="5" maxlength="1000">{{ old('description', $category->description) }}</flux:textarea>
+                        <flux:error name="description" />
+                    </flux:field>
                 </div>
+            </flux:card>
 
-                <div class="card">
-                    <div class="card-body">
-                        <button type="submit" class="btn btn-primary w-100" data-loading-text="Menyimpan...">
-                            <i class="bi bi-save me-1" aria-hidden="true"></i>Simpan
-                        </button>
-                        <a href="{{ route('admin.categories.index') }}" class="btn btn-outline-secondary w-100 mt-2">Batal</a>
+            <div class="space-y-4">
+                <flux:card class="p-0!">
+                    <div class="border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+                        <flux:heading size="lg" level="2">Status</flux:heading>
                     </div>
-                </div>
+                    <div class="p-5">
+                        <input type="hidden" name="is_active" value="0">
+                        <flux:switch
+                            id="is_active"
+                            name="is_active"
+                            value="1"
+                            :checked="(bool) old('is_active', $category->is_active ?? true)"
+                            label="Aktif"
+                            description="Kategori nonaktif tidak muncul sebagai pilihan filter katalog publik."
+                        />
+                        <flux:error name="is_active" />
+                    </div>
+                </flux:card>
+
+                <flux:card>
+                    <div class="flex flex-col gap-2">
+                        <flux:button type="submit" variant="primary" icon="check" data-loading-text="Menyimpan...">
+                            Simpan
+                        </flux:button>
+                        <flux:button variant="outline" href="{{ route('admin.categories.index') }}">
+                            Batal
+                        </flux:button>
+                    </div>
+                </flux:card>
             </div>
         </div>
     </form>

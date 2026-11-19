@@ -1,4 +1,13 @@
 @inject('identity', 'App\Services\LibraryIdentity')
+@php
+    $user = auth()->user();
+    $initials = \Illuminate\Support\Str::of($user->name)
+        ->explode(' ')
+        ->filter()
+        ->take(2)
+        ->map(fn ($part) => \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($part, 0, 1)))
+        ->implode('');
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -8,107 +17,160 @@
     <title>@yield('title', 'Beranda') &mdash; {{ $identity->libraryName() }}</title>
     <link rel="icon" href="{{ $identity->logoUrl() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @fluxAppearance
 </head>
-<body class="d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand-lg borrower-navbar sticky-top">
-        <div class="container-xl">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('borrower.dashboard') }}">
-                <x-library-logo size="sm" />
-                <span class="d-flex flex-column lh-sm">
-                    <span class="fw-semibold">{{ $identity->libraryName() }}</span>
-                    <span class="small text-muted">{{ $identity->schoolName() }}</span>
-                </span>
-            </a>
+<body class="min-h-screen bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
+    <flux:sidebar sticky collapsible class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
+        <flux:sidebar.header>
+            <flux:sidebar.brand :name="$identity->libraryName()" href="{{ route('borrower.dashboard') }}">
+                <img src="{{ $identity->logoUrl() }}" alt="" class="h-6 w-6 object-contain">
+            </flux:sidebar.brand>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#borrowerNav" aria-controls="borrowerNav" aria-label="Buka menu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <flux:sidebar.collapse />
+        </flux:sidebar.header>
 
-            <div class="offcanvas-lg offcanvas-end" tabindex="-1" id="borrowerNav" aria-labelledby="borrowerNavLabel">
-                <div class="offcanvas-header d-lg-none">
-                    <h2 class="offcanvas-title h6" id="borrowerNavLabel">Menu</h2>
-                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Tutup"></button>
+        <div class="-mt-3 px-2 text-[0.7rem] leading-snug text-zinc-500 in-data-flux-sidebar-collapsed-desktop:hidden dark:text-zinc-400">
+            {{ $identity->schoolName() }}
+        </div>
+
+        <flux:sidebar.nav>
+            <flux:sidebar.item icon="home" href="{{ route('borrower.dashboard') }}" :current="request()->routeIs('borrower.dashboard')">
+                Beranda
+            </flux:sidebar.item>
+
+            <flux:sidebar.item icon="book-open" href="{{ route('catalog.index') }}" :current="request()->routeIs('catalog.*', 'borrower.requests.*')">
+                Katalog Buku
+            </flux:sidebar.item>
+
+            <flux:sidebar.group
+                expandable
+                heading="Peminjaman Saya"
+                icon="arrows-right-left"
+                :expanded="request()->routeIs('borrower.loans.*')"
+            >
+                <flux:sidebar.item icon="clock" href="{{ route('borrower.loans.index') }}" :current="request()->routeIs('borrower.loans.index')">
+                    Pinjaman Aktif
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="arrow-uturn-left" href="{{ route('borrower.loans.history') }}" :current="request()->routeIs('borrower.loans.history')">
+                    Riwayat Peminjaman
+                </flux:sidebar.item>
+            </flux:sidebar.group>
+
+            <flux:sidebar.group
+                expandable
+                heading="Akun Saya"
+                icon="user-circle"
+                :expanded="request()->routeIs('borrower.profile.*')"
+            >
+                <flux:sidebar.item icon="user-circle" href="{{ route('borrower.profile.edit') }}" :current="request()->routeIs('borrower.profile.*')">
+                    Profil &amp; Keamanan
+                </flux:sidebar.item>
+            </flux:sidebar.group>
+        </flux:sidebar.nav>
+
+        <flux:spacer />
+
+        <flux:sidebar.nav>
+            <flux:sidebar.item icon="arrow-top-right-on-square" href="{{ route('home') }}">
+                Situs Perpustakaan
+            </flux:sidebar.item>
+        </flux:sidebar.nav>
+
+        <flux:dropdown position="top" align="start">
+            <flux:sidebar.profile :name="$user->name" :initials="$initials" />
+
+            <flux:menu>
+                <flux:menu.heading>{{ $user->name }}</flux:menu.heading>
+                <div class="px-2 pb-2 text-xs text-zinc-500 dark:text-zinc-400">
+                    {{ $user->roleLabel() }} &middot; {{ $user->nomor_induk }}
                 </div>
-                <div class="offcanvas-body">
-                    <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('borrower.dashboard') ? 'active' : '' }}" href="{{ route('borrower.dashboard') }}">
-                                Beranda
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('catalog.*', 'borrower.requests.create') ? 'active' : '' }}" href="{{ route('catalog.index') }}">
-                                Katalog
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('borrower.loans.index') ? 'active' : '' }}" href="{{ route('borrower.loans.index') }}">
-                                Pinjaman Saya
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('borrower.loans.history') ? 'active' : '' }}" href="{{ route('borrower.loans.history') }}">Riwayat</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('borrower.profile.*') ? 'active' : '' }}" href="{{ route('borrower.profile.edit') }}">Profil</a>
-                        </li>
-                        <li class="nav-item dropdown" data-notifications data-mode="borrower" data-endpoint="{{ route('notifications.status') }}">
-                            <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifikasi">
-                                <i class="bi bi-bell" aria-hidden="true"></i>
-                                <span class="d-lg-none ms-1">Notifikasi</span>
-                                <span class="badge rounded-pill text-bg-danger d-none ms-1" data-notification-badge>0</span>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end notification-dropdown">
-                                <div class="notification-header">
-                                    <span class="fw-semibold">Notifikasi</span>
-                                </div>
-                                <div class="notification-body" data-notification-body>
-                                    <div class="notification-empty">Memuat notifikasi...</div>
-                                </div>
-                                <div class="notification-footer" data-notification-updated></div>
-                            </div>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-person-circle" aria-hidden="true"></i>
-                                {{ auth()->user()->name }}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <span class="dropdown-item-text small text-muted">
-                                        {{ auth()->user()->roleLabel() }} &middot; {{ auth()->user()->nomor_induk }}
-                                    </span>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form method="POST" action="{{ route('logout') }}">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item text-danger">
-                                            <i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>Keluar
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
+                <flux:menu.separator />
+                <flux:menu.item href="{{ route('borrower.profile.edit') }}" icon="user-circle">
+                    Profil Saya
+                </flux:menu.item>
+                <flux:menu.item href="{{ route('catalog.index') }}" icon="book-open">
+                    Katalog Buku
+                </flux:menu.item>
+                <flux:menu.separator />
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" variant="danger" class="w-full">
+                        Keluar
+                    </flux:menu.item>
+                </form>
+            </flux:menu>
+        </flux:dropdown>
+    </flux:sidebar>
+
+    <flux:header class="sticky top-0 z-20 min-h-16 border-b border-zinc-200 bg-white/90 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/90">
+        <div class="flex w-full items-center gap-2 px-4 lg:px-8">
+            <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
+
+            <div class="min-w-0 flex-1">
+                <flux:breadcrumbs class="text-sm">
+                    <flux:breadcrumbs.item href="{{ route('borrower.dashboard') }}">Beranda</flux:breadcrumbs.item>
+                    @unless (request()->routeIs('borrower.dashboard'))
+                        <flux:breadcrumbs.item>@yield('title', 'Halaman')</flux:breadcrumbs.item>
+                    @endunless
+                </flux:breadcrumbs>
+            </div>
+
+            <div class="flex items-center gap-1">
+                @include('partials.notifications-menu', [
+                    'mode' => 'borrower',
+                    'endpoint' => route('notifications.status'),
+                ])
+
+                @include('partials.theme-switcher')
+
+                <flux:dropdown position="bottom" align="end">
+                    <flux:profile
+                        :name="$user->name"
+                        :initials="$initials"
+                        class="max-sm:[&>span]:hidden"
+                        aria-label="Menu akun {{ $user->name }}"
+                    />
+
+                    <flux:menu>
+                        <flux:menu.heading>{{ $user->name }}</flux:menu.heading>
+                        <div class="px-2 pb-2 text-xs text-zinc-500 dark:text-zinc-400">
+                            {{ $user->roleLabel() }} &middot; {{ $user->nomor_induk }}
+                        </div>
+                        <flux:menu.separator />
+                        <flux:menu.item href="{{ route('borrower.profile.edit') }}" icon="user-circle">
+                            Profil Saya
+                        </flux:menu.item>
+                        <flux:menu.item href="{{ route('borrower.loans.index') }}" icon="clock">
+                            Pinjaman Saya
+                        </flux:menu.item>
+                        <flux:menu.item href="{{ route('home') }}" icon="arrow-top-right-on-square">
+                            Lihat Situs
+                        </flux:menu.item>
+                        <flux:menu.separator />
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" variant="danger" class="w-full">
+                                Keluar
+                            </flux:menu.item>
+                        </form>
+                    </flux:menu>
+                </flux:dropdown>
             </div>
         </div>
-    </nav>
+    </flux:header>
 
-    <main class="container-xl py-4 py-lg-5 flex-grow-1">
+    <flux:main>
         @yield('content')
-    </main>
 
-    <footer class="border-top bg-white py-3 mt-auto">
-        <div class="container-xl d-flex flex-column flex-sm-row justify-content-between gap-2 small text-muted">
-            <span>&copy; {{ date('Y') }} {{ $identity->schoolName() }}</span>
-            <span>{{ $identity->libraryName() }}</span>
-        </div>
-    </footer>
+        <footer class="mt-8 border-t border-zinc-200 pt-4 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+            &copy; {{ date('Y') }} {{ $identity->schoolName() }} &mdash; {{ $identity->libraryName() }}
+        </footer>
+    </flux:main>
 
+    <flux:toast position="top end" />
     @include('partials.confirm-modal')
     @include('partials.flash')
     @stack('scripts')
+    @fluxScripts
 </body>
 </html>

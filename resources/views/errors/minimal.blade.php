@@ -29,7 +29,7 @@
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
 
-        .card {
+        .error-card {
             width: 100%;
             max-width: 520px;
             padding: 2.5rem;
@@ -80,7 +80,7 @@
             gap: .5rem;
         }
 
-        .btn {
+        .button {
             display: inline-block;
             padding: .6rem 1rem;
             border-radius: .25rem;
@@ -92,14 +92,14 @@
             font-weight: 500;
         }
 
-        .btn:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+        .button:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
 
-        .btn-outline {
+        .button-outline {
             color: var(--primary);
             background: #fff;
         }
 
-        .btn-outline:hover { color: #fff; }
+        .button-outline:hover { color: #fff; }
 
         .brand {
             margin-top: 1.5rem;
@@ -109,16 +109,16 @@
     </style>
 </head>
 <body>
-    <main class="card">
+    <main class="error-card">
         <div class="mark" aria-hidden="true">&#128218;</div>
         <p class="code">@yield('code', '500')</p>
         <h1>@yield('title', 'Terjadi Kesalahan')</h1>
         <p>@yield('message', 'Maaf, terjadi kesalahan. Silakan coba lagi.')</p>
 
         <div class="actions">
-            <a href="{{ url('/') }}" class="btn">Kembali ke Beranda</a>
+            <a href="{{ url('/') }}" class="button">Kembali ke Beranda</a>
             @auth
-                <a href="{{ route('dashboard') }}" class="btn btn-outline">Buka Dashboard</a>
+                <a href="{{ route('dashboard') }}" class="button button-outline">Buka Dashboard</a>
             @endauth
         </div>
 

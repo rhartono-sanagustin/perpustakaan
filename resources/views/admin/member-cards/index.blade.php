@@ -10,82 +10,78 @@
     >
         <x-slot:actions>
             @if ($users->total() > 0)
-                <a href="{{ route('admin.member-cards.print', request()->query()) }}" target="_blank" rel="noopener" class="btn btn-primary">
-                    <i class="bi bi-printer me-1" aria-hidden="true"></i>Cetak Massal
-                </a>
+                <flux:button variant="primary" icon="printer" href="{{ route('admin.member-cards.print', request()->query()) }}" target="_blank" rel="noopener">
+                    Cetak Massal
+                </flux:button>
             @endif
-            <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-people me-1" aria-hidden="true"></i>Kelola Pengguna
-            </a>
+            <flux:button variant="outline" icon="users" href="{{ route('admin.users.index') }}">
+                Kelola Pengguna
+            </flux:button>
         </x-slot:actions>
     </x-page-header>
 
-    <div class="alert alert-info d-flex gap-2" role="alert">
-        <i class="bi bi-info-circle mt-1" aria-hidden="true"></i>
-        <div>
+    <flux:callout icon="information-circle" class="mb-4">
+        <flux:callout.text>
             Kartu hanya dapat dicetak untuk akun guru atau siswa yang aktif dan memiliki nomor induk.
             Setiap lembar A4 memuat hingga 8 kartu (2 &times; 4).
-        </div>
-    </div>
+        </flux:callout.text>
+    </flux:callout>
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <form method="GET" action="{{ route('admin.member-cards.index') }}" class="row g-2 align-items-end">
-                <div class="col-12 col-lg-4">
-                    <label for="q" class="form-label">Cari anggota</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-search" aria-hidden="true"></i></span>
-                        <input type="search" id="q" name="q" value="{{ $search }}" class="form-control" placeholder="Nama, nomor induk, atau email">
-                    </div>
-                </div>
+    <flux:card class="mb-4">
+        <form method="GET" action="{{ route('admin.member-cards.index') }}" class="grid items-end gap-3 md:grid-cols-2 xl:grid-cols-12">
+            <div class="xl:col-span-4">
+                <flux:field>
+                    <flux:label for="q">Cari anggota</flux:label>
+                    <flux:input type="search" id="q" name="q" value="{{ $search }}" icon="magnifying-glass" placeholder="Nama, nomor induk, atau email" />
+                </flux:field>
+            </div>
 
-                <div class="col-6 col-lg-2">
-                    <label for="role" class="form-label">Peran</label>
-                    <select id="role" name="role" class="form-select">
+            <div class="xl:col-span-2">
+                <flux:field>
+                    <flux:label for="role">Peran</flux:label>
+                    <flux:select id="role" name="role">
                         <option value="">Semua peran</option>
                         @foreach ($roles as $roleOption)
                             <option value="{{ $roleOption->value }}" @selected($role === $roleOption)>{{ $roleOption->label() }}</option>
                         @endforeach
-                    </select>
-                </div>
+                    </flux:select>
+                </flux:field>
+            </div>
 
-                <div class="col-6 col-lg-3">
-                    <label for="kelas" class="form-label">Kelas / Unit kerja</label>
-                    <input type="text" id="kelas" name="kelas" value="{{ $kelas }}" class="form-control" list="kelas-options" placeholder="Contoh: XI IPA 1">
-                    <datalist id="kelas-options">
-                        @foreach ($classes->merge($units)->unique() as $option)
-                            <option value="{{ $option }}"></option>
-                        @endforeach
-                    </datalist>
-                </div>
+            <div class="xl:col-span-3">
+                <flux:field>
+                    <flux:label for="kelas">Kelas / Unit kerja</flux:label>
+                    <flux:input type="text" id="kelas" name="kelas" value="{{ $kelas }}" list="kelas-options" placeholder="Contoh: XI IPA 1" />
+                </flux:field>
+                <datalist id="kelas-options">
+                    @foreach ($classes->merge($units)->unique() as $option)
+                        <option value="{{ $option }}"></option>
+                    @endforeach
+                </datalist>
+            </div>
 
-                <div class="col-12 col-lg-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-grow-1">Terapkan</button>
-                    @if ($search !== '' || $role !== null || $kelas !== '')
-                        <a href="{{ route('admin.member-cards.index') }}" class="btn btn-outline-secondary" aria-label="Reset filter">
-                            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                        </a>
-                    @endif
-                </div>
-            </form>
-        </div>
-    </div>
+            <div class="flex gap-2 xl:col-span-3">
+                <flux:button type="submit" variant="primary" class="flex-1">Terapkan</flux:button>
+                @if ($search !== '' || $role !== null || $kelas !== '')
+                    <flux:button variant="outline" href="{{ route('admin.member-cards.index') }}" icon="arrow-path" aria-label="Reset filter" />
+                @endif
+            </div>
+        </form>
+    </flux:card>
 
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h6 mb-0">Anggota yang Dapat Dicetak</h2>
-            <span class="small text-muted">{{ $users->total() }} anggota</span>
+    <flux:card class="p-0!">
+        <div class="flex items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+            <flux:heading size="lg" level="2">Anggota yang Dapat Dicetak</flux:heading>
+            <flux:badge color="zinc" size="sm">{{ $users->total() }} anggota</flux:badge>
         </div>
 
         @if ($users->isEmpty())
-            <div class="card-body">
-                <x-empty-state icon="person-vcard" title="Tidak ada anggota" message="Tidak ada akun guru atau siswa aktif yang sesuai dengan filter saat ini.">
-                    <a href="{{ route('admin.member-cards.index') }}" class="btn btn-outline-primary btn-sm">Reset Filter</a>
-                </x-empty-state>
-            </div>
+            <x-empty-state icon="person-vcard" title="Tidak ada anggota" message="Tidak ada akun guru atau siswa aktif yang sesuai dengan filter saat ini.">
+                <flux:button variant="outline" size="sm" href="{{ route('admin.member-cards.index') }}">Reset Filter</flux:button>
+            </x-empty-state>
         @else
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+            <div class="overflow-x-auto" data-scrollable-region>
+                <table class="data-table">
                     <thead>
                         <tr>
                             <th scope="col">Nama</th>
@@ -99,18 +95,18 @@
                         @foreach ($users as $user)
                             <tr>
                                 <td>
-                                    <div class="fw-semibold">{{ $user->name }}</div>
-                                    <div class="small text-muted">{{ $user->email ?? 'Email belum diisi' }}</div>
+                                    <div class="font-semibold">{{ $user->name }}</div>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $user->email ?? 'Email belum diisi' }}</div>
                                 </td>
                                 <td>{{ $user->nomor_induk }}</td>
                                 <td>
-                                    <span class="badge text-bg-light border">{{ $user->roleLabel() }}</span>
+                                    <flux:badge color="zinc" size="sm">{{ $user->roleLabel() }}</flux:badge>
                                 </td>
-                                <td class="small text-muted">{{ $user->kelas ?? $user->unit_kerja ?? '-' }}</td>
+                                <td class="text-xs text-zinc-500 dark:text-zinc-400">{{ $user->kelas ?? $user->unit_kerja ?? '-' }}</td>
                                 <td class="text-end">
-                                    <a href="{{ route('admin.users.card', $user) }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-printer me-1" aria-hidden="true"></i>Cetak
-                                    </a>
+                                    <flux:button size="sm" variant="outline" icon="printer" href="{{ route('admin.users.card', $user) }}" target="_blank" rel="noopener">
+                                        Cetak
+                                    </flux:button>
                                 </td>
                             </tr>
                         @endforeach
@@ -118,10 +114,10 @@
                 </table>
             </div>
 
-            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <span class="small text-muted">Menampilkan {{ $users->firstItem() }}&ndash;{{ $users->lastItem() }} dari {{ $users->total() }} anggota</span>
+            <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 px-5 py-4 dark:border-white/10">
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">Menampilkan {{ $users->firstItem() }}&ndash;{{ $users->lastItem() }} dari {{ $users->total() }} anggota</span>
                 {{ $users->links() }}
             </div>
         @endif
-    </div>
+    </flux:card>
 @endsection

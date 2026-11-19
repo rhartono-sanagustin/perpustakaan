@@ -6,71 +6,66 @@
 @section('content')
     <x-page-header title="Daftar Buku" subtitle="Kelola data bibliografi, status katalog, dan eksemplar.">
         <x-slot:actions>
-            <a href="{{ route('admin.books.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Tambah Buku
-            </a>
+            <flux:button variant="primary" icon="plus" href="{{ route('admin.books.create') }}">
+                Tambah Buku
+            </flux:button>
         </x-slot:actions>
     </x-page-header>
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <form method="GET" action="{{ route('admin.books.index') }}" class="row g-2 align-items-end">
-                <div class="col-12 col-lg-5">
-                    <label for="q" class="form-label">Cari</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-search" aria-hidden="true"></i></span>
-                        <input type="search" id="q" name="q" value="{{ $search }}" class="form-control" placeholder="Judul, ISBN, penulis, atau kata kunci">
-                    </div>
-                </div>
+    <flux:card class="mb-4">
+        <form method="GET" action="{{ route('admin.books.index') }}" class="grid items-end gap-3 md:grid-cols-2 xl:grid-cols-12">
+            <div class="xl:col-span-5">
+                <flux:field>
+                    <flux:label for="q">Cari</flux:label>
+                    <flux:input type="search" id="q" name="q" value="{{ $search }}" icon="magnifying-glass" placeholder="Judul, ISBN, penulis, atau kata kunci" />
+                </flux:field>
+            </div>
 
-                <div class="col-6 col-lg-3">
-                    <label for="category_id" class="form-label">Kategori</label>
-                    <select id="category_id" name="category_id" class="form-select">
+            <div class="xl:col-span-3">
+                <flux:field>
+                    <flux:label for="category_id">Kategori</flux:label>
+                    <flux:select id="category_id" name="category_id">
                         <option value="">Semua kategori</option>
                         @foreach ($categories as $category)
                             <option value="{{ $category->id }}" @selected($categoryId === $category->id)>{{ $category->name }}</option>
                         @endforeach
-                    </select>
-                </div>
+                    </flux:select>
+                </flux:field>
+            </div>
 
-                <div class="col-6 col-lg-2">
-                    <label for="status" class="form-label">Status</label>
-                    <select id="status" name="status" class="form-select">
+            <div class="xl:col-span-2">
+                <flux:field>
+                    <flux:label for="status">Status</flux:label>
+                    <flux:select id="status" name="status">
                         <option value="">Semua status</option>
                         <option value="aktif" @selected($status === 'aktif')>Aktif</option>
                         <option value="arsip" @selected($status === 'arsip')>Diarsipkan</option>
-                    </select>
-                </div>
+                    </flux:select>
+                </flux:field>
+            </div>
 
-                <div class="col-12 col-lg-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-grow-1">Terapkan</button>
-                    @if ($search !== '' || $categoryId || $status !== '')
-                        <a href="{{ route('admin.books.index') }}" class="btn btn-outline-secondary" aria-label="Reset filter">
-                            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                        </a>
-                    @endif
-                </div>
-            </form>
-        </div>
-    </div>
+            <div class="flex gap-2 xl:col-span-2">
+                <flux:button type="submit" variant="primary" class="flex-1">Terapkan</flux:button>
+                @if ($search !== '' || $categoryId || $status !== '')
+                    <flux:button variant="outline" href="{{ route('admin.books.index') }}" icon="arrow-path" aria-label="Reset filter" />
+                @endif
+            </div>
+        </form>
+    </flux:card>
 
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h6 mb-0">Data Buku</h2>
-            <span class="small text-muted">{{ $books->total() }} judul</span>
+    <flux:card class="p-0!">
+        <div class="flex items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+            <flux:heading size="lg" level="2">Data Buku</flux:heading>
+            <flux:badge color="zinc" size="sm">{{ $books->total() }} judul</flux:badge>
         </div>
 
         @if ($books->isEmpty())
-            <div class="card-body">
-                <x-empty-state icon="journal-bookmark" title="Belum ada data buku" message="Tambahkan buku pertama atau ubah filter pencarian.">
-                    <a href="{{ route('admin.books.create') }}" class="btn btn-primary btn-sm">
-                        <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Tambah Buku
-                    </a>
-                </x-empty-state>
-            </div>
+            <x-empty-state icon="journal-bookmark" title="Belum ada data buku" message="Tambahkan buku pertama atau ubah filter pencarian.">
+                <flux:button variant="primary" size="sm" icon="plus" href="{{ route('admin.books.create') }}">Tambah Buku</flux:button>
+            </x-empty-state>
         @else
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+            <div class="overflow-x-auto" data-scrollable-region>
+                <table class="data-table">
                     <thead>
                         <tr>
                             <th scope="col">Sampul</th>
@@ -86,49 +81,49 @@
                         @foreach ($books as $book)
                             <tr>
                                 <td>
-                                    <img src="{{ $book->cover_url }}" alt="" class="admin-cover">
+                                    <img src="{{ $book->cover_url }}" alt="" class="h-16 w-12 rounded-md object-cover">
                                 </td>
                                 <td>
-                                    <a href="{{ route('admin.books.edit', $book) }}" class="fw-semibold text-reset">{{ $book->title }}</a>
-                                    <div class="small text-muted">{{ $book->isbn ?? 'Tanpa ISBN' }}</div>
-                                    <div class="small text-muted">{{ $book->authors_label }}</div>
+                                    <a href="{{ route('admin.books.edit', $book) }}" class="font-semibold text-zinc-900 dark:text-white">{{ $book->title }}</a>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $book->isbn ?? 'Tanpa ISBN' }}</div>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $book->authors_label }}</div>
                                 </td>
                                 <td>{{ $book->category->name }}</td>
                                 <td class="text-center">{{ $book->copies_count }}</td>
                                 <td class="text-center">
-                                    <span class="badge {{ $book->available_copies_count > 0 ? 'text-bg-success' : 'text-bg-secondary' }}">
+                                    <flux:badge :color="$book->available_copies_count > 0 ? 'green' : 'zinc'" size="sm">
                                         {{ $book->available_copies_count }}
-                                    </span>
+                                    </flux:badge>
                                 </td>
                                 <td>
                                     <x-status-badge
                                         :label="$book->is_active ? 'Aktif' : 'Diarsipkan'"
                                         :variant="$book->is_active ? 'success' : 'secondary'"
-                                        :icon="$book->is_active ? 'check-circle' : 'archive'"
+                                        :icon="$book->is_active ? 'check-circle' : 'archive-box'"
                                     />
                                 </td>
                                 <td class="text-end">
-                                    <div class="d-inline-flex flex-wrap justify-content-end gap-1">
+                                    <div class="inline-flex flex-wrap justify-end gap-1">
                                         @if ($book->is_active)
-                                            <a href="{{ route('catalog.show', $book) }}" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener">
+                                            <flux:button size="sm" variant="outline" href="{{ route('catalog.show', $book) }}" target="_blank" rel="noopener">
                                                 Lihat
-                                            </a>
+                                            </flux:button>
                                         @endif
-                                        <a href="{{ route('admin.books.edit', $book) }}" class="btn btn-sm btn-outline-primary">
+                                        <flux:button size="sm" variant="outline" href="{{ route('admin.books.edit', $book) }}">
                                             Edit
-                                        </a>
-                                        <a href="{{ route('admin.books.copies.index', $book) }}" class="btn btn-sm btn-outline-secondary">
+                                        </flux:button>
+                                        <flux:button size="sm" variant="outline" href="{{ route('admin.books.copies.index', $book) }}">
                                             Eksemplar
-                                        </a>
+                                        </flux:button>
                                         @if ($book->is_active)
                                             <form method="POST" action="{{ route('admin.books.archive', $book) }}" data-confirm="Arsipkan buku &quot;{{ $book->title }}&quot; dari katalog publik?">
                                                 @csrf
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Arsipkan</button>
+                                                <flux:button type="submit" size="sm" variant="danger">Arsipkan</flux:button>
                                             </form>
                                         @else
                                             <form method="POST" action="{{ route('admin.books.activate', $book) }}">
                                                 @csrf
-                                                <button type="submit" class="btn btn-sm btn-outline-success">Aktifkan</button>
+                                                <flux:button type="submit" size="sm" variant="primary">Aktifkan</flux:button>
                                             </form>
                                         @endif
                                     </div>
@@ -139,12 +134,12 @@
                 </table>
             </div>
 
-            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <span class="small text-muted">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 px-5 py-4 dark:border-white/10">
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">
                     Menampilkan {{ $books->firstItem() }}&ndash;{{ $books->lastItem() }} dari {{ $books->total() }} buku
                 </span>
                 {{ $books->links() }}
             </div>
         @endif
-    </div>
+    </flux:card>
 @endsection

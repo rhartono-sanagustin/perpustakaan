@@ -6,147 +6,138 @@
 @section('content')
     <x-page-header title="Checkout Peminjaman" :subtitle="'#'.$loanRequest->reference.' · '.$loanRequest->user->name">
         <x-slot:actions>
-            <a href="{{ route('admin.requests.show', $loanRequest) }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Kembali ke Detail
-            </a>
+            <flux:button variant="outline" icon="arrow-left" href="{{ route('admin.requests.show', $loanRequest) }}">
+                Kembali ke Detail
+            </flux:button>
         </x-slot:actions>
     </x-page-header>
 
-    @if ($errors->any())
-        <div class="alert alert-danger" role="alert">
-            <div class="fw-semibold mb-1">Checkout belum dapat dicatat:</div>
-            <ul class="mb-0 ps-3">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    <x-form-errors title="Checkout belum dapat dicatat:" />
 
-    <div class="row g-4">
-        <div class="col-12 col-xl-8">
+    <div class="grid gap-4 xl:grid-cols-3">
+        <div class="xl:col-span-2">
             <form method="POST" action="{{ route('admin.requests.checkout.store', $loanRequest) }}" data-confirm="Catat penyerahan buku ini? Status eksemplar akan berubah menjadi Dipinjam dan tanggal jatuh tempo ditetapkan." data-loading>
                 @csrf
 
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h2 class="h6 mb-0">Pilih Eksemplar yang Diserahkan</h2>
+                <flux:card class="mb-4 p-0!">
+                    <div class="border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+                        <flux:heading size="lg" level="2">Pilih Eksemplar yang Diserahkan</flux:heading>
                     </div>
-                    <div class="card-body">
+                    <div class="p-5">
                         @if ($copies->isEmpty())
-                            <div class="alert alert-warning mb-0" role="alert">
-                                <div class="fw-semibold mb-1">Tidak ada eksemplar tersedia.</div>
-                                Semua eksemplar buku ini sedang dipinjam, rusak, hilang, atau belum tersedia. Periksa inventaris terlebih dahulu.
-                            </div>
+                            <flux:callout variant="warning" icon="exclamation-triangle">
+                                <flux:callout.heading>Tidak ada eksemplar tersedia.</flux:callout.heading>
+                                <flux:callout.text>Semua eksemplar buku ini sedang dipinjam, rusak, hilang, atau belum tersedia. Periksa inventaris terlebih dahulu.</flux:callout.text>
+                            </flux:callout>
                         @else
-                            <p class="small text-muted">
+                            <flux:text>
                                 Pilih eksemplar fisik yang benar-benar diserahkan. Satu eksemplar hanya dapat memiliki satu pinjaman aktif.
-                            </p>
+                            </flux:text>
 
-                            <div class="d-flex flex-column gap-2">
+                            <div class="mt-4 flex flex-col gap-2">
                                 @foreach ($copies as $copy)
-                                    <div class="form-check border rounded p-3 ps-5">
+                                    <label for="copy-{{ $copy->id }}" class="flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-200 p-3 transition hover:border-[var(--color-accent)] has-checked:border-[var(--color-accent)] has-checked:bg-[color-mix(in_oklab,var(--color-accent),transparent_94%)] dark:border-zinc-700">
                                         <input
                                             type="radio"
                                             id="copy-{{ $copy->id }}"
                                             name="book_copy_id"
                                             value="{{ $copy->id }}"
-                                            class="form-check-input @error('book_copy_id') is-invalid @enderror"
+                                            class="mt-1 size-4 accent-[var(--color-accent)]"
                                             @checked((string) old('book_copy_id') === (string) $copy->id)
                                             required
                                         >
-                                        <label class="form-check-label w-100" for="copy-{{ $copy->id }}">
-                                            <span class="d-flex flex-column flex-sm-row justify-content-between gap-1">
-                                                <span class="fw-semibold">{{ $copy->inventory_code }}</span>
+                                        <span class="min-w-0 flex-1">
+                                            <span class="flex flex-col justify-between gap-1 sm:flex-row">
+                                                <span class="font-semibold">{{ $copy->inventory_code }}</span>
                                                 <x-status-badge :label="$copy->condition->label()" variant="secondary" />
                                             </span>
-                                            <span class="d-block small text-muted mt-1">
+                                            <span class="mt-1 block text-xs text-zinc-500 dark:text-zinc-400">
                                                 {{ $copy->shelf_location ?? 'Lokasi rak belum diatur' }}
                                             </span>
-                                        </label>
-                                    </div>
+                                        </span>
+                                    </label>
                                 @endforeach
                             </div>
 
-                            @error('book_copy_id')
-                                <div class="text-danger small mt-2">{{ $message }}</div>
-                            @enderror
+                            <flux:error name="book_copy_id" class="mt-2" />
                         @endif
                     </div>
-                </div>
+                </flux:card>
 
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h2 class="h6 mb-0">Konfirmasi Penyerahan</h2>
+                <flux:card class="mb-4 p-0!">
+                    <div class="border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+                        <flux:heading size="lg" level="2">Konfirmasi Penyerahan</flux:heading>
                     </div>
-                    <div class="card-body">
-                        <dl class="row small mb-3">
-                            <dt class="col-sm-5 text-muted">Tanggal pinjam</dt>
-                            <dd class="col-sm-7">{{ today()->locale('id')->translatedFormat('d F Y') }}</dd>
+                    <div class="p-5">
+                        <dl class="mb-4 grid gap-x-4 gap-y-2 text-sm sm:grid-cols-5">
+                            <dt class="text-zinc-500 dark:text-zinc-400">Tanggal pinjam</dt>
+                            <dd class="sm:col-span-4">{{ today()->locale('id')->translatedFormat('d F Y') }}</dd>
 
-                            <dt class="col-sm-5 text-muted">Jatuh tempo</dt>
-                            <dd class="col-sm-7 fw-semibold">{{ $dueDate->locale('id')->translatedFormat('d F Y') }}</dd>
+                            <dt class="text-zinc-500 dark:text-zinc-400">Jatuh tempo</dt>
+                            <dd class="font-semibold sm:col-span-4">{{ $dueDate->locale('id')->translatedFormat('d F Y') }}</dd>
 
-                            <dt class="col-sm-5 text-muted">Durasi pinjam</dt>
-                            <dd class="col-sm-7">{{ $quota['duration_days'] }} hari</dd>
+                            <dt class="text-zinc-500 dark:text-zinc-400">Durasi pinjam</dt>
+                            <dd class="sm:col-span-4">{{ $quota['duration_days'] }} hari</dd>
 
-                            <dt class="col-sm-5 text-muted">Kuota peminjam</dt>
-                            <dd class="col-sm-7">{{ $quota['used'] }} / {{ $quota['max'] }} terpakai</dd>
+                            <dt class="text-zinc-500 dark:text-zinc-400">Kuota peminjam</dt>
+                            <dd class="sm:col-span-4">{{ $quota['used'] }} / {{ $quota['max'] }} terpakai</dd>
                         </dl>
 
-                        @error('confirm')
-                            <div class="text-danger small mb-2">{{ $message }}</div>
-                        @enderror
+                        <flux:error name="confirm" class="mb-2" />
 
-                        <div class="form-check">
-                            <input type="checkbox" id="confirm" name="confirm" value="1" class="form-check-input @error('confirm') is-invalid @enderror" @checked(old('confirm')) required>
-                            <label class="form-check-label" for="confirm">
-                                Saya mengonfirmasi buku telah diserahkan kepada peminjam dan data eksemplar serta jatuh tempo sudah benar.
-                            </label>
-                        </div>
+                        <flux:checkbox
+                            id="confirm"
+                            name="confirm"
+                            value="1"
+                            :checked="(bool) old('confirm')"
+                            required
+                            label="Saya mengonfirmasi buku telah diserahkan kepada peminjam dan data eksemplar serta jatuh tempo sudah benar."
+                        />
                     </div>
-                </div>
+                </flux:card>
 
-                <div class="d-flex flex-column flex-sm-row gap-2">
-                    <button type="submit" class="btn btn-primary" data-loading-text="Mencatat checkout..." @disabled($copies->isEmpty())>
-                        <i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i>Catat Checkout
-                    </button>
-                    <a href="{{ route('admin.requests.show', $loanRequest) }}" class="btn btn-outline-secondary">Batal</a>
+                <div class="flex flex-col gap-2 sm:flex-row">
+                    <flux:button type="submit" variant="primary" icon="arrow-right-start-on-rectangle" data-loading-text="Mencatat checkout..." :disabled="$copies->isEmpty()">
+                        Catat Checkout
+                    </flux:button>
+                    <flux:button variant="outline" href="{{ route('admin.requests.show', $loanRequest) }}">Batal</flux:button>
                 </div>
             </form>
         </div>
 
-        <div class="col-12 col-xl-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h2 class="h6 mb-0">Ringkasan Peminjam</h2>
+        <div class="space-y-4">
+            <flux:card class="p-0!">
+                <div class="border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+                    <flux:heading size="lg" level="2">Ringkasan Peminjam</flux:heading>
                 </div>
-                <div class="card-body">
-                    <div class="fw-semibold">{{ $loanRequest->user->name }}</div>
-                    <div class="small text-muted">
+                <div class="p-5">
+                    <div class="font-semibold">{{ $loanRequest->user->name }}</div>
+                    <div class="text-xs text-zinc-500 dark:text-zinc-400">
                         {{ $loanRequest->user->roleLabel() }} &middot; {{ $loanRequest->user->nomor_induk }}
                     </div>
                     @if ($loanRequest->user->kelas || $loanRequest->user->unit_kerja)
-                        <div class="small text-muted">{{ $loanRequest->user->kelas ?? $loanRequest->user->unit_kerja }}</div>
+                        <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $loanRequest->user->kelas ?? $loanRequest->user->unit_kerja }}</div>
                     @endif
 
-                    <hr>
+                    <flux:separator class="my-4" />
 
-                    <div class="d-flex gap-3">
-                        <img src="{{ $loanRequest->book->cover_url }}" alt="Sampul {{ $loanRequest->book->title }}" class="admin-cover" style="width: 64px; height: 90px;">
+                    <div class="flex gap-3">
+                        <img src="{{ $loanRequest->book->cover_url }}" alt="Sampul {{ $loanRequest->book->title }}" class="h-[90px] w-16 rounded-md object-cover">
                         <div class="min-w-0">
-                            <div class="fw-semibold">{{ $loanRequest->book->title }}</div>
-                            <div class="small text-muted">{{ $loanRequest->book->authors_label ?: 'Penulis tidak diketahui' }}</div>
-                            <div class="small text-muted">{{ $loanRequest->book->category?->name ?? 'Tanpa kategori' }}</div>
+                            <div class="font-semibold">{{ $loanRequest->book->title }}</div>
+                            <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $loanRequest->book->authors_label ?: 'Penulis tidak diketahui' }}</div>
+                            <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $loanRequest->book->category?->name ?? 'Tanpa kategori' }}</div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </flux:card>
 
-            <div class="alert alert-info mb-0" role="alert">
-                <div class="fw-semibold mb-1"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>Sebelum mencatat checkout</div>
-                Pastikan buku sudah benar-benar diterima peminjam. Setelah checkout, status pengajuan menjadi Dipinjam dan eksemplar tidak lagi tersedia untuk pengajuan lain.
-            </div>
+            <flux:callout icon="information-circle">
+                <flux:callout.heading>Sebelum mencatat checkout</flux:callout.heading>
+                <flux:callout.text>
+                    Pastikan buku sudah benar-benar diterima peminjam. Setelah checkout, status pengajuan menjadi Dipinjam dan eksemplar tidak lagi tersedia untuk pengajuan lain.
+                </flux:callout.text>
+            </flux:callout>
         </div>
     </div>
 @endsection

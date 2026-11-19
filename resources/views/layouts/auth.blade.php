@@ -8,31 +8,36 @@
     <title>@yield('title', 'Masuk') &mdash; {{ $identity->libraryName() }}</title>
     <link rel="icon" href="{{ $identity->logoUrl() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @fluxAppearance
 </head>
-<body class="auth-page">
-    <main class="auth-card">
-        <div class="text-center mb-4">
-            <a href="{{ route('home') }}" class="text-decoration-none text-reset d-inline-flex align-items-center gap-3">
+<body class="flex min-h-screen flex-col bg-zinc-100 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
+    <div class="absolute end-4 top-4">
+        @include('partials.theme-switcher')
+    </div>
+
+    <main class="flex flex-1 items-center justify-center px-4 py-10">
+        <div class="w-full max-w-md">
+            <div class="mb-6 flex items-center justify-center gap-3 text-center">
                 <x-library-logo size="md" />
-                <span class="text-start">
-                    <span class="d-block fw-semibold">{{ $identity->libraryName() }}</span>
-                    <span class="d-block small text-muted">{{ $identity->schoolName() }}</span>
-                </span>
-            </a>
-        </div>
-
-        <div class="card">
-            <div class="card-body p-4 p-md-5">
-                @yield('content')
+                <div class="text-start">
+                    <div class="text-base font-semibold">{{ $identity->libraryName() }}</div>
+                    <div class="text-sm text-zinc-500 dark:text-zinc-400">{{ $identity->schoolName() }}</div>
+                </div>
             </div>
-        </div>
 
-        <p class="text-center text-muted small mt-4 mb-0">
-            &copy; {{ date('Y') }} {{ $identity->schoolName() }}
-        </p>
+            <flux:card class="border-t-4 border-t-[var(--color-accent)]">
+                @yield('content')
+            </flux:card>
+
+            <p class="mt-6 text-center text-xs text-zinc-500 dark:text-zinc-400">
+                &copy; {{ date('Y') }} {{ $identity->schoolName() }}
+            </p>
+        </div>
     </main>
 
+    <flux:toast position="top end" />
     @include('partials.flash')
     @stack('scripts')
+    @fluxScripts
 </body>
 </html>

@@ -1,19 +1,8 @@
-import * as bootstrap from 'bootstrap';
 import { initKiosk } from './kiosk';
 import { initNotifications } from './notifications';
 import { initShareButtons } from './share';
 
-window.bootstrap = bootstrap;
-
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((element) => {
-        new bootstrap.Tooltip(element);
-    });
-
-    document.querySelectorAll('.toast').forEach((element) => {
-        new bootstrap.Toast(element, { autohide: true, delay: 5500 }).show();
-    });
-
     document.querySelectorAll('[data-toggle-password]').forEach((button) => {
         button.addEventListener('click', () => {
             const target = document.querySelector(button.dataset.togglePassword);
@@ -28,36 +17,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 'aria-label',
                 isPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi',
             );
-
-            const icon = button.querySelector('i');
-
-            if (icon) {
-                icon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
-            }
+            button.querySelector('[data-password-show]')?.classList.toggle('hidden', !isPassword);
+            button.querySelector('[data-password-hide]')?.classList.toggle('hidden', isPassword);
         });
     });
 
-    const confirmModalElement = document.getElementById('confirmModal');
-    const confirmModal = confirmModalElement
-        ? bootstrap.Modal.getOrCreateInstance(confirmModalElement)
-        : null;
-    const confirmMessage = confirmModalElement?.querySelector('[data-confirm-message]');
-    const confirmAccept = confirmModalElement?.querySelector('[data-confirm-accept]');
+    const confirmMessage = document.querySelector('[data-confirm-message]');
+    const confirmAccept = document.querySelector('[data-confirm-accept]');
     let pendingConfirmForm = null;
 
-    confirmModalElement?.addEventListener('hidden.bs.modal', () => {
-        pendingConfirmForm = null;
-    });
-
-    confirmAccept?.addEventListener('click', () => {
-        const form = pendingConfirmForm;
-        pendingConfirmForm = null;
-        confirmModal?.hide();
-
-        if (!form) {
-            return;
-        }
-
+    const submitConfirmed = (form) => {
         form.dataset.confirmed = 'true';
 
         if (typeof form.requestSubmit === 'function') {
@@ -67,6 +36,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         delete form.dataset.confirmed;
+    };
+
+    confirmAccept?.addEventListener('click', () => {
+        const form = pendingConfirmForm;
+        pendingConfirmForm = null;
+        window.Flux?.modal('confirm').close();
+
+        if (form) {
+            submitConfirmed(form);
+        }
     });
 
     document.querySelectorAll('form[data-confirm]').forEach((form) => {
@@ -76,31 +55,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            event.preventDefault();
-
-            if (!confirmModal) {
+            if (!window.Flux) {
                 if (window.confirm(form.dataset.confirm)) {
-                    form.dataset.confirmed = 'true';
-
-                    if (typeof form.requestSubmit === 'function') {
-                        form.requestSubmit();
-                    } else {
-                        form.submit();
-                    }
-
-                    delete form.dataset.confirmed;
+                    submitConfirmed(form);
                 }
 
+                event.preventDefault();
                 return;
             }
 
+            event.preventDefault();
             pendingConfirmForm = form;
 
             if (confirmMessage) {
                 confirmMessage.textContent = form.dataset.confirm;
             }
 
-            confirmModal.show();
+            window.Flux.modal('confirm').show();
         });
     });
 
@@ -117,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             button.disabled = true;
-            button.innerHTML = `<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>${button.dataset.loadingText || 'Memproses...'}`;
+            button.innerHTML = `<span class="inline-flex items-center gap-2"><svg class="size-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"></path></svg>${button.dataset.loadingText || 'Memproses...'}</span>`;
         });
     });
 
@@ -152,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const syncScrollableRegions = () => {
-        document.querySelectorAll('.table-responsive, [data-scrollable-region]').forEach((region) => {
+        document.querySelectorAll('[data-scrollable-region]').forEach((region) => {
             if (region.scrollWidth > region.clientWidth + 1) {
                 region.setAttribute('tabindex', '0');
             } else {
@@ -168,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if ('ResizeObserver' in window) {
         const scrollRegionObserver = new ResizeObserver(syncScrollableRegions);
 
-        document.querySelectorAll('.table-responsive, [data-scrollable-region]').forEach((region) => {
+        document.querySelectorAll('[data-scrollable-region]').forEach((region) => {
             scrollRegionObserver.observe(region);
         });
     }
@@ -176,48 +147,4 @@ document.addEventListener('DOMContentLoaded', () => {
     initShareButtons();
     initNotifications();
     initKiosk();
-
-    document.querySelectorAll('[data-carousel]').forEach((carouselElement) => {
-        const carousel = bootstrap.Carousel.getOrCreateInstance(carouselElement, {
-            interval: Number(carouselElement.dataset.interval) || 6000,
-            ride: false,
-            pause: false,
-        });
-
-        const pauseButton = carouselElement.querySelector('[data-carousel-toggle]');
-        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        let paused = prefersReducedMotion;
-
-        const updatePauseButton = () => {
-            if (!pauseButton) {
-                return;
-            }
-
-            pauseButton.hidden = false;
-            pauseButton.setAttribute('aria-label', paused ? 'Putar carousel' : 'Jeda carousel');
-            pauseButton.innerHTML = paused
-                ? '<i class="bi bi-play-fill" aria-hidden="true"></i>'
-                : '<i class="bi bi-pause-fill" aria-hidden="true"></i>';
-        };
-
-        if (paused) {
-            carousel.pause();
-        } else {
-            carousel.cycle();
-        }
-
-        updatePauseButton();
-
-        pauseButton?.addEventListener('click', () => {
-            paused = !paused;
-
-            if (paused) {
-                carousel.pause();
-            } else {
-                carousel.cycle();
-            }
-
-            updatePauseButton();
-        });
-    });
 });

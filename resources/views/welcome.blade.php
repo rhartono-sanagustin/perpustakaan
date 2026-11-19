@@ -6,143 +6,103 @@
 @section('content')
     @include('partials.landing-carousel', ['carouselSlides' => $carouselSlides ?? collect()])
 
-    <section class="container-xl py-4 py-lg-5">
-        <div class="row align-items-center g-4 g-xl-5">
-            <div class="col-lg-6">
-                <span class="badge text-bg-light border mb-3">Sistem Informasi Perpustakaan Sekolah</span>
-                <h1 class="display-5 fw-bold mb-3">
+    <section class="mx-auto w-full max-w-7xl px-4 py-8 lg:px-8 lg:py-12">
+        <div class="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+            <div>
+                <flux:badge color="zinc" class="mb-4">Sistem Informasi Perpustakaan Sekolah</flux:badge>
+
+                <flux:heading size="2xl" level="1" class="max-w-2xl text-3xl! sm:text-4xl!">
                     Temukan buku, ajukan pinjaman, dan pantau koleksi dalam satu tempat.
-                </h1>
-                <p class="lead text-muted mb-4">
+                </flux:heading>
+
+                <flux:text class="mt-4 max-w-xl text-base!">
                     {{ $identity->tagline() }} Kelola koleksi, peminjaman, dan laporan perpustakaan
                     sekolah dengan alur yang jelas dan mudah digunakan.
-                </p>
-                <div class="d-flex flex-wrap gap-2">
-                    <a href="{{ route('catalog.index') }}" class="btn btn-primary btn-lg">
-                        <i class="bi bi-search me-2" aria-hidden="true"></i>Jelajahi Katalog
-                    </a>
-                    <a href="{{ route('login') }}" class="btn btn-outline-secondary btn-lg">
-                        <i class="bi bi-box-arrow-in-right me-2" aria-hidden="true"></i>Masuk
-                    </a>
+                </flux:text>
+
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <flux:button variant="primary" icon="magnifying-glass" href="{{ route('catalog.index') }}" class="h-11 px-5">
+                        Jelajahi Katalog
+                    </flux:button>
+                    <flux:button variant="outline" icon="arrow-right-start-on-rectangle" href="{{ route('login') }}" class="h-11 px-5">
+                        Masuk
+                    </flux:button>
                 </div>
-                <p class="small text-muted mt-3 mb-0">
+
+                <p class="mt-4 text-xs text-zinc-500 dark:text-zinc-400">
                     Katalog dapat diakses tanpa login. Pengajuan pinjaman memerlukan akun aktif.
                 </p>
             </div>
 
-            <div class="col-lg-6">
-                <div class="card p-4">
-                    <div class="d-flex align-items-center gap-3 mb-4">
-                        <x-library-logo size="md" />
-                        <div>
-                            <div class="fw-semibold">{{ $identity->libraryName() }}</div>
-                            <div class="small text-muted">{{ $identity->schoolName() }}</div>
-                        </div>
-                    </div>
-
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <div class="border p-3 h-100">
-                                <i class="bi bi-search text-primary fs-4" aria-hidden="true"></i>
-                                <div class="fw-semibold small mt-2">Cari koleksi</div>
-                                <div class="text-muted small">Temukan buku berdasarkan judul, penulis, atau ISBN.</div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="border p-3 h-100">
-                                <i class="bi bi-journal-check text-success fs-4" aria-hidden="true"></i>
-                                <div class="fw-semibold small mt-2">Ajukan pinjaman</div>
-                                <div class="text-muted small">Kirim pengajuan dan pantau statusnya.</div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="border p-3 h-100">
-                                <i class="bi bi-calendar-check text-warning fs-4" aria-hidden="true"></i>
-                                <div class="fw-semibold small mt-2">Pantau jatuh tempo</div>
-                                <div class="text-muted small">Lihat tanggal kembali dan status pinjaman.</div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="border p-3 h-100">
-                                <i class="bi bi-bar-chart text-info fs-4" aria-hidden="true"></i>
-                                <div class="fw-semibold small mt-2">Laporan rapi</div>
-                                <div class="text-muted small">Data sirkulasi dan inventaris siap diekspor.</div>
-                            </div>
-                        </div>
+            <flux:card class="p-5!">
+                <div class="mb-5 flex items-center gap-3">
+                    <x-library-logo size="md" />
+                    <div>
+                        <div class="font-semibold">{{ $identity->libraryName() }}</div>
+                        <div class="text-sm text-zinc-500 dark:text-zinc-400">{{ $identity->schoolName() }}</div>
                     </div>
                 </div>
-            </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    @foreach ([
+                        ['icon' => 'magnifying-glass', 'title' => 'Cari koleksi', 'text' => 'Temukan buku berdasarkan judul, penulis, atau ISBN.', 'color' => 'text-sky-600 dark:text-sky-400'],
+                        ['icon' => 'book-open', 'title' => 'Ajukan pinjaman', 'text' => 'Kirim pengajuan dan pantau statusnya.', 'color' => 'text-emerald-600 dark:text-emerald-400'],
+                        ['icon' => 'calendar-days', 'title' => 'Pantau jatuh tempo', 'text' => 'Lihat tanggal kembali dan status pinjaman.', 'color' => 'text-amber-600 dark:text-amber-400'],
+                        ['icon' => 'chart-bar', 'title' => 'Laporan rapi', 'text' => 'Data sirkulasi dan inventaris siap diekspor.', 'color' => 'text-cyan-600 dark:text-cyan-400'],
+                    ] as $feature)
+                        <div class="rounded-lg border border-zinc-200 p-3 dark:border-zinc-700">
+                            <flux:icon :icon="$feature['icon']" variant="outline" class="size-6 {{ $feature['color'] }}" />
+                            <div class="mt-2 text-sm font-semibold">{{ $feature['title'] }}</div>
+                            <div class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{{ $feature['text'] }}</div>
+                        </div>
+                    @endforeach
+                </div>
+            </flux:card>
         </div>
     </section>
 
     @if ($visitKioskEnabled ?? false)
-        <section class="container-xl pb-4" aria-labelledby="kiosk-heading">
-            <div class="card border-primary">
-                <div class="card-body d-flex flex-column flex-lg-row align-items-lg-center gap-3 gap-lg-4">
-                    <span class="kpi-icon text-bg-primary flex-shrink-0" aria-hidden="true">
-                        <i class="bi bi-upc-scan"></i>
+        <section class="mx-auto w-full max-w-7xl px-4 pb-8 lg:px-8" aria-labelledby="kiosk-heading">
+            <flux:card class="border-s-4! border-s-[var(--color-accent)]!">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-center">
+                    <span class="inline-flex size-12 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-400/15 dark:text-sky-300">
+                        <flux:icon.qr-code class="size-6" />
                     </span>
-                    <div class="flex-grow-1">
-                        <h2 class="h5 mb-1" id="kiosk-heading">Berkunjung ke perpustakaan?</h2>
-                        <p class="text-muted mb-0">
+                    <div class="flex-1">
+                        <flux:heading size="lg" id="kiosk-heading">Berkunjung ke perpustakaan?</flux:heading>
+                        <flux:text class="mt-1">
                             Scan kartu anggota atau ketik nomor induk di kiosk kunjungan untuk mencatat kehadiran
                             tanpa perlu login.
-                        </p>
+                        </flux:text>
                     </div>
-                    <a href="{{ route('visits.kiosk') }}" class="btn btn-primary flex-shrink-0">
-                        <i class="bi bi-upc-scan me-1" aria-hidden="true"></i>Buka Kiosk Kunjungan
-                    </a>
+                    <flux:button variant="primary" icon="qr-code" href="{{ route('visits.kiosk') }}" class="shrink-0">
+                        Buka Kiosk Kunjungan
+                    </flux:button>
                 </div>
-            </div>
+            </flux:card>
         </section>
     @endif
 
-    <section id="fitur" class="container-xl py-4">
-        <div class="text-center mb-4">
-            <h2 class="h4 mb-1">Dirancang untuk seluruh warga sekolah</h2>
-            <p class="text-muted mb-0">Satu alur kerja untuk admin, guru, dan siswa.</p>
+    <section id="fitur" class="mx-auto w-full max-w-7xl px-4 py-8 lg:px-8">
+        <div class="mb-6 text-center">
+            <flux:heading size="xl" level="2">Dirancang untuk seluruh warga sekolah</flux:heading>
+            <flux:text class="mt-1">Satu alur kerja untuk admin, guru, dan siswa.</flux:text>
         </div>
 
-        <div class="row row-cols-1 row-cols-md-3 g-3">
-            <div class="col">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <span class="kpi-icon text-bg-primary mb-3">
-                            <i class="bi bi-shield-check" aria-hidden="true"></i>
-                        </span>
-                        <h3 class="h6">Akses sesuai peran</h3>
-                        <p class="text-muted small mb-0">
-                            Admin mengelola operasional, guru dan siswa mengakses katalog serta pinjaman miliknya.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <span class="kpi-icon text-bg-success mb-3">
-                            <i class="bi bi-collection" aria-hidden="true"></i>
-                        </span>
-                        <h3 class="h6">Inventaris eksemplar</h3>
-                        <p class="text-muted small mb-0">
-                            Ketersediaan dihitung dari eksemplar yang benar-benar siap dipinjam.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <span class="kpi-icon text-bg-warning mb-3">
-                            <i class="bi bi-clock-history" aria-hidden="true"></i>
-                        </span>
-                        <h3 class="h6">Transaksi terlacak</h3>
-                        <p class="text-muted small mb-0">
-                            Setiap pengajuan, penyerahan, dan pengembalian tercatat dengan status yang jelas.
-                        </p>
-                    </div>
-                </div>
-            </div>
+        <div class="grid gap-4 md:grid-cols-3">
+            @foreach ([
+                ['icon' => 'shield-check', 'title' => 'Akses sesuai peran', 'text' => 'Admin mengelola operasional, guru dan siswa mengakses katalog serta pinjaman miliknya.', 'box' => 'bg-sky-100 text-sky-700 dark:bg-sky-400/15 dark:text-sky-300'],
+                ['icon' => 'rectangle-stack', 'title' => 'Inventaris eksemplar', 'text' => 'Ketersediaan dihitung dari eksemplar yang benar-benar siap dipinjam.', 'box' => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300'],
+                ['icon' => 'clock', 'title' => 'Transaksi terlacak', 'text' => 'Setiap pengajuan, penyerahan, dan pengembalian tercatat dengan status yang jelas.', 'box' => 'bg-amber-100 text-amber-700 dark:bg-amber-400/15 dark:text-amber-300'],
+            ] as $feature)
+                <flux:card class="h-full">
+                    <span class="mb-3 inline-flex size-11 items-center justify-center rounded-lg {{ $feature['box'] }}">
+                        <flux:icon :icon="$feature['icon']" class="size-5" />
+                    </span>
+                    <flux:heading size="lg" level="3">{{ $feature['title'] }}</flux:heading>
+                    <flux:text class="mt-2">{{ $feature['text'] }}</flux:text>
+                </flux:card>
+            @endforeach
         </div>
     </section>
 @endsection

@@ -89,18 +89,21 @@ function createEmpty(message) {
     return element;
 }
 
-function createItem({ icon, title, subtitle, href, variant = 'primary' }) {
+function createItem({ title, subtitle, href, variant = 'primary' }) {
     const item = document.createElement('a');
     item.className = 'notification-item';
     item.href = href;
 
     const iconWrapper = document.createElement('span');
-    iconWrapper.className = `notification-icon text-bg-${variant}`;
+    iconWrapper.className = `notification-icon ${variant === 'warning'
+        ? 'bg-amber-100 text-amber-600 dark:bg-amber-400/20 dark:text-amber-300'
+        : variant === 'danger'
+            ? 'bg-rose-100 text-rose-600 dark:bg-rose-400/20 dark:text-rose-300'
+            : 'bg-sky-100 text-sky-600 dark:bg-sky-400/20 dark:text-sky-300'}`;
 
-    const iconElement = document.createElement('i');
-    iconElement.className = `bi bi-${icon}`;
-    iconElement.setAttribute('aria-hidden', 'true');
-    iconWrapper.appendChild(iconElement);
+    const dot = document.createElement('span');
+    dot.className = 'size-2 rounded-full bg-current';
+    iconWrapper.appendChild(dot);
 
     const content = document.createElement('span');
     content.className = 'notification-content';
@@ -124,15 +127,10 @@ function updateBadge(badge, total) {
         return;
     }
 
-    if (total > 0) {
-        badge.textContent = total > 9 ? '9+' : String(total);
-        badge.classList.remove('d-none');
-    } else {
-        badge.textContent = '0';
-        badge.classList.add('d-none');
-    }
+    badge.textContent = total > 9 ? '9+' : String(total);
+    badge.classList.toggle('hidden', total <= 0);
 
-    const trigger = badge.closest('[data-notifications]')?.querySelector('[data-bs-toggle="dropdown"]');
+    const trigger = badge.closest('[data-notifications]')?.querySelector('[data-notification-trigger]');
 
     if (trigger) {
         trigger.setAttribute('aria-label', total > 0 ? `Notifikasi, ${total} item` : 'Notifikasi');
@@ -144,7 +142,6 @@ function renderAdmin(body, updated, data) {
 
     if (data.pending_requests > 0) {
         body.appendChild(createItem({
-            icon: 'inbox',
             title: `${data.pending_requests} permintaan menunggu`,
             subtitle: data.latest_request
                 ? `${data.latest_request.borrower} \u00b7 ${data.latest_request.book}`
@@ -156,7 +153,6 @@ function renderAdmin(body, updated, data) {
 
     if (data.overdue_loans > 0) {
         body.appendChild(createItem({
-            icon: 'exclamation-triangle',
             title: `${data.overdue_loans} pinjaman terlambat`,
             subtitle: 'Periksa daftar pinjaman yang melewati jatuh tempo.',
             href: data.overdue_url,
@@ -176,7 +172,6 @@ function renderBorrower(body, updated, data) {
 
     if (data.pending_requests > 0) {
         body.appendChild(createItem({
-            icon: 'hourglass-split',
             title: `${data.pending_requests} pengajuan menunggu`,
             subtitle: 'Pengajuan sedang diperiksa admin perpustakaan.',
             href: data.requests_url,
@@ -186,7 +181,6 @@ function renderBorrower(body, updated, data) {
 
     if (data.overdue_loans > 0) {
         body.appendChild(createItem({
-            icon: 'exclamation-triangle',
             title: `${data.overdue_loans} pinjaman terlambat`,
             subtitle: 'Segera kembalikan buku ke perpustakaan.',
             href: data.loans_url,
@@ -198,7 +192,6 @@ function renderBorrower(body, updated, data) {
         const nearest = data.loans[0];
 
         body.appendChild(createItem({
-            icon: 'arrow-left-right',
             title: `${data.active_loans} pinjaman aktif`,
             subtitle: nearest
                 ? `${nearest.book} \u00b7 jatuh tempo ${nearest.due_at_label ?? nearest.due_at}`
@@ -255,6 +248,7 @@ function initNotificationRoot(root) {
     const body = root.querySelector('[data-notification-body]');
     const updated = root.querySelector('[data-notification-updated]');
     const soundButton = root.querySelector('[data-notification-sound]');
+    const trigger = root.querySelector('[data-notification-trigger]');
 
     if (!endpoint || !body || !updated) {
         return;
@@ -275,7 +269,8 @@ function initNotificationRoot(root) {
         const enabled = soundEnabled();
         soundButton.setAttribute('aria-pressed', enabled ? 'true' : 'false');
         soundButton.setAttribute('aria-label', enabled ? 'Matikan suara notifikasi' : 'Aktifkan suara notifikasi');
-        soundButton.innerHTML = `<i class="bi bi-volume-${enabled ? 'up' : 'mute'}" aria-hidden="true"></i>`;
+        soundButton.querySelector('[data-sound-on]')?.classList.toggle('hidden', !enabled);
+        soundButton.querySelector('[data-sound-off]')?.classList.toggle('hidden', enabled);
     };
 
     soundButton?.addEventListener('click', () => {
@@ -350,7 +345,7 @@ function initNotificationRoot(root) {
         }
     });
 
-    root.addEventListener('show.bs.dropdown', fetchNotifications);
+    trigger?.addEventListener('click', fetchNotifications);
 }
 
 export function initNotifications() {

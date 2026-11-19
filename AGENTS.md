@@ -1,14 +1,14 @@
 # AGENTS.md
 
 ## Project state
-Laravel 12.71 / PHP 8.2.26 (composer `^8.2`; keep code PHP 8.2-compatible) school library app (Sistem Informasi Perpustakaan Sekolah). It is currently still the stock skeleton: default `users` table/model (name/email/password only), `welcome` view, and `/` route. No auth UI, Breeze/Jetstream, role package, domain models, or library features exist yet. The PRD requires `role` (admin/guru/siswa), `nomor_induk`, and an active/inactive account status on users.
+Laravel 12.71 / PHP 8.2.26 (composer `^8.2`; keep code PHP 8.2-compatible) school library app (Sistem Informasi Perpustakaan Sekolah) with role-based access (admin/guru/siswa), catalog, loan requests, circulation, reports, member cards, and visit kiosk. The UI is built with Flux UI (Flux Free) + Livewire + Tailwind CSS 4; Bootstrap has been removed. Tests: 185 PHPUnit tests.
 
 ## Read first
 - `agents/prd.md` — roles, business rules, loan/copy statuses, MVP scope.
-- `agents/design.md` — required Bootstrap 5 UI, Indonesian copy, tokens, page/component patterns.
+- `agents/design.md` — required Flux UI, Indonesian copy, theme tokens, page/component patterns.
 - `agents/task-instruction.md` — task workflow and checklist categories.
 
-These specs are the source of truth; don't rewrite or revert them to match the code. The root `README.md` is stock Laravel boilerplate.
+These specs are the source of truth; don't rewrite or revert them to match the code. The root `README.md` documents setup and usage.
 
 **Required after each task:** update `agents/tasklist.md` (create it if missing) with `[x]` ✅, changed files, and overall progress %.
 
@@ -24,10 +24,13 @@ These specs are the source of truth; don't rewrite or revert them to match the c
 `phpunit.xml` leaves `DB_CONNECTION`/`DB_DATABASE` commented out, so tests use `.env`'s MySQL `perpustakaan` database. Before adding tests that use `RefreshDatabase`, add SQLite `:memory:` overrides (or a dedicated test DB) to `phpunit.xml`; otherwise the suite can wipe the dev database. Avoid `migrate:fresh` on the default connection for the same reason. Dev is MySQL and the recommended test DB is SQLite, so keep queries portable (avoid MySQL-only SQL).
 
 ## Frontend
-- `design.md` mandates Bootstrap 5, but the skeleton currently wires Tailwind 4 + Vite. Bootstrap is the requirement: add Bootstrap 5 via npm and replace the Tailwind wiring in the Vite entrypoints. Don't build the library UI with Tailwind utilities or install Breeze/Jetstream (their scaffolding is Tailwind-based).
-- `resources/js/bootstrap.js` is Laravel's axios setup, not Bootstrap 5. Import Bootstrap's CSS/JS bundle separately; modal/offcanvas/toast need its JS.
-- Use Blade + Bootstrap (no Vue/React/SPA). User-facing labels, validation, and status text must be Indonesian; Laravel's default validation messages are English and there is no `lang/` directory, so run `php artisan lang:publish` and add Indonesian messages/translations. Follow the layout/component structure in `design.md` §11.
-- `config/app.php` hardcodes UTC (no `APP_TIMEZONE` env hook) and defaults locale to `en`; set `APP_LOCALE=id` and handle school-local date conversion explicitly for due dates.
+- UI uses **Flux UI (Flux Free 2.x)** + **Livewire 4** + **Tailwind CSS 4** via Vite. Do not reintroduce Bootstrap, Bootstrap Icons, or Breeze/Jetstream scaffolding.
+- Entrypoints: `resources/css/app.css` imports Tailwind and Flux CSS, defines theme tokens/dark variant, and holds `.data-table`, chart, kiosk, print, and member-card styles. `resources/js/app.js` provides confirm modal (`flux:modal`), loading states, password toggles, print, auto-submit, scroll regions, share, and notifications.
+- Layouts: `layouts/admin`, `layouts/borrower`, `layouts/auth`, `layouts/public` use `flux:sidebar` + `flux:header` + `flux:main` and must include `@fluxAppearance` in `<head>` and `@fluxScripts` before `</body>`. `layouts/kiosk`, `layouts/print`, and `layouts/print-card` are light-only and must not include `@fluxAppearance`.
+- Navigation: use `flux:sidebar.group expandable` for menu groups; reserve `flux:dropdown` for account, notifications, and theme menus. Theme switcher is `partials/theme-switcher.blade.php` using `$flux.appearance` (`light|dark|system`); borrower profile has a dark-mode switch bound to the same state.
+- Flux Free has no Tabs, Date Picker, or Chart components. Use link-based tab navigation, native date inputs, and existing HTML/CSS charts.
+- Use Blade + Flux components (no Vue/React/SPA). User-facing labels, validation, and status text must be Indonesian; `lang/id` already contains the translations. Follow the layout/component structure in `design.md` §11.
+- `config/app.php` hardcodes UTC (no `APP_TIMEZONE` env hook) and defaults locale to `en`; `APP_LOCALE=id` is set in `.env`, and school-local date conversion is handled explicitly for due dates.
 - Laravel 12 wiring: providers in `bootstrap/providers.php`; middleware/exceptions in `bootstrap/app.php`; scheduled tasks in `routes/console.php` (run locally with `php artisan schedule:work`). There is no `app/Http/Kernel.php` or `app/Console/Kernel.php`.
 
 ## Domain invariants easy to miss

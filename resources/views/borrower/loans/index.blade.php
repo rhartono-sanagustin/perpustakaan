@@ -3,85 +3,74 @@
 @section('title', 'Pinjaman Saya')
 
 @section('content')
-    <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
-        <div>
-            <h1 class="h3 mb-1">Pinjaman Saya</h1>
-            <p class="text-muted mb-0">Pantau pengajuan, pinjaman aktif, dan jatuh tempo buku Anda.</p>
-        </div>
-        <a href="{{ route('catalog.index') }}" class="btn btn-primary align-self-md-start">
-            <i class="bi bi-search me-1" aria-hidden="true"></i>Cari Buku
-        </a>
-    </div>
+    <x-page-header title="Pinjaman Saya" subtitle="Pantau pengajuan, pinjaman aktif, dan jatuh tempo buku Anda.">
+        <x-slot:actions>
+            <flux:button variant="primary" icon="magnifying-glass" href="{{ route('catalog.index') }}">
+                Cari Buku
+            </flux:button>
+        </x-slot:actions>
+    </x-page-header>
 
-    @if ($errors->any())
-        <div class="alert alert-danger" role="alert">
-            <div class="fw-semibold mb-1">Tindakan belum dapat diproses:</div>
-            <ul class="mb-0 ps-3">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    <x-form-errors title="Tindakan belum dapat diproses:" />
 
     @php
         $tabs = [
-            'menunggu' => ['label' => 'Menunggu Diproses', 'icon' => 'hourglass-split', 'count' => $counts['menunggu']],
+            'menunggu' => ['label' => 'Menunggu Diproses', 'icon' => 'hourglass', 'count' => $counts['menunggu']],
             'disetujui' => ['label' => 'Disetujui', 'icon' => 'check-circle', 'count' => $counts['disetujui']],
-            'dipinjam' => ['label' => 'Sedang Dipinjam', 'icon' => 'arrow-left-right', 'count' => $counts['dipinjam']],
+            'dipinjam' => ['label' => 'Sedang Dipinjam', 'icon' => 'arrows-right-left', 'count' => $counts['dipinjam']],
             'terlambat' => ['label' => 'Terlambat', 'icon' => 'exclamation-triangle', 'count' => $counts['terlambat']],
         ];
     @endphp
 
-    <ul class="nav nav-pills flex-wrap gap-2 mb-4" role="tablist" aria-label="Filter status pinjaman">
+    <nav class="mb-4 flex flex-wrap gap-2" aria-label="Filter status pinjaman">
         @foreach ($tabs as $key => $item)
-            <li class="nav-item" role="presentation">
-                <a
-                    href="{{ route('borrower.loans.index', ['tab' => $key]) }}"
-                    class="nav-link {{ $tab === $key ? 'active' : '' }}"
-                    role="tab"
-                    aria-selected="{{ $tab === $key ? 'true' : 'false' }}"
-                >
-                    <i class="bi bi-{{ $item['icon'] }} me-1" aria-hidden="true"></i>{{ $item['label'] }}
-                    <span class="badge {{ $tab === $key ? 'text-bg-light' : 'text-bg-secondary' }} ms-1">{{ $item['count'] }}</span>
-                </a>
-            </li>
+            <a
+                href="{{ route('borrower.loans.index', ['tab' => $key]) }}"
+                @class([
+                    'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition',
+                    'bg-[var(--color-accent)] text-[var(--color-accent-foreground)] shadow-xs' => $tab === $key,
+                    'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-white/10' => $tab !== $key,
+                ])
+                @if ($tab === $key) aria-current="page" @endif
+            >
+                <x-icon :name="$item['icon']" variant="mini" class="size-4" />
+                {{ $item['label'] }}
+                <flux:badge :color="$tab === $key ? 'white' : 'zinc'" size="sm">{{ $item['count'] }}</flux:badge>
+            </a>
         @endforeach
-    </ul>
+    </nav>
 
     @if ($items->isEmpty())
-        <div class="card">
-            <div class="card-body">
-                @if ($tab === 'menunggu')
-                    <x-empty-state icon="hourglass-split" title="Tidak ada pengajuan yang menunggu" message="Pengajuan baru akan tampil di sini setelah Anda mengirimkannya dari katalog." />
-                @elseif ($tab === 'disetujui')
-                    <x-empty-state icon="check-circle" title="Tidak ada pengajuan yang disetujui" message="Pengajuan yang disetujui admin akan tampil di sini beserta batas pengambilannya." />
-                @elseif ($tab === 'terlambat')
-                    <x-empty-state icon="exclamation-triangle" title="Tidak ada pinjaman terlambat" message="Pinjaman yang melewati jatuh tempo akan ditandai di sini." />
-                @else
-                    <x-empty-state icon="book" title="Anda belum memiliki pinjaman aktif" message="Jelajahi katalog dan ajukan buku yang ingin Anda baca.">
-                        <a href="{{ route('catalog.index') }}" class="btn btn-primary btn-sm">Jelajahi Katalog</a>
-                    </x-empty-state>
-                @endif
-            </div>
-        </div>
+        <flux:card>
+            @if ($tab === 'menunggu')
+                <x-empty-state icon="hourglass" title="Tidak ada pengajuan yang menunggu" message="Pengajuan baru akan tampil di sini setelah Anda mengirimkannya dari katalog." />
+            @elseif ($tab === 'disetujui')
+                <x-empty-state icon="check-circle" title="Tidak ada pengajuan yang disetujui" message="Pengajuan yang disetujui admin akan tampil di sini beserta batas pengambilannya." />
+            @elseif ($tab === 'terlambat')
+                <x-empty-state icon="exclamation-triangle" title="Tidak ada pinjaman terlambat" message="Pinjaman yang melewati jatuh tempo akan ditandai di sini." />
+            @else
+                <x-empty-state icon="book-open" title="Anda belum memiliki pinjaman aktif" message="Jelajahi katalog dan ajukan buku yang ingin Anda baca.">
+                    <flux:button variant="primary" size="sm" href="{{ route('catalog.index') }}">Jelajahi Katalog</flux:button>
+                </x-empty-state>
+            @endif
+        </flux:card>
     @elseif (in_array($tab, ['menunggu', 'disetujui'], true))
-        @foreach ($items as $loanRequest)
-            <div class="card mb-3">
-                <div class="card-body">
-                    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+        <div class="space-y-3">
+            @foreach ($items as $loanRequest)
+                <flux:card>
+                    <div class="flex flex-col justify-between gap-3 lg:flex-row">
                         <div class="min-w-0">
-                            <h2 class="h6 mb-1">{{ $loanRequest->book->title }}</h2>
-                            <p class="small text-muted mb-2">{{ $loanRequest->book->authors_label ?: 'Penulis tidak diketahui' }}</p>
-                            <div class="small text-muted">
+                            <flux:heading size="lg" level="2" class="text-base!">{{ $loanRequest->book->title }}</flux:heading>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ $loanRequest->book->authors_label ?: 'Penulis tidak diketahui' }}</p>
+                            <div class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
                                 Diajukan {{ $loanRequest->requested_at->locale('id')->translatedFormat('d F Y, H:i') }}
-                                &middot; <span class="text-body">#{{ $loanRequest->reference }}</span>
+                                &middot; <span class="text-zinc-700 dark:text-zinc-200">#{{ $loanRequest->reference }}</span>
                             </div>
                         </div>
-                        <div class="text-lg-end">
+                        <div class="lg:text-end">
                             <x-status-badge :label="$loanRequest->statusLabel()" :variant="$loanRequest->statusVariant()" />
                             @if ($loanRequest->isApproved())
-                                <div class="small {{ $loanRequest->isExpired() ? 'text-danger' : 'text-muted' }} mt-2">
+                                <div class="mt-2 text-xs {{ $loanRequest->isExpired() ? 'text-rose-600 dark:text-rose-400' : 'text-zinc-500 dark:text-zinc-400' }}">
                                     @if ($loanRequest->isExpired())
                                         Batas pengambilan sudah lewat
                                     @else
@@ -93,79 +82,81 @@
                     </div>
 
                     @if ($loanRequest->isApproved() && ! $loanRequest->isExpired())
-                        <div class="alert alert-info mt-3 mb-0 py-2 small" role="alert">
-                            <i class="bi bi-info-circle me-1" aria-hidden="true"></i>
-                            Pengajuan sudah disetujui. Buku belum dipinjam sampai Anda mengambilnya dan admin mencatat checkout.
-                        </div>
+                        <flux:callout icon="information-circle" class="mt-4">
+                            <flux:callout.text>Pengajuan sudah disetujui. Buku belum dipinjam sampai Anda mengambilnya dan admin mencatat checkout.</flux:callout.text>
+                        </flux:callout>
                     @endif
 
                     @if ($loanRequest->isApproved() && $loanRequest->isExpired())
-                        <div class="alert alert-warning mt-3 mb-0 py-2 small" role="alert">
-                            <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>
-                            Batas pengambilan sudah lewat. Batalkan pengajuan ini lalu ajukan ulang jika buku masih dibutuhkan.
-                        </div>
+                        <flux:callout variant="warning" icon="exclamation-triangle" class="mt-4">
+                            <flux:callout.text>Batas pengambilan sudah lewat. Batalkan pengajuan ini lalu ajukan ulang jika buku masih dibutuhkan.</flux:callout.text>
+                        </flux:callout>
                     @endif
 
                     @if ($loanRequest->notes)
-                        <div class="small text-muted mt-3">
-                            <span class="fw-semibold">Catatan Anda:</span> {{ $loanRequest->notes }}
+                        <div class="mt-3 text-xs text-zinc-500 dark:text-zinc-400">
+                            <span class="font-semibold">Catatan Anda:</span> {{ $loanRequest->notes }}
                         </div>
                     @endif
 
-                    <div class="d-flex flex-wrap gap-2 mt-3">
-                        <a href="{{ route('catalog.show', $loanRequest->book) }}" class="btn btn-sm btn-outline-secondary">Lihat Buku</a>
+                    <div class="mt-4 flex flex-wrap items-center gap-2">
+                        <flux:button size="sm" variant="outline" href="{{ route('catalog.show', $loanRequest->book) }}">
+                            Lihat Buku
+                        </flux:button>
 
                         @can('cancel', $loanRequest)
                             <form method="POST" action="{{ route('borrower.requests.cancel', $loanRequest) }}" data-confirm="Batalkan pengajuan untuk buku ini?">
                                 @csrf
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Batalkan Pengajuan</button>
+                                <flux:button type="submit" size="sm" variant="danger">Batalkan Pengajuan</flux:button>
                             </form>
                         @endcan
                     </div>
-                </div>
-            </div>
-        @endforeach
+                </flux:card>
+            @endforeach
+        </div>
 
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3">
-            <span class="small text-muted">Menampilkan {{ $items->firstItem() }}&ndash;{{ $items->lastItem() }} dari {{ $items->total() }} pengajuan</span>
+        <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <span class="text-xs text-zinc-500 dark:text-zinc-400">Menampilkan {{ $items->firstItem() }}&ndash;{{ $items->lastItem() }} dari {{ $items->total() }} pengajuan</span>
             {{ $items->links() }}
         </div>
     @else
-        @foreach ($items as $loan)
-            <div class="card mb-3">
-                <div class="card-body">
-                    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+        <div class="space-y-3">
+            @foreach ($items as $loan)
+                <flux:card>
+                    <div class="flex flex-col justify-between gap-3 lg:flex-row">
                         <div class="min-w-0">
-                            <h2 class="h6 mb-1">{{ $loan->copy->book->title }}</h2>
-                            <p class="small text-muted mb-2">{{ $loan->copy->book->authors_label ?: 'Penulis tidak diketahui' }}</p>
-                            <div class="small text-muted">
+                            <flux:heading size="lg" level="2" class="text-base!">{{ $loan->copy->book->title }}</flux:heading>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ $loan->copy->book->authors_label ?: 'Penulis tidak diketahui' }}</p>
+                            <div class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
                                 {{ $loan->copy->inventory_code }} &middot; {{ $loan->copy->shelf_location ?? 'Lokasi rak belum diatur' }}
-                                &middot; <span class="text-body">#{{ $loan->reference }}</span>
+                                &middot; <span class="text-zinc-700 dark:text-zinc-200">#{{ $loan->reference }}</span>
                             </div>
-                            <div class="small text-muted mt-1">
+                            <div class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
                                 Dipinjam {{ $loan->borrowed_at->locale('id')->translatedFormat('d M Y') }}
                             </div>
                         </div>
-                        <div class="text-lg-end">
-                            <x-status-badge :label="$loan->statusLabel()" :variant="$loan->statusVariant()" :icon="$loan->isOverdue() ? 'exclamation-triangle' : 'arrow-left-right'" />
-                            <div class="small {{ $loan->isOverdue() ? 'text-danger' : 'text-muted' }} mt-2">
+                        <div class="lg:text-end">
+                            <x-status-badge :label="$loan->statusLabel()" :variant="$loan->statusVariant()" :icon="$loan->isOverdue() ? 'exclamation-triangle' : 'arrows-right-left'" />
+                            <div class="mt-2 text-xs {{ $loan->isOverdue() ? 'text-rose-600 dark:text-rose-400' : 'text-zinc-500 dark:text-zinc-400' }}">
                                 Jatuh tempo {{ $loan->due_at->locale('id')->translatedFormat('d F Y') }}
                             </div>
                             @if ($loan->isOverdue())
-                                <div class="small text-danger mt-1">{{ $loan->daysOverdue() }} hari terlambat</div>
+                                <div class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $loan->daysOverdue() }} hari terlambat</div>
                             @endif
                         </div>
                     </div>
 
-                    <div class="d-flex flex-wrap gap-2 mt-3">
-                        <a href="{{ route('catalog.show', $loan->copy->book) }}" class="btn btn-sm btn-outline-secondary">Lihat Buku</a>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <flux:button size="sm" variant="outline" href="{{ route('catalog.show', $loan->copy->book) }}">
+                            Lihat Buku
+                        </flux:button>
                     </div>
-                </div>
-            </div>
-        @endforeach
+                </flux:card>
+            @endforeach
+        </div>
 
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3">
-            <span class="small text-muted">Menampilkan {{ $items->firstItem() }}&ndash;{{ $items->lastItem() }} dari {{ $items->total() }} pinjaman</span>
+        <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <span class="text-xs text-zinc-500 dark:text-zinc-400">Menampilkan {{ $items->firstItem() }}&ndash;{{ $items->lastItem() }} dari {{ $items->total() }} pinjaman</span>
             {{ $items->links() }}
         </div>
     @endif

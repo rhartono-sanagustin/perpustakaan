@@ -11,12 +11,12 @@
 
     <x-page-header :title="$title" :subtitle="$subtitle.' Periode '.$filters->periodLabel().'.'">
         <x-slot:actions>
-            <a href="{{ route('admin.reports.export', $exportQuery) }}" class="btn btn-outline-secondary">
-                <i class="bi bi-file-earmark-spreadsheet me-1" aria-hidden="true"></i>Ekspor CSV
-            </a>
-            <a href="{{ route('admin.reports.print', $exportQuery) }}" target="_blank" rel="noopener" class="btn btn-outline-primary">
-                <i class="bi bi-printer me-1" aria-hidden="true"></i>Cetak
-            </a>
+            <flux:button variant="outline" icon="document-text" href="{{ route('admin.reports.export', $exportQuery) }}">
+                Ekspor CSV
+            </flux:button>
+            <flux:button variant="outline" icon="printer" href="{{ route('admin.reports.print', $exportQuery) }}" target="_blank" rel="noopener">
+                Cetak
+            </flux:button>
         </x-slot:actions>
     </x-page-header>
 
@@ -32,25 +32,23 @@
         'resetUrl' => $action,
     ])
 
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h6 mb-0">{{ $mode === 'peminjaman' ? 'Daftar Peminjaman' : 'Daftar Pengembalian' }}</h2>
-            <span class="small text-muted">{{ $loans->total() }} transaksi</span>
+    <flux:card class="p-0!">
+        <div class="flex items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+            <flux:heading size="lg" level="2">{{ $mode === 'peminjaman' ? 'Daftar Peminjaman' : 'Daftar Pengembalian' }}</flux:heading>
+            <flux:badge color="zinc" size="sm">{{ $loans->total() }} transaksi</flux:badge>
         </div>
 
         @if ($loans->isEmpty())
-            <div class="card-body">
-                <x-empty-state
-                    icon="file-earmark-text"
-                    title="Tidak ada data untuk filter periode ini"
-                    message="Ubah rentang tanggal atau filter lain untuk melihat transaksi."
-                >
-                    <a href="{{ $action }}" class="btn btn-outline-primary btn-sm">Ubah Periode</a>
-                </x-empty-state>
-            </div>
+            <x-empty-state
+                icon="file-earmark-text"
+                title="Tidak ada data untuk filter periode ini"
+                message="Ubah rentang tanggal atau filter lain untuk melihat transaksi."
+            >
+                <flux:button variant="outline" size="sm" href="{{ $action }}">Ubah Periode</flux:button>
+            </x-empty-state>
         @else
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+            <div class="overflow-x-auto" data-scrollable-region>
+                <table class="data-table">
                     <thead>
                         <tr>
                             <th scope="col">Transaksi</th>
@@ -66,14 +64,14 @@
                         @foreach ($loans as $loan)
                             <tr>
                                 <td>
-                                    <div class="fw-semibold">#{{ $loan->reference }}</div>
-                                    <div class="small text-muted">
+                                    <div class="font-semibold">#{{ $loan->reference }}</div>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">
                                         {{ $loan->borrowed_at->locale('id')->translatedFormat('d M Y') }}
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="fw-semibold">{{ $loan->user->name }}</div>
-                                    <div class="small text-muted">
+                                    <div class="font-semibold">{{ $loan->user->name }}</div>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">
                                         {{ $loan->user->roleLabel() }} &middot; {{ $loan->user->nomor_induk }}
                                         @if ($loan->user->kelas)
                                             &middot; {{ $loan->user->kelas }}
@@ -84,18 +82,18 @@
                                 </td>
                                 <td>
                                     <div>{{ $loan->copy->book->title }}</div>
-                                    <div class="small text-muted">{{ $loan->copy->inventory_code }}</div>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $loan->copy->inventory_code }}</div>
                                 </td>
-                                <td class="small text-muted">
+                                <td class="text-xs whitespace-nowrap text-zinc-500 dark:text-zinc-400">
                                     {{ $loan->borrowed_at->locale('id')->translatedFormat('d M Y') }}
                                 </td>
-                                <td class="small">
+                                <td class="text-xs">
                                     @if ($mode === 'peminjaman')
-                                        <span class="{{ $loan->isOverdue() ? 'text-danger fw-semibold' : 'text-muted' }}">
+                                        <span class="{{ $loan->isOverdue() ? 'font-semibold text-rose-600 dark:text-rose-400' : 'text-zinc-500 dark:text-zinc-400' }}">
                                             {{ $loan->due_at->locale('id')->translatedFormat('d M Y') }}
                                         </span>
                                     @else
-                                        <span class="text-muted">
+                                        <span class="text-zinc-500 dark:text-zinc-400">
                                             {{ $loan->returned_at?->locale('id')->translatedFormat('d M Y') ?? '-' }}
                                         </span>
                                     @endif
@@ -110,17 +108,17 @@
                                         />
                                     @endif
                                 </td>
-                                <td class="small text-muted">{{ $loan->processor?->name ?? '-' }}</td>
+                                <td class="text-xs text-zinc-500 dark:text-zinc-400">{{ $loan->processor?->name ?? '-' }}</td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
 
-            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <span class="small text-muted">Menampilkan {{ $loans->firstItem() }}&ndash;{{ $loans->lastItem() }} dari {{ $loans->total() }} transaksi</span>
+            <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 px-5 py-4 dark:border-white/10">
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">Menampilkan {{ $loans->firstItem() }}&ndash;{{ $loans->lastItem() }} dari {{ $loans->total() }} transaksi</span>
                 {{ $loans->links() }}
             </div>
         @endif
-    </div>
+    </flux:card>
 @endsection
