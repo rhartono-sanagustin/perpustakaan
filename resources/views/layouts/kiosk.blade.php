@@ -13,30 +13,30 @@
 <body class="kiosk-body">
     <div class="kiosk-shell">
         <header class="kiosk-header">
-            <div class="container-xl d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 py-3">
-                <a href="{{ route('home') }}" class="d-flex align-items-center gap-2 text-reset">
+            <div class="mx-auto flex w-full max-w-6xl flex-col justify-between gap-3 px-4 py-3 sm:flex-row sm:items-center">
+                <a href="{{ route('home') }}" class="flex items-center gap-2 text-inherit">
                     <x-library-logo size="sm" />
-                    <span class="d-flex flex-column lh-sm">
-                        <span class="fw-semibold">{{ $identity->libraryName() }}</span>
-                        <span class="small text-muted">{{ $identity->schoolName() }}</span>
+                    <span class="flex flex-col leading-tight">
+                        <span class="font-semibold">{{ $identity->libraryName() }}</span>
+                        <span class="text-xs text-slate-500">{{ $identity->schoolName() }}</span>
                     </span>
                 </a>
 
-                <div class="kiosk-clock text-sm-end" aria-label="Waktu sekolah">
+                <div class="text-left sm:text-right" aria-label="Waktu sekolah">
                     <div class="kiosk-clock-time" data-kiosk-clock>--:--:--</div>
                     <div class="kiosk-clock-date" data-kiosk-date>{{ now()->locale('id')->translatedFormat('l, d F Y') }}</div>
                 </div>
             </div>
         </header>
 
-        <main class="container-xl flex-grow-1 py-4 py-lg-5">
+        <main class="mx-auto w-full max-w-6xl flex-1 px-4 py-5 lg:py-8">
             @yield('content')
         </main>
 
         <footer class="kiosk-footer">
-            <div class="container-xl d-flex flex-column flex-sm-row justify-content-between gap-2 small text-muted py-3">
+            <div class="mx-auto flex w-full max-w-6xl flex-col justify-between gap-2 px-4 py-3 text-xs text-slate-500 sm:flex-row">
                 <span>&copy; {{ date('Y') }} {{ $identity->schoolName() }}</span>
-                <a href="{{ route('home') }}" class="text-muted">Kembali ke beranda</a>
+                <a href="{{ route('home') }}" class="text-slate-500 underline-offset-2 hover:underline">Kembali ke beranda</a>
             </div>
         </footer>
     </div>

@@ -1,16 +1,17 @@
 # UX/UI DESIGN SPECIFICATION
 
-## Sistem Informasi Perpustakaan Sekolah — Bootstrap 5
+## Sistem Informasi Perpustakaan Sekolah — Flux UI
 
 | Informasi | Keterangan |
 |---|---|
 | Dokumen | UX/UI Design Guide (`design.md`) |
-| Versi | 1.0 |
-| Tanggal | 7 November 2026 |
+| Versi | 2.0 |
+| Tanggal | 18 November 2026 |
 | Acuan kebutuhan | `prd.md` versi 1.0 |
-| Framework UI | Bootstrap 5.x |
+| Framework UI | Flux UI (Flux Free) 2.x + Tailwind CSS 4.x |
+| Runtime interaktif | Livewire 4.x dan Alpine.js (bawaan Flux) |
 | Bahasa antarmuka | Bahasa Indonesia |
-| Jenis aplikasi | Web responsif, desktop-first untuk admin dan mobile-friendly untuk peminjam |
+| Jenis aplikasi | Web responsif, sidebar desktop dan mobile-friendly |
 
 ---
 
@@ -38,7 +39,7 @@ Antarmuka harus membantu tiga kelompok pengguna menyelesaikan tugas utama dengan
 
 ### 3.1 Navigasi admin
 
-Sidebar desktop:
+Sidebar desktop dengan grup menu yang dapat dibuka/tutup (accordion):
 
 1. Dashboard
 2. Katalog Buku
@@ -61,21 +62,33 @@ Sidebar desktop:
 5. Pengguna
 6. Pengaturan
 
-Topbar admin: tombol menu (mobile), breadcrumb/judul halaman, pencarian opsional, notifikasi aktivitas (bila diimplementasikan), profil admin, dan logout.
+Topbar admin: pemilih tema Terang/Gelap/Sistem, notifikasi aktivitas, profil admin, dan logout. Tombol buka/tutup sidebar tersedia pada layar kecil.
 
 ### 3.2 Navigasi guru dan siswa
 
-Navbar utama:
+Sidebar dengan grup menu yang dapat dibuka/tutup:
 
 - Beranda
 - Katalog Buku
 - Pinjaman Saya
-- Riwayat
+  - Menunggu Diproses
+  - Disetujui
+  - Sedang Dipinjam
+  - Terlambat
+  - Riwayat
 - Profil
 
-Pada layar kecil, menu dapat berubah menjadi offcanvas Bootstrap. Guru dan siswa menggunakan struktur yang sama; perbedaan kebijakan pinjam ditampilkan sebagai informasi akun, bukan sebagai navigasi yang berbeda.
+Pada layar kecil, sidebar berubah menjadi panel geser (offcanvas) yang dikelola komponen `flux:sidebar`; tombol menu berada di header. Guru dan siswa menggunakan struktur yang sama; perbedaan kebijakan pinjam ditampilkan sebagai informasi akun, bukan sebagai navigasi yang berbeda.
 
-### 3.3 Aturan navigasi
+### 3.3 Tema tampilan
+
+- Tersedia tiga pilihan tema: **Terang**, **Gelap**, dan **Sistem** (mengikuti preferensi perangkat).
+- Pemilih tema diletakkan di dropdown header untuk seluruh peran.
+- Halaman profil peminjam menyediakan saklar mode gelap sebagai akses cepat.
+- Preferensi disimpan di browser melalui mekanisme `$flux.appearance` sehingga tetap konsisten antarhalaman.
+- Halaman kiosk dan cetak selalu terang agar hasil cetak dan barcode tetap terbaca.
+
+### 3.4 Aturan navigasi
 
 - Menu ditampilkan berdasarkan peran dari server.
 - Menyembunyikan menu bukan pengganti otorisasi backend.
@@ -110,67 +123,65 @@ Warna status perlu dipasangkan dengan teks dan/atau ikon. Jangan menggunakan war
 
 ### 4.3 Tipografi
 
-- Gunakan font sistem Bootstrap: `system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`.
-- Ukuran teks isi standar: 1rem.
-- Judul halaman: sekitar 1.5–1.75rem pada desktop dan 1.25–1.5rem pada mobile.
-- Label form dan metadata: 0.875–0.95rem.
-- Gunakan `fw-semibold` untuk judul kartu dan `text-muted` untuk keterangan sekunder.
+- Gunakan font sistem: `ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`.
+- Ukuran teks isi standar: 1rem (kelas `text-base`).
+- Judul halaman: `text-2xl` pada desktop dan `text-xl` pada mobile.
+- Label form dan metadata: `text-sm` atau `text-xs`.
+- Gunakan `font-semibold` untuk judul kartu dan `text-zinc-500 dark:text-zinc-400` untuk keterangan sekunder.
 - Hindari terlalu banyak variasi ukuran dan ketebalan font.
 
 ### 4.4 Spasi dan bentuk
 
-- Gunakan skala spacing Bootstrap (`1` sampai `5`) secara konsisten.
-- Jarak antarbagian halaman: 1.5rem–2rem.
-- Jarak isi kartu: 1rem–1.25rem.
-- Radius kartu: sekitar 0.75rem.
-- Tombol dan input menggunakan tinggi sentuh yang nyaman; targetkan minimal sekitar 44px untuk kontrol utama pada perangkat sentuh.
-- Gunakan border tipis; shadow ringan hanya untuk elemen yang perlu terangkat.
+- Gunakan skala spacing Tailwind (`1`, `2`, `3`, `4`, `5`, `6`, `8`) secara konsisten.
+- Jarak antarbagian halaman: `gap-4` sampai `gap-6`.
+- Jarak isi kartu: `p-4` sampai `p-5`.
+- Radius kartu: `rounded-xl`; tombol dan input `rounded-lg`.
+- Tombol dan input menggunakan tinggi sentuh yang nyaman; gunakan `h-11` untuk CTA utama pada perangkat sentuh.
+- Gunakan border tipis (`border-zinc-200 dark:border-white/10`); shadow ringan (`shadow-xs`) hanya untuk elemen yang perlu terangkat.
 
 ## 5. Kerangka Layout
 
 ### 5.1 Layout admin desktop
 
-Gunakan sidebar tetap di sisi kiri dan area konten di kanan. Lebar sidebar awal sekitar 250px dan dapat dipersempit bila diperlukan. Area utama menggunakan `container-fluid`, latar app background, serta konten dengan lebar yang nyaman dibaca.
+Gunakan `flux:sidebar` tetap di sisi kiri, `flux:header` di atas area konten, dan `flux:main` untuk isi halaman. Sidebar memakai grup `flux:sidebar.group expandable` agar menu dapat dilipat. Area utama memakai latar `bg-zinc-50 dark:bg-zinc-950` dan padding responsif.
 
 ```text
 +----------------------+---------------------------------------------+
-| BRAND                | Topbar: breadcrumb / title / profile        |
+| BRAND                | Header: tema / notifikasi / profil          |
 |----------------------|---------------------------------------------|
 | Dashboard            | Page title                  [Primary action]|
-| Katalog Buku         |                                             |
-| Sirkulasi            | KPI cards                                  |
-| Laporan              |                                             |
+| Katalog Buku     [v] |                                             |
+| Sirkulasi        [v] | KPI cards                                   |
+| Laporan          [v] |                                             |
 | Pengguna             | Main content: table / chart / form          |
 | Pengaturan           |                                             |
 +----------------------+---------------------------------------------+
 ```
 
-Pada layar di bawah breakpoint `lg`, sidebar berubah menjadi offcanvas. Konten utama mengambil lebar penuh.
+Pada layar di bawah breakpoint `lg`, sidebar tersembunyi dan dapat dibuka sebagai panel geser melalui tombol menu di header. Konten utama mengambil lebar penuh.
 
 ### 5.2 Layout guru/siswa
 
-Gunakan navbar di atas, konten utama di tengah dengan lebar maksimum yang wajar, dan footer sederhana. Dashboard peminjam menempatkan ringkasan pinjaman aktif dan daftar buku terbaru/populer di bawahnya.
+Guru dan siswa memakai pola yang sama dengan admin: `flux:sidebar`, `flux:header`, dan `flux:main`. Sidebar memuat menu utama serta grup status pinjaman. Dashboard peminjam menempatkan ringkasan pinjaman aktif dan daftar buku terbaru/populer di bawahnya.
 
 ```text
-+-------------------------------------------------------------+
-| Logo | Beranda | Katalog | Pinjaman Saya | Profil           |
-+-------------------------------------------------------------+
-| Sapaan + ringkasan akun                                     |
-| [Pinjaman aktif] [Menunggu] [Terlambat]                     |
-| Buku yang sedang dipinjam                                   |
-| Rekomendasi / buku terbaru                                  |
-+-------------------------------------------------------------+
-| Footer                                                      |
-+-------------------------------------------------------------+
++----------------------+---------------------------------------------+
+| BRAND                | Header: tema / notifikasi / profil          |
+|----------------------|---------------------------------------------|
+| Beranda              | Sapaan + ringkasan akun                     |
+| Katalog Buku         | [Pinjaman aktif] [Menunggu] [Terlambat]     |
+| Pinjaman Saya    [v] | Buku yang sedang dipinjam                   |
+| Profil               | Rekomendasi / buku terbaru                  |
++----------------------+---------------------------------------------+
 ```
 
-### 5.3 Grid responsif Bootstrap
+### 5.3 Grid responsif Tailwind
 
-- Desktop: gunakan `container-fluid` untuk halaman admin dan `container-xl` untuk halaman katalog publik/peminjam.
-- Kartu katalog: `row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3` sesuai kepadatan konten.
-- Dashboard KPI: `row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3`.
-- Form panjang: gunakan satu kolom pada mobile dan dua kolom pada desktop untuk field yang saling berkaitan.
-- Tabel admin dibungkus `.table-responsive` agar tidak memaksa layout melebar pada mobile.
+- Konten admin dibungkus `mx-auto w-full max-w-7xl px-4 lg:px-8`; halaman publik memakai pembungkus yang sama.
+- Kartu katalog: `grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5`.
+- Dashboard KPI: `grid gap-3 sm:grid-cols-2 xl:grid-cols-4`.
+- Form panjang: `grid gap-5 sm:grid-cols-2` untuk field yang saling berkaitan.
+- Tabel admin dibungkus `div.overflow-x-auto` dengan atribut `data-scrollable-region` agar tidak memaksa layout melebar pada mobile.
 
 ## 6. Spesifikasi Halaman
 
@@ -342,36 +353,37 @@ Pada laporan inventaris, sediakan ringkasan per status. Pada laporan keterlambat
 
 ## 7. Komponen UI dan Pola Interaksi
 
-| Komponen | Bootstrap 5 | Pedoman penggunaan |
+| Komponen | Flux UI | Pedoman penggunaan |
 |---|---|---|
-| Navbar peminjam | `.navbar`, `.navbar-expand-lg`, `.offcanvas` | Navigasi utama guru/siswa |
-| Sidebar admin | `.offcanvas-lg` atau sidebar custom berbasis grid | Offcanvas pada layar kecil; panel tetap pada desktop |
-| KPI card | `.card`, `.card-body` | Angka besar, label singkat, ikon dekoratif seperlunya |
-| Kartu buku | `.card`, `.card-img-top`, `.card-body` | Sampul rasio konsisten dan CTA jelas |
-| Tabel | `.table`, `.table-hover`, `.table-responsive` | Header jelas, aksi tidak terlalu padat |
-| Form | `.form-label`, `.form-control`, `.form-select` | Selalu gunakan label eksplisit dan pesan validasi |
-| Status | `.badge` | Teks status wajib terlihat; warna hanya pendukung |
-| Tabs | `.nav`, `.nav-tabs` atau `.nav-pills` | Memisahkan status pinjaman |
-| Modal | `.modal` | Konfirmasi singkat atau tindakan kontekstual |
-| Toast/alert | `.toast`, `.alert` | Feedback sukses/gagal/informasi |
-| Pagination | `.pagination` | Tampilkan halaman aktif dan navigasi yang mudah |
-| Empty state | `.text-center`, ilustrasi/icon sederhana | Jelaskan keadaan dan langkah selanjutnya |
-| Loading | spinner atau skeleton ringan | Cegah klik ganda ketika permintaan berjalan |
+| Sidebar | `flux:sidebar`, `flux:sidebar.group expandable` | Navigasi utama admin, guru, dan siswa; grup menu dapat dilipat |
+| Header | `flux:header` | Pemilih tema, notifikasi, profil, dan tombol sidebar mobile |
+| KPI card | `flux:card` + komponen `kpi-card` | Angka besar, label singkat, ikon dekoratif seperlunya |
+| Kartu buku | `flux:card` + komponen `book-card` | Sampul rasio konsisten dan CTA jelas |
+| Tabel | `table.data-table` dalam `div.overflow-x-auto` | Header jelas, aksi tidak terlalu padat |
+| Form | `flux:field`, `flux:label`, `flux:input`, `flux:select`, `flux:textarea`, `flux:error` | Selalu gunakan label eksplisit dan pesan validasi |
+| Status | `flux:badge` melalui komponen `status-badge` | Teks status wajib terlihat; warna hanya pendukung |
+| Tabs | Tautan berbasis `flux:badge`/segmented nav | Memisahkan status pinjaman tanpa komponen Tabs Pro |
+| Modal | `flux:modal` | Konfirmasi singkat atau tindakan kontekstual |
+| Toast/alert | `flux:toast`, `flux:callout` | Feedback sukses/gagal/informasi |
+| Pagination | `{{ $paginator->links() }}` | Tampilkan halaman aktif dan navigasi yang mudah |
+| Empty state | komponen `empty-state` | Jelaskan keadaan dan langkah selanjutnya |
+| Loading | state tombol `data-loading-text` | Cegah klik ganda ketika permintaan berjalan |
+| Tema | `partials.theme-switcher` dengan `$flux.appearance` | Terang, Gelap, atau Sistem |
 
 ### 7.1 Label status standar
 
-| Status | Label tampilan | Gaya Bootstrap yang disarankan |
+| Status | Label tampilan | Varian badge Flux |
 |---|---|---|
-| Menunggu Diproses | Menunggu | `text-bg-warning` dengan teks gelap bila perlu |
-| Disetujui | Disetujui | `text-bg-info` |
-| Ditolak | Ditolak | `text-bg-danger` |
-| Dipinjam | Dipinjam | `text-bg-primary` |
-| Terlambat | Terlambat | `text-bg-danger` |
-| Dikembalikan | Dikembalikan | `text-bg-success` |
-| Dibatalkan | Dibatalkan | `text-bg-secondary` |
-| Tersedia | Tersedia | `text-bg-success` |
-| Rusak | Rusak | `text-bg-warning` |
-| Hilang | Hilang | `text-bg-danger` |
+| Menunggu Diproses | Menunggu | `warning` (amber) |
+| Disetujui | Disetujui | `info` (cyan) |
+| Ditolak | Ditolak | `danger` (red) |
+| Dipinjam | Dipinjam | `primary` (sky) |
+| Terlambat | Terlambat | `danger` (red) |
+| Dikembalikan | Dikembalikan | `success` (green) |
+| Dibatalkan | Dibatalkan | `secondary` (zinc) |
+| Tersedia | Tersedia | `success` (green) |
+| Rusak | Rusak | `warning` (amber) |
+| Hilang | Hilang | `danger` (red) |
 
 Teks badge harus tetap terbaca dan tidak hanya mengandalkan warna. Pastikan kombinasi kontras diperiksa ketika tema diubah.
 
@@ -388,18 +400,18 @@ Hindari pesan teknis seperti stack trace atau query database pada UI.
 
 | Ukuran | Perilaku yang diharapkan |
 |---|---|
-| Mobile, <576px | Navbar offcanvas; KPI satu kolom; katalog dua kolom; tabel menjadi scroll horizontal atau card; form satu kolom |
+| Mobile, <576px | Sidebar menjadi panel geser; KPI satu kolom; katalog dua kolom; tabel scroll horizontal atau card; form satu kolom |
 | Small tablet, ≥576px | KPI dua kolom; katalog dua/tiga kolom; beberapa form dapat dua kolom |
 | Tablet/desktop, ≥768px | Area konten lebih luas; filter dapat sejajar; tabel mulai menjadi pola utama |
-| Desktop, ≥992px | Sidebar admin tampil; katalog tiga/empat kolom sesuai lebar |
+| Desktop, ≥992px | Sidebar tampil; katalog tiga/empat kolom sesuai lebar |
 | Wide desktop, ≥1200px | Maksimalisasi keterbacaan; tabel dan dashboard dapat menggunakan beberapa panel |
 
 Ketentuan tambahan:
 - Jangan menetapkan lebar tetap pada area konten utama.
 - Tombol penting tidak boleh terpotong atau tertutup oleh elemen sticky.
 - Modal panjang harus dapat discroll di dalam modal.
-- Filter pada mobile dapat ditempatkan di offcanvas atau collapse agar area katalog tetap luas.
-- Uji pada ukuran 360px, 390px, 768px, 1024px, dan 1440px.
+- Filter pada mobile dapat ditempatkan pada panel/dropdown agar area katalog tetap luas.
+- Uji pada ukuran 360px, 390px, 768px, 1024px, dan 1440px, pada tema terang dan gelap.
 
 ## 9. Aksesibilitas dan Usability
 
@@ -414,133 +426,142 @@ Ketentuan tambahan:
 - Gunakan ukuran teks dan target sentuh yang nyaman.
 - Hormati preferensi reduced motion bila menambahkan animasi.
 
-## 10. Panduan Implementasi Bootstrap 5
+## 10. Panduan Implementasi Flux UI
 
 ### 10.1 Dependensi
 
-Gunakan Bootstrap 5 melalui package manager atau file yang dipasang secara lokal. Untuk proyek produksi, versi dependency sebaiknya dikunci di package manifest/lockfile dan diperbarui melalui proses pengujian.
+- **Flux Free** dipasang melalui Composer (`livewire/flux`) bersama `livewire/livewire`.
+- **Tailwind CSS 4** dipasang melalui npm bersama `@tailwindcss/vite`; Vite memuat `resources/css/app.css` dan `resources/js/app.js`.
+- CSS Flux diimpor dari `vendor/livewire/flux/dist/flux.css` di dalam `app.css`.
+- Bootstrap dan Bootstrap Icons tidak digunakan lagi. Ikon memakai Heroicons melalui `flux:icon` atau komponen `x-icon`.
+- Setiap layout aplikasi wajib memuat `@fluxAppearance` di `<head>` dan `@fluxScripts` sebelum `</body>`. Layout kiosk dan cetak tidak memuat `@fluxAppearance` agar selalu terang.
+- Komponen interaktif memakai Livewire/Alpine: konfirmasi melalui `flux:modal`, notifikasi melalui `Flux.toast`, dan dropdown melalui `flux:dropdown`/`flux:menu`.
 
-Komponen interaktif Bootstrap seperti offcanvas, dropdown, modal, dan toast memerlukan JavaScript Bootstrap. Bootstrap 5 tidak mewajibkan jQuery. Bootstrap Icons dapat digunakan sebagai pustaka ikon terpisah bila proyek memerlukannya.
+Flux Free tidak menyediakan komponen Tabs, Date Picker, dan Chart. Gunakan navigasi tautan untuk tab, input tanggal native, dan markup HTML/CSS yang sudah ada untuk grafik.
 
-### 10.2 CSS custom properties
+### 10.2 Token tema
 
-Tempatkan token desain di satu file, misalnya `resources/css/app.css`.
+Token desain ditempatkan di `resources/css/app.css` menggunakan direktif Tailwind 4.
 
 ```css
-:root {
-  --library-primary: #1f4e79;
-  --library-primary-hover: #173b5c;
-  --library-secondary: #0f766e;
-  --library-app-bg: #f5f7fa;
-  --library-surface: #ffffff;
-  --library-text: #243244;
-  --library-muted: #667085;
-  --library-border: #e4e7ec;
-  --library-radius: 0.75rem;
+@import 'tailwindcss';
+@import '../../vendor/livewire/flux/dist/flux.css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --color-accent: #1f4e79;
+    --color-accent-content: #173b5c;
+    --color-accent-foreground: #ffffff;
 }
 
-body {
-  color: var(--library-text);
-  background: var(--library-app-bg);
-}
-
-.card {
-  border-color: var(--library-border);
-  border-radius: var(--library-radius);
-}
-
-.btn-primary {
-  --bs-btn-bg: var(--library-primary);
-  --bs-btn-border-color: var(--library-primary);
-  --bs-btn-hover-bg: var(--library-primary-hover);
-  --bs-btn-hover-border-color: var(--library-primary-hover);
+@layer theme {
+    .dark {
+        --color-accent: #3b82c4;
+        --color-accent-content: #93c5fd;
+        --color-accent-foreground: #ffffff;
+    }
 }
 ```
 
-### 10.3 Contoh layout katalog
+Gunakan `bg-[var(--color-accent)]`, `text-[var(--color-accent-content)]`, dan varian `dark:` untuk mempertahankan konsistensi tema terang/gelap.
 
-```html
-<main class="container-xl py-4">
-  <div class="d-flex flex-column flex-md-row gap-3 align-items-md-end justify-content-between mb-4">
-    <div>
-      <h1 class="h3 mb-1">Katalog Buku</h1>
-      <p class="text-muted mb-0">Temukan buku yang ingin Anda baca.</p>
-    </div>
-    <form class="d-flex gap-2" role="search">
-      <label class="visually-hidden" for="book-search">Cari buku</label>
-      <input id="book-search" class="form-control" type="search"
-             placeholder="Judul, penulis, ISBN...">
-      <button class="btn btn-primary" type="submit">Cari</button>
+### 10.3 Kerangka layout
+
+```blade
+<body class="min-h-screen bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
+    <flux:sidebar stashable sticky class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+        <flux:sidebar.header>
+            <x-library-logo size="sm" />
+        </flux:sidebar.header>
+
+        <flux:sidebar.nav>
+            <flux:sidebar.item icon="home" href="{{ route('admin.dashboard') }}">Dashboard</flux:sidebar.item>
+
+            <flux:sidebar.group expandable heading="Katalog Buku" icon="book-open" :expanded="request()->routeIs('admin.books.*', 'admin.categories.*')">
+                <flux:sidebar.item href="{{ route('admin.books.index') }}">Daftar Buku</flux:sidebar.item>
+                <flux:sidebar.item href="{{ route('admin.categories.index') }}">Kategori</flux:sidebar.item>
+            </flux:sidebar.group>
+        </flux:sidebar.nav>
+    </flux:sidebar>
+
+    <flux:header class="border-b border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
+        <flux:sidebar.toggle icon="bars-3" />
+        <flux:spacer />
+        @include('partials.theme-switcher')
+        @include('partials.notifications-menu')
+    </flux:header>
+
+    <flux:main class="mx-auto w-full max-w-7xl">
+        @yield('content')
+    </flux:main>
+
+    @fluxScripts
+</body>
+```
+
+`flux:sidebar` dan `flux:header` harus menjadi anak langsung `<body>` agar perilaku sticky dan panel geser bekerja benar.
+
+### 10.4 Contoh form filter katalog
+
+```blade
+<flux:card>
+    <form method="GET" action="{{ route('catalog.index') }}" role="search" class="grid items-end gap-3 lg:grid-cols-12">
+        <div class="lg:col-span-5">
+            <flux:field>
+                <flux:label for="q">Cari buku</flux:label>
+                <flux:input id="q" name="q" type="search" icon="magnifying-glass"
+                            placeholder="Cari judul, penulis, ISBN, atau kata kunci" />
+            </flux:field>
+        </div>
+
+        <div class="lg:col-span-3" data-auto-submit>
+            <flux:field>
+                <flux:label for="category">Kategori</flux:label>
+                <flux:select id="category" name="category">
+                    <option value="">Semua kategori</option>
+                </flux:select>
+            </flux:field>
+        </div>
+
+        <div class="lg:col-span-2">
+            <flux:button type="submit" variant="primary" icon="funnel" class="w-full">Terapkan</flux:button>
+        </div>
     </form>
-  </div>
-
-  <div class="row g-3">
-    <aside class="col-12 col-lg-3">
-      <div class="card card-body">
-        <h2 class="h6">Filter katalog</h2>
-        <label class="form-label" for="category">Kategori</label>
-        <select id="category" class="form-select mb-3">
-          <option value="">Semua kategori</option>
-        </select>
-        <label class="form-label" for="availability">Ketersediaan</label>
-        <select id="availability" class="form-select">
-          <option value="">Semua</option>
-          <option value="available">Tersedia</option>
-          <option value="unavailable">Tidak tersedia</option>
-        </select>
-      </div>
-    </aside>
-
-    <section class="col-12 col-lg-9" aria-label="Hasil katalog buku">
-      <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
-        <!-- Render kartu buku dari data aplikasi. -->
-      </div>
-    </section>
-  </div>
-</main>
+</flux:card>
 ```
 
-### 10.4 Contoh kartu buku
+Letakkan `data-auto-submit` pada elemen pembungkus, bukan langsung pada `flux:select`, karena Flux meneruskan atribut ke wrapper dan kontrol sekaligus.
 
-```html
-<article class="card h-100">
-  <img src="/images/book-placeholder.png"
-       class="card-img-top object-fit-cover"
-       alt="Sampul buku" loading="lazy">
-  <div class="card-body d-flex flex-column">
-    <p class="small text-muted mb-1">Kategori</p>
-    <h2 class="h6 card-title">Judul Buku</h2>
-    <p class="small text-muted mb-3">Nama Penulis</p>
-    <div class="mt-auto">
-      <span class="badge text-bg-success">Tersedia 3</span>
-      <a href="#" class="btn btn-outline-primary btn-sm w-100 mt-3">
-        Lihat Detail
-      </a>
-    </div>
-  </div>
-</article>
-```
+### 10.5 Contoh kartu buku dan tabel admin
 
-### 10.5 Contoh tabel admin
+```blade
+<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+    @foreach ($books as $book)
+        <x-book-card :book="$book" />
+    @endforeach
+</div>
 
-```html
-<div class="table-responsive">
-  <table class="table table-hover align-middle mb-0">
-    <caption class="visually-hidden">Daftar transaksi peminjaman aktif</caption>
-    <thead class="table-light">
-      <tr>
-        <th scope="col">Peminjam</th>
-        <th scope="col">Buku</th>
-        <th scope="col">Tanggal Pinjam</th>
-        <th scope="col">Jatuh Tempo</th>
-        <th scope="col">Status</th>
-        <th scope="col"><span class="visually-hidden">Aksi</span></th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Render baris berdasarkan data dari server. -->
-    </tbody>
-  </table>
+<div class="overflow-x-auto" data-scrollable-region>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th scope="col">Peminjam</th>
+                <th scope="col">Buku</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($loans as $loan)
+                <tr>
+                    <td>{{ $loan->user->name }}</td>
+                    <td>{{ $loan->copy->book->title }}</td>
+                    <td><x-status-badge :label="$loan->statusLabel()" :variant="$loan->statusVariant()" /></td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
 </div>
 ```
 
@@ -553,20 +574,37 @@ Contoh struktur yang dapat disesuaikan dengan arsitektur Laravel/Blade:
 ```text
 resources/
 ├── css/
-│   └── app.css
+│   └── app.css                 # Tailwind + Flux + token tema
 ├── js/
-│   └── app.js
+│   ├── app.js                  # konfirmasi, loading, print, auto-submit
+│   ├── kiosk.js
+│   ├── notifications.js
+│   ├── share.js
+│   └── toast.js
 └── views/
     ├── layouts/
-    │   ├── app.blade.php
-    │   ├── admin.blade.php
-    │   └── auth.blade.php
+    │   ├── admin.blade.php     # flux:sidebar + flux:header + flux:main
+    │   ├── borrower.blade.php  # sidebar guru/siswa
+    │   ├── auth.blade.php
+    │   ├── public.blade.php
+    │   ├── kiosk.blade.php     # terang saja
+    │   ├── print.blade.php     # A4 landscape, terang saja
+    │   └── print-card.blade.php # A4 portrait, terang saja
+    ├── partials/
+    │   ├── theme-switcher.blade.php
+    │   ├── notifications-menu.blade.php
+    │   ├── confirm-modal.blade.php
+    │   ├── flash.blade.php
+    │   └── landing-carousel.blade.php
     ├── components/
     │   ├── status-badge.blade.php
     │   ├── book-card.blade.php
     │   ├── empty-state.blade.php
     │   ├── page-header.blade.php
-    │   └── confirm-modal.blade.php
+    │   ├── kpi-card.blade.php
+    │   ├── form-errors.blade.php
+    │   ├── icon.blade.php
+    │   └── library-logo.blade.php
     ├── admin/
     │   ├── dashboard/
     │   ├── books/
@@ -577,14 +615,14 @@ resources/
     │   └── settings/
     ├── borrower/
     │   ├── dashboard.blade.php
-    │   ├── catalog/
     │   ├── loans/
     │   └── profile.blade.php
+    ├── catalog/
     └── auth/
         └── login.blade.php
 ```
 
-Pisahkan komponen yang berulang (badge status, kartu buku, header halaman, empty state) agar perubahan visual dapat diterapkan konsisten. Hindari menaruh seluruh markup aplikasi dalam satu file view besar.
+Pisahkan komponen yang berulang (badge status, kartu buku, header halaman, empty state) agar perubahan visual dapat diterapkan konsisten. Hindari menaruh seluruh markup aplikasi dalam satu file view besar. Halaman cetak memakai komponen `member-card` dan CSS cetak khusus agar ukuran A4 serta barcode tidak berubah.
 
 ## 12. State dan Microcopy
 
@@ -617,12 +655,19 @@ Pisahkan komponen yang berulang (badge status, kartu buku, header halaman, empty
 - [ ] Label status konsisten di katalog, dashboard, sirkulasi, dan laporan.
 - [ ] Tombol utama dan tombol berbahaya memiliki gaya berbeda dan konsisten.
 
+### Tema
+- [ ] Pemilih tema Terang/Gelap/Sistem berfungsi di header admin, guru, dan siswa.
+- [ ] Saklar mode gelap pada profil peminjam menyimpan preferensi yang sama.
+- [ ] Seluruh halaman aplikasi terbaca pada tema terang dan gelap.
+- [ ] Halaman kiosk dan cetak tetap terang serta tidak terpengaruh preferensi gelap.
+
 ### Alur pengguna
 - [ ] Guru/siswa dapat mencapai katalog dari beranda dalam satu aksi yang jelas.
 - [ ] Informasi ketersediaan tampak sebelum pengguna mengajukan peminjaman.
 - [ ] Pengguna memahami bahwa pengajuan belum berarti buku telah dipinjam.
 - [ ] Admin dapat menemukan permintaan, checkout, dan pengembalian tanpa berpindah menu berlebihan.
 - [ ] Pengguna dapat melihat tanggal jatuh tempo dan status pinjaman pribadi.
+- [ ] Grup menu sidebar dapat dibuka/tutup dan status aktif mengikuti halaman.
 
 ### Responsif dan aksesibilitas
 - [ ] Tidak ada horizontal overflow halaman pada lebar 360px, kecuali area tabel yang memang dibuat scrollable.

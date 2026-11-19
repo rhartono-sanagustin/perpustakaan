@@ -6,84 +6,73 @@
 @section('content')
     <x-page-header title="Riwayat Transaksi" subtitle="Telusuri peminjaman yang sudah dikembalikan beserta kondisinya.">
         <x-slot:actions>
-            <a href="{{ route('admin.loans.index') }}" class="btn btn-outline-primary">
-                <i class="bi bi-arrow-left-right me-1" aria-hidden="true"></i>Peminjaman Aktif
-            </a>
-            <a href="{{ route('admin.requests.index') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-inbox me-1" aria-hidden="true"></i>Permintaan
-            </a>
+            <flux:button variant="outline" icon="arrows-right-left" href="{{ route('admin.loans.index') }}">
+                Peminjaman Aktif
+            </flux:button>
+            <flux:button variant="outline" icon="inbox" href="{{ route('admin.requests.index') }}">
+                Permintaan
+            </flux:button>
         </x-slot:actions>
     </x-page-header>
 
-    <div class="row row-cols-2 g-2 mb-4">
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body py-3">
-                    <div class="fs-4 fw-bold">{{ $returnedCount }}</div>
-                    <div class="small text-muted">Total pengembalian tercatat</div>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body py-3">
-                    <div class="fs-4 fw-bold">{{ $loans->total() }}</div>
-                    <div class="small text-muted">Hasil sesuai filter</div>
-                </div>
-            </div>
-        </div>
+    <div class="mb-4 grid grid-cols-2 gap-2">
+        <flux:card class="py-3!">
+            <div class="text-2xl font-bold">{{ $returnedCount }}</div>
+            <div class="text-xs text-zinc-500 dark:text-zinc-400">Total pengembalian tercatat</div>
+        </flux:card>
+        <flux:card class="py-3!">
+            <div class="text-2xl font-bold">{{ $loans->total() }}</div>
+            <div class="text-xs text-zinc-500 dark:text-zinc-400">Hasil sesuai filter</div>
+        </flux:card>
     </div>
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <form method="GET" action="{{ route('admin.loans.history') }}" class="row g-2 align-items-end">
-                <div class="col-12 col-lg-4">
-                    <label for="q" class="form-label">Cari</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-search" aria-hidden="true"></i></span>
-                        <input type="search" id="q" name="q" value="{{ $search }}" class="form-control" placeholder="Nama, nomor induk, kode eksemplar, atau judul">
-                    </div>
-                </div>
+    <flux:card class="mb-4">
+        <form method="GET" action="{{ route('admin.loans.history') }}" class="grid items-end gap-3 md:grid-cols-2 xl:grid-cols-12">
+            <div class="xl:col-span-4">
+                <flux:field>
+                    <flux:label for="q">Cari</flux:label>
+                    <flux:input type="search" id="q" name="q" value="{{ $search }}" icon="magnifying-glass" placeholder="Nama, nomor induk, kode eksemplar, atau judul" />
+                </flux:field>
+            </div>
 
-                <div class="col-6 col-lg-2">
-                    <label for="date_from" class="form-label">Dari tanggal</label>
-                    <input type="date" id="date_from" name="date_from" value="{{ $dateFrom }}" class="form-control">
-                </div>
+            <div class="xl:col-span-2">
+                <flux:field>
+                    <flux:label for="date_from">Dari tanggal</flux:label>
+                    <flux:input type="date" id="date_from" name="date_from" value="{{ $dateFrom }}" />
+                </flux:field>
+            </div>
 
-                <div class="col-6 col-lg-2">
-                    <label for="date_to" class="form-label">Sampai tanggal</label>
-                    <input type="date" id="date_to" name="date_to" value="{{ $dateTo }}" class="form-control">
-                </div>
+            <div class="xl:col-span-2">
+                <flux:field>
+                    <flux:label for="date_to">Sampai tanggal</flux:label>
+                    <flux:input type="date" id="date_to" name="date_to" value="{{ $dateTo }}" />
+                </flux:field>
+            </div>
 
-                <div class="col-12 col-lg-4 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-grow-1">Terapkan</button>
-                    @if ($search !== '' || $dateFrom || $dateTo)
-                        <a href="{{ route('admin.loans.history') }}" class="btn btn-outline-secondary" aria-label="Reset filter">
-                            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                        </a>
-                    @endif
-                </div>
-            </form>
-        </div>
-    </div>
+            <div class="flex gap-2 xl:col-span-4">
+                <flux:button type="submit" variant="primary" class="flex-1">Terapkan</flux:button>
+                @if ($search !== '' || $dateFrom || $dateTo)
+                    <flux:button variant="outline" href="{{ route('admin.loans.history') }}" icon="arrow-path" aria-label="Reset filter" />
+                @endif
+            </div>
+        </form>
+    </flux:card>
 
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h6 mb-0">Pengembalian</h2>
-            <span class="small text-muted">{{ $loans->total() }} transaksi</span>
+    <flux:card class="p-0!">
+        <div class="flex items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+            <flux:heading size="lg" level="2">Pengembalian</flux:heading>
+            <flux:badge color="zinc" size="sm">{{ $loans->total() }} transaksi</flux:badge>
         </div>
 
         @if ($loans->isEmpty())
-            <div class="card-body">
-                <x-empty-state
-                    icon="clock-history"
-                    title="Belum ada riwayat pengembalian"
-                    message="Transaksi yang sudah dikembalikan akan tampil di sini."
-                />
-            </div>
+            <x-empty-state
+                icon="clock-history"
+                title="Belum ada riwayat pengembalian"
+                message="Transaksi yang sudah dikembalikan akan tampil di sini."
+            />
         @else
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+            <div class="overflow-x-auto" data-scrollable-region>
+                <table class="data-table">
                     <thead>
                         <tr>
                             <th scope="col">Peminjam</th>
@@ -98,41 +87,41 @@
                         @foreach ($loans as $loan)
                             <tr>
                                 <td>
-                                    <div class="fw-semibold">{{ $loan->user->name }}</div>
-                                    <div class="small text-muted">{{ $loan->user->roleLabel() }} &middot; {{ $loan->user->nomor_induk }}</div>
+                                    <div class="font-semibold">{{ $loan->user->name }}</div>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $loan->user->roleLabel() }} &middot; {{ $loan->user->nomor_induk }}</div>
                                 </td>
                                 <td>
                                     <div>{{ $loan->copy->book->title }}</div>
-                                    <div class="small text-muted">{{ $loan->copy->inventory_code }} &middot; #{{ $loan->reference }}</div>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $loan->copy->inventory_code }} &middot; #{{ $loan->reference }}</div>
                                 </td>
-                                <td class="small text-muted">{{ $loan->borrowed_at->locale('id')->translatedFormat('d M Y') }}</td>
-                                <td class="small text-muted">
+                                <td class="text-xs whitespace-nowrap text-zinc-500 dark:text-zinc-400">{{ $loan->borrowed_at->locale('id')->translatedFormat('d M Y') }}</td>
+                                <td class="text-xs text-zinc-500 dark:text-zinc-400">
                                     {{ $loan->returned_at?->locale('id')->translatedFormat('d M Y') ?? '-' }}
                                     @if ($loan->returned_at && $loan->returned_at->gt($loan->due_at))
-                                        <div class="small text-danger">Terlambat {{ (int) $loan->due_at->diffInDays($loan->returned_at) }} hari</div>
+                                        <div class="text-rose-600 dark:text-rose-400">Terlambat {{ (int) $loan->due_at->diffInDays($loan->returned_at) }} hari</div>
                                     @endif
                                 </td>
                                 <td>
                                     @if ($loan->return_condition)
                                         <x-status-badge :label="$loan->return_condition->label()" :variant="$loan->return_condition->badgeVariant()" />
                                     @else
-                                        <span class="small text-muted">-</span>
+                                        <span class="text-xs text-zinc-500 dark:text-zinc-400">-</span>
                                     @endif
                                     @if ($loan->return_notes)
-                                        <div class="small text-muted mt-1">{{ $loan->return_notes }}</div>
+                                        <div class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{{ $loan->return_notes }}</div>
                                     @endif
                                 </td>
-                                <td class="small text-muted">{{ $loan->processor?->name ?? '-' }}</td>
+                                <td class="text-xs text-zinc-500 dark:text-zinc-400">{{ $loan->processor?->name ?? '-' }}</td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
 
-            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <span class="small text-muted">Menampilkan {{ $loans->firstItem() }}&ndash;{{ $loans->lastItem() }} dari {{ $loans->total() }} transaksi</span>
+            <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 px-5 py-4 dark:border-white/10">
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">Menampilkan {{ $loans->firstItem() }}&ndash;{{ $loans->lastItem() }} dari {{ $loans->total() }} transaksi</span>
                 {{ $loans->links() }}
             </div>
         @endif
-    </div>
+    </flux:card>
 @endsection

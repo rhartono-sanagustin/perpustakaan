@@ -6,78 +6,69 @@
 @section('content')
     <x-page-header title="Eksemplar Buku" :subtitle="$book->title">
         <x-slot:actions>
-            <a href="{{ route('admin.books.edit', $book) }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Kembali ke Buku
-            </a>
-            <a href="{{ route('admin.books.copies.create', $book) }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Tambah Eksemplar
-            </a>
+            <flux:button variant="outline" icon="arrow-left" href="{{ route('admin.books.edit', $book) }}">
+                Kembali ke Buku
+            </flux:button>
+            <flux:button variant="primary" icon="plus" href="{{ route('admin.books.copies.create', $book) }}">
+                Tambah Eksemplar
+            </flux:button>
         </x-slot:actions>
     </x-page-header>
 
-    <div class="row row-cols-2 row-cols-md-5 g-2 mb-4">
+    <div class="mb-4 grid grid-cols-2 gap-2 md:grid-cols-5">
         @foreach ($statuses as $copyStatus)
-            <div class="col">
-                <div class="card h-100">
-                    <div class="card-body py-3">
-                        <div class="fs-4 fw-bold">{{ $summary[$copyStatus->value] ?? 0 }}</div>
-                        <div class="small text-muted">{{ $copyStatus->label() }}</div>
-                    </div>
-                </div>
-            </div>
+            <flux:card class="py-3!">
+                <div class="text-2xl font-bold">{{ $summary[$copyStatus->value] ?? 0 }}</div>
+                <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $copyStatus->label() }}</div>
+            </flux:card>
         @endforeach
     </div>
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <form method="GET" action="{{ route('admin.books.copies.index', $book) }}" class="row g-2 align-items-end">
-                <div class="col-12 col-md-6">
-                    <label for="q" class="form-label">Cari eksemplar</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-search" aria-hidden="true"></i></span>
-                        <input type="search" id="q" name="q" value="{{ $search }}" class="form-control" placeholder="Kode inventaris atau lokasi rak">
-                    </div>
-                </div>
+    <flux:card class="mb-4">
+        <form method="GET" action="{{ route('admin.books.copies.index', $book) }}" class="grid items-end gap-3 md:grid-cols-6">
+            <div class="md:col-span-3">
+                <flux:field>
+                    <flux:label for="q">Cari eksemplar</flux:label>
+                    <flux:input type="search" id="q" name="q" value="{{ $search }}" icon="magnifying-glass" placeholder="Kode inventaris atau lokasi rak" />
+                </flux:field>
+            </div>
 
-                <div class="col-8 col-md-4">
-                    <label for="status" class="form-label">Status</label>
-                    <select id="status" name="status" class="form-select">
+            <div class="md:col-span-2">
+                <flux:field>
+                    <flux:label for="status">Status</flux:label>
+                    <flux:select id="status" name="status">
                         <option value="">Semua status</option>
                         @foreach ($statuses as $copyStatus)
                             <option value="{{ $copyStatus->value }}" @selected($status === $copyStatus->value)>{{ $copyStatus->label() }}</option>
                         @endforeach
-                    </select>
-                </div>
+                    </flux:select>
+                </flux:field>
+            </div>
 
-                <div class="col-4 col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-grow-1">Filter</button>
-                    @if ($search !== '' || $status !== '')
-                        <a href="{{ route('admin.books.copies.index', $book) }}" class="btn btn-outline-secondary" aria-label="Reset filter">
-                            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                        </a>
-                    @endif
-                </div>
-            </form>
-        </div>
-    </div>
+            <div class="flex gap-2">
+                <flux:button type="submit" variant="primary" class="flex-1">Filter</flux:button>
+                @if ($search !== '' || $status !== '')
+                    <flux:button variant="outline" href="{{ route('admin.books.copies.index', $book) }}" icon="arrow-path" aria-label="Reset filter" />
+                @endif
+            </div>
+        </form>
+    </flux:card>
 
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h6 mb-0">Daftar Eksemplar</h2>
-            <span class="small text-muted">{{ $copies->total() }} eksemplar</span>
+    <flux:card class="p-0!">
+        <div class="flex items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+            <flux:heading size="lg" level="2">Daftar Eksemplar</flux:heading>
+            <flux:badge color="zinc" size="sm">{{ $copies->total() }} eksemplar</flux:badge>
         </div>
 
         @if ($copies->isEmpty())
-            <div class="card-body">
-                <x-empty-state icon="collection" title="Belum ada eksemplar" message="Tambahkan eksemplar fisik agar buku dapat dipinjam.">
-                    <a href="{{ route('admin.books.copies.create', $book) }}" class="btn btn-primary btn-sm">
-                        <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Tambah Eksemplar
-                    </a>
-                </x-empty-state>
-            </div>
+            <x-empty-state icon="collection" title="Belum ada eksemplar" message="Tambahkan eksemplar fisik agar buku dapat dipinjam.">
+                <flux:button variant="primary" size="sm" icon="plus" href="{{ route('admin.books.copies.create', $book) }}">
+                    Tambah Eksemplar
+                </flux:button>
+            </x-empty-state>
         @else
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+            <div class="overflow-x-auto" data-scrollable-region>
+                <table class="data-table">
                     <thead>
                         <tr>
                             <th scope="col">Kode Inventaris</th>
@@ -91,7 +82,7 @@
                     <tbody>
                         @foreach ($copies as $copy)
                             <tr>
-                                <td class="fw-semibold">{{ $copy->inventory_code }}</td>
+                                <td class="font-semibold">{{ $copy->inventory_code }}</td>
                                 <td>{{ $copy->shelf_location ?? '-' }}</td>
                                 <td>
                                     <x-status-badge :label="$copy->condition->label()" :variant="$copy->condition->badgeVariant()" />
@@ -101,19 +92,19 @@
                                 </td>
                                 <td>
                                     @if ($copy->activeLoan)
-                                        <div class="small fw-semibold">{{ $copy->activeLoan->user->name }}</div>
-                                        <div class="small text-muted">Jatuh tempo {{ $copy->activeLoan->due_at->locale('id')->translatedFormat('d M Y') }}</div>
+                                        <div class="text-sm font-semibold">{{ $copy->activeLoan->user->name }}</div>
+                                        <div class="text-xs text-zinc-500 dark:text-zinc-400">Jatuh tempo {{ $copy->activeLoan->due_at->locale('id')->translatedFormat('d M Y') }}</div>
                                     @else
-                                        <span class="small text-muted">-</span>
+                                        <span class="text-xs text-zinc-500 dark:text-zinc-400">-</span>
                                     @endif
                                 </td>
                                 <td class="text-end">
-                                    <div class="d-inline-flex gap-1">
-                                        <a href="{{ route('admin.books.copies.edit', [$book, $copy]) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                    <div class="inline-flex gap-1">
+                                        <flux:button size="sm" variant="outline" href="{{ route('admin.books.copies.edit', [$book, $copy]) }}">Edit</flux:button>
                                         <form method="POST" action="{{ route('admin.books.copies.destroy', [$book, $copy]) }}" data-confirm="Hapus atau nonaktifkan eksemplar {{ $copy->inventory_code }}?">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                            <flux:button type="submit" size="sm" variant="danger">Hapus</flux:button>
                                         </form>
                                     </div>
                                 </td>
@@ -123,12 +114,12 @@
                 </table>
             </div>
 
-            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <span class="small text-muted">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 px-5 py-4 dark:border-white/10">
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">
                     Menampilkan {{ $copies->firstItem() }}&ndash;{{ $copies->lastItem() }} dari {{ $copies->total() }} eksemplar
                 </span>
                 {{ $copies->links() }}
             </div>
         @endif
-    </div>
+    </flux:card>
 @endsection

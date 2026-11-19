@@ -18,17 +18,11 @@
 @endphp
 
 @if (count($flashMessages) > 0)
-    <div class="toast-container position-fixed top-0 end-0 p-3" data-toast-container aria-live="polite" aria-atomic="true">
-        @foreach ($flashMessages as $flash)
-            @php($isWarning = $flash['variant'] === 'warning')
-            <div class="toast align-items-center border-0 text-bg-{{ $flash['variant'] }}" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        {{ $flash['message'] }}
-                    </div>
-                    <button type="button" class="btn-close {{ $isWarning ? '' : 'btn-close-white' }} me-2 m-auto" data-bs-dismiss="toast" aria-label="Tutup"></button>
-                </div>
-            </div>
-        @endforeach
-    </div>
+    @php
+        $toastCalls = collect($flashMessages)
+            ->map(fn ($flash) => '$flux.toast({ text: '.Illuminate\Support\Js::from($flash['message']).', variant: '.Illuminate\Support\Js::from($flash['variant']).', duration: 5500 });')
+            ->implode(' ');
+    @endphp
+
+    <div x-data x-init="{{ $toastCalls }}" hidden aria-hidden="true"></div>
 @endif

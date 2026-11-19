@@ -1,9 +1,9 @@
 # Checklist UAT — Sistem Informasi Perpustakaan Sekolah
 
-**Versi dokumen:** 1.1  
-**Terakhir diperbarui:** 16 November 2026  
-**Cakupan:** MVP Fase 1–8 (autentikasi, katalog, sirkulasi, laporan, pengguna, pengaturan, pengumuman, notifikasi, kartu anggota, kunjungan, kiosk kunjungan mandiri)  
-**Lingkungan acuan:** Laravel 12.71, PHP 8.2.26, Bootstrap 5, MySQL `perpustakaan` (dev) / `perpustakaan_test` (test)
+**Versi dokumen:** 1.2  
+**Terakhir diperbarui:** 19 November 2026  
+**Cakupan:** MVP Fase 1–9 (autentikasi, katalog, sirkulasi, laporan, pengguna, pengaturan, pengumuman, notifikasi, kartu anggota, kunjungan, kiosk kunjungan mandiri, Flux UI, sidebar accordion, tema terang/gelap/sistem)  
+**Lingkungan acuan:** Laravel 12.71, PHP 8.2.26, Flux UI + Livewire 4 + Tailwind CSS 4, MySQL `perpustakaan` (dev) / `perpustakaan_test` (test)
 
 ---
 
@@ -213,7 +213,10 @@ Verifikasi berikut sudah dijalankan pada 16 November 2026 dan menjadi bukti pend
 | UAT-RT-03 | Toast, loading, konfirmasi | Simpan form, klik aksi destruktif, batalkan konfirmasi | Toast sukses/gagal tampil; tombol menampilkan loading dan tidak terklik ganda; pembatalan konfirmasi tidak mengunci tombol | ⬜ | |
 | UAT-RT-04 | Share fallback | Nonaktifkan Web Share API (atau gunakan browser desktop), klik Bagikan | Tautan tersalin ke clipboard dan toast sukses tampil | ⬜ | |
 | UAT-RT-05 | Kurangi gerak | Aktifkan **prefers-reduced-motion** di OS/browser | Animasi, transisi, smooth scroll, dan auto-play carousel dimatikan/dikendalikan | ⬜ | |
-| UAT-QA-01 | Responsif | Buka halaman utama (termasuk kiosk kunjungan) pada 360, 390, 768, 1024, dan 1440 px | Tidak ada scroll horizontal; tabel dapat digeser; sidebar menjadi offcanvas di mobile | ⬜ | |
+| UAT-UI-01 | Sidebar accordion | Buka dashboard admin, guru, dan siswa; buka/tutup setiap grup menu | Grup menu dapat dilipat; grup halaman aktif terbuka otomatis; menu aktif ditandai; sidebar menjadi panel geser di mobile | ⬜ | |
+| UAT-UI-02 | Tema terang/gelap/sistem | Pilih Terang, Gelap, lalu Ikuti Sistem dari menu header; reload halaman | Seluruh halaman mengikuti tema; pilihan tersimpan; teks, tabel, form, badge, modal, dan toast tetap terbaca | ⬜ | |
+| UAT-UI-03 | Saklar mode gelap profil | Buka profil peminjam, aktifkan saklar mode gelap, lalu buka halaman lain | Tema berubah tanpa reload; preferensi sama dengan menu header; halaman kiosk dan cetak tetap terang | ⬜ | |
+| UAT-QA-01 | Responsif | Buka halaman utama (termasuk kiosk kunjungan) pada 360, 390, 768, 1024, dan 1440 px | Tidak ada scroll horizontal; tabel dapat digeser; sidebar menjadi panel geser di mobile | ⬜ | |
 | UAT-QA-02 | Keyboard dan fokus | Tab melalui navigasi, form, tabel, dan tombol; gunakan Enter/Space | Urutan fokus logis; fokus terlihat; tabel/region yang dapat digeser dapat difokuskan; modal dapat ditutup keyboard | ⬜ | |
 | UAT-QA-03 | Kontras dan status non-warna | Periksa teks, tombol outline, badge status | Kontras teks memenuhi WCAG AA; status selalu disertai teks/label, bukan hanya warna | ⬜ | |
 | UAT-QA-04 | Cetak di perangkat nyata | Cetak satu lembar kartu dan satu laporan di printer sekolah | Skala 100%; barcode tajam dan terbaca; footer kartu/tanda tangan laporan tidak terpotong | ⬜ | |
@@ -241,9 +244,9 @@ Verifikasi berikut sudah dijalankan pada 16 November 2026 dan menjadi bukti pend
 | Admin — pengguna & pengaturan | 10 | | | |
 | Kartu anggota & kunjungan | 11 | | | |
 | Kiosk kunjungan mandiri | 8 | | | |
-| Realtime, UX, responsif | 9 | | | |
+| Realtime, UX, responsif | 12 | | | |
 | Operasional | 3 | | | |
-| **Total** | **82** | | | |
+| **Total** | **85** | | | |
 
 ---
 

@@ -8,58 +8,61 @@
     <title>@yield('title', 'Beranda') &mdash; {{ $identity->libraryName() }}</title>
     <link rel="icon" href="{{ $identity->logoUrl() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @fluxAppearance
 </head>
-<body class="d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand borrower-navbar">
-        <div class="container-xl">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('home') }}">
+<body class="flex min-h-screen flex-col bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
+    <header class="sticky top-0 z-30 border-b border-zinc-200 border-t-4 border-t-[var(--color-accent)] bg-white/90 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/90">
+        <div class="mx-auto flex min-h-16 w-full max-w-7xl items-center gap-3 px-4 lg:px-8">
+            <a href="{{ route('home') }}" class="flex min-w-0 items-center gap-2">
                 <x-library-logo size="sm" />
-                <span class="d-none d-sm-flex flex-column lh-sm">
-                    <span class="fw-semibold">{{ $identity->libraryName() }}</span>
-                    <span class="small text-muted">{{ $identity->schoolName() }}</span>
+                <span class="hidden min-w-0 flex-col leading-tight sm:flex">
+                    <span class="truncate text-sm font-semibold">{{ $identity->libraryName() }}</span>
+                    <span class="truncate text-xs text-zinc-500 dark:text-zinc-400">{{ $identity->schoolName() }}</span>
                 </span>
-                <span class="d-sm-none fw-semibold lh-sm" style="max-width: 150px; white-space: normal;">{{ $identity->libraryName() }}</span>
+                <span class="truncate text-sm font-semibold sm:hidden">{{ $identity->libraryName() }}</span>
             </a>
 
-            <div class="ms-auto d-flex align-items-center gap-1 gap-sm-2">
-                <a href="{{ route('catalog.index') }}" class="nav-link {{ request()->routeIs('catalog.*') ? 'active' : '' }}" aria-label="Katalog">
-                    <i class="bi bi-journal-bookmark d-sm-none" aria-hidden="true"></i>
-                    <span class="d-none d-sm-inline">Katalog</span>
-                </a>
+            <nav class="ms-auto flex items-center gap-1" aria-label="Navigasi utama">
+                <flux:button variant="subtle" size="sm" icon="book-open" href="{{ route('catalog.index') }}" class="max-sm:[&>span]:hidden">
+                    Katalog
+                </flux:button>
 
                 @if ($visitKioskEnabled ?? false)
-                    <a href="{{ route('visits.kiosk') }}" class="nav-link {{ request()->routeIs('visits.kiosk') ? 'active' : '' }}" aria-label="Kunjungan">
-                        <i class="bi bi-upc-scan d-sm-none" aria-hidden="true"></i>
-                        <span class="d-none d-sm-inline">Kunjungan</span>
-                    </a>
+                    <flux:button variant="subtle" size="sm" icon="qr-code" href="{{ route('visits.kiosk') }}" class="max-sm:[&>span]:hidden">
+                        Kunjungan
+                    </flux:button>
                 @endif
 
-                @auth
-                    <a href="{{ route('dashboard') }}" class="btn btn-primary btn-sm px-3">
-                        <i class="bi bi-speedometer2 me-1" aria-hidden="true"></i>Dashboard
-                    </a>
-                @else
-                    <a href="{{ route('login') }}" class="btn btn-primary btn-sm px-3">
-                        <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i>Masuk
-                    </a>
-                @endauth
-            </div>
-        </div>
-    </nav>
+                @include('partials.theme-switcher')
 
-    <main class="flex-grow-1">
+                @auth
+                    <flux:button variant="primary" size="sm" icon="home" href="{{ route('dashboard') }}">
+                        Dashboard
+                    </flux:button>
+                @else
+                    <flux:button variant="primary" size="sm" icon="arrow-right-start-on-rectangle" href="{{ route('login') }}">
+                        Masuk
+                    </flux:button>
+                @endauth
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-1">
         @yield('content')
     </main>
 
-    <footer class="border-top bg-white py-3 mt-auto">
-        <div class="container-xl d-flex flex-column flex-sm-row justify-content-between gap-2 small text-muted">
+    <footer class="border-t border-zinc-200 bg-white py-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <div class="mx-auto flex w-full max-w-7xl flex-col justify-between gap-1 px-4 text-xs text-zinc-500 sm:flex-row lg:px-8 dark:text-zinc-400">
             <span>&copy; {{ date('Y') }} {{ $identity->schoolName() }}</span>
             <span>{{ $identity->libraryName() }}</span>
         </div>
     </footer>
 
+    <flux:toast position="top end" />
     @include('partials.confirm-modal')
     @include('partials.flash')
     @stack('scripts')
+    @fluxScripts
 </body>
 </html>

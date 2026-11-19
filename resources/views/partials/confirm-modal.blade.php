@@ -1,17 +1,17 @@
-<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title h5" id="confirmModalLabel">Konfirmasi Tindakan</h2>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-            </div>
-            <div class="modal-body">
-                <p class="mb-0" data-confirm-message>Apakah Anda yakin ingin melanjutkan tindakan ini?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batalkan</button>
-                <button type="button" class="btn btn-primary" data-confirm-accept>Ya, Lanjutkan</button>
-            </div>
+<flux:modal name="confirm" class="min-w-[22rem] max-w-md">
+    <div class="space-y-6">
+        <div>
+            <flux:heading size="lg">Konfirmasi Tindakan</flux:heading>
+            <flux:text class="mt-2" data-confirm-message>
+                Apakah Anda yakin ingin melanjutkan tindakan ini?
+            </flux:text>
+        </div>
+
+        <div class="flex justify-end gap-2">
+            <flux:modal.close>
+                <flux:button variant="filled">Batalkan</flux:button>
+            </flux:modal.close>
+            <flux:button variant="primary" data-confirm-accept>Ya, Lanjutkan</flux:button>
         </div>
     </div>
-</div>
+</flux:modal>

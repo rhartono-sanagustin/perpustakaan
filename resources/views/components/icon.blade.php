@@ -1,0 +1,56 @@
+@props(['name', 'variant' => 'outline'])
+
+@php
+    $icons = [
+        'journal-bookmark' => 'book-open',
+        'collection' => 'rectangle-stack',
+        'arrow-left-right' => 'arrows-right-left',
+        'arrow-return-left' => 'arrow-uturn-left',
+        'bar-chart' => 'chart-bar',
+        'bar-chart-line' => 'chart-bar',
+        'calendar-check' => 'calendar-days',
+        'calendar-event' => 'calendar-days',
+        'check2' => 'check',
+        'check2-circle' => 'check-circle',
+        'check-circle' => 'check-circle',
+        'x-circle' => 'x-circle',
+        'x-lg' => 'x-mark',
+        'clock-history' => 'clock',
+        'hourglass' => 'clock',
+        'hourglass-split' => 'clock',
+        'exclamation-triangle' => 'exclamation-triangle',
+        'exclamation-circle' => 'exclamation-circle',
+        'info-circle' => 'information-circle',
+        'person-check' => 'user',
+        'person-plus' => 'user-plus',
+        'person-circle' => 'user-circle',
+        'person-vcard' => 'identification',
+        'people' => 'users',
+        'tags' => 'tag',
+        'pen' => 'pencil',
+        'pencil-square' => 'pencil-square',
+        'building' => 'building-office',
+        'box-seam' => 'archive-box',
+        'box-arrow-up-right' => 'arrow-top-right-on-square',
+        'box-arrow-in-right' => 'arrow-right-start-on-rectangle',
+        'box-arrow-right' => 'arrow-right-start-on-rectangle',
+        'upc-scan' => 'qr-code',
+        'search' => 'magnifying-glass',
+        'plus-lg' => 'plus',
+        'speedometer2' => 'home',
+        'gear' => 'cog-6-tooth',
+        'list' => 'bars-2',
+        'volume-up' => 'speaker-wave',
+        'volume-mute' => 'speaker-x-mark',
+        'file-earmark-spreadsheet' => 'document-text',
+        'file-earmark-text' => 'document-text',
+        'journal' => 'book-open',
+        'book' => 'book-open',
+        'megaphone-fill' => 'megaphone',
+        'person-lines-fill' => 'users',
+    ];
+
+    $resolved = $icons[$name] ?? $name;
+@endphp
+
+<flux:icon :icon="$resolved" :variant="$variant" {{ $attributes }} />

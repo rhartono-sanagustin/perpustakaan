@@ -1,8 +1,8 @@
 # Tasklist — Sistem Informasi Perpustakaan Sekolah
 
-**Terakhir diperbarui:** 16 November 2026  
-**Progress keseluruhan:** 100% (152 dari 152 task)  
-**Fase saat ini:** Fase 8 — Kiosk Kunjungan Mandiri (selesai; siap direview)
+**Terakhir diperbarui:** 19 November 2026  
+**Progress keseluruhan:** 100% (177 dari 177 task)  
+**Fase saat ini:** Fase 9 — Redesign Flux UI (selesai; 25/25 task)
 
 > Catatan: progress dihitung dari jumlah checklist task, bukan estimasi jam kerja.
 > Setiap task selesai ditandai `[x] ✅` dan diberi catatan file yang dibuat/diubah.
@@ -461,6 +461,86 @@
 
 ---
 
+## 14. Fase 9 — Redesign Flux UI
+
+- [x] ✅ Task 14.1 - Fondasi Flux UI: Livewire, Flux Free, Tailwind, Vite, dan tema `[Sedang]` (Selesai)
+  - File: `composer.json`, `package.json`, `vite.config.js`, `resources/css/app.css`, `resources/js/app.js`
+  - Catatan: Flux Free 2.x + Livewire 4.x + Tailwind CSS 4.x; Tailwind/Flux menjadi entrypoint utama dan Bootstrap dihapus dari dependency.
+- [x] ✅ Task 14.2 - Token tema, tipografi, pemetaan ikon Bootstrap ke Heroicons, dan palette dark `[Sedang]` (Selesai)
+  - File: `resources/css/app.css`, `resources/views/components/icon.blade.php`
+  - Catatan: aksen #1F4E79, base zinc, varian `dark`, pemetaan nama ikon lama ke Heroicons, radius/spacing Tailwind konsisten.
+- [x] ✅ Task 14.3 - Komponen UI bersama Flux `[Sedang]` (Selesai)
+  - File: `resources/views/components/*`
+  - Catatan: `icon`, `page-header`, `status-badge`, `empty-state`, `kpi-card`, `library-logo`, `book-card`, dan `form-errors` memakai Flux/Tailwind dengan props lama dipertahankan.
+- [x] ✅ Task 14.4 - Refactor JavaScript inti tanpa Bootstrap `[Sedang]` (Selesai)
+  - File: `resources/js/app.js`, `notifications.js`, `toast.js`, `share.js`, `kiosk.js`
+  - Catatan: konfirmasi lewat `window.Flux.modal('confirm')`, toast lewat `Flux.toast`, loading form, password toggle, print, auto-submit, scroll region, share, dan inisialisasi kiosk.
+- [x] ✅ Task 14.5 - Layout admin Flux + sidebar accordion `[Sedang]` (Selesai)
+  - File: `resources/views/layouts/admin.blade.php`
+  - Catatan: `flux:sidebar` + `flux:sidebar.group expandable` untuk Katalog Buku, Sirkulasi, Laporan, Manajemen, dan Tautan Publik; grup aktif terbuka otomatis; panel geser di mobile.
+- [x] ✅ Task 14.6 - Layout guru/siswa Flux + sidebar accordion `[Sedang]` (Selesai)
+  - File: `resources/views/layouts/borrower.blade.php`
+  - Catatan: sidebar untuk guru/siswa dengan grup Peminjaman Saya dan Akun Saya; identitas sekolah dan tautan situs tetap tersedia.
+- [x] ✅ Task 14.7 - Topbar, breadcrumb, notifikasi, dan dropdown akun `[Sedang]` (Selesai)
+  - File: `layouts/admin.blade.php`, `layouts/borrower.blade.php`, `partials/notifications-menu.blade.php`, `js/notifications.js`
+  - Catatan: `flux:header`, `flux:breadcrumbs`, `flux:dropdown`, dan polling notifikasi tetap berjalan.
+- [x] ✅ Task 14.8 - Theme switcher Terang/Gelap/Sistem dan dukungan mode gelap `[Sedang]` (Selesai)
+  - File: `partials/theme-switcher.blade.php`, layout Flux, `borrower/profile.blade.php`, `resources/css/app.css`
+  - Catatan: `@fluxAppearance` + `$flux.appearance`/`$flux.dark`; dropdown tema di header admin/guru/siswa/publik/login; saklar mode gelap di profil peminjam; kiosk/cetak tetap terang.
+- [x] ✅ Task 14.9 - Form controls dan validasi `[Sedang]` (Selesai)
+  - File: form admin, borrower, auth
+  - Catatan: `flux:field`, `flux:input`, `flux:select`, `flux:textarea`, `flux:checkbox`, `flux:switch`, `flux:error`; upload file dan old value tetap berfungsi.
+- [x] ✅ Task 14.10 - Tabel, filter, pagination, dan navigasi tab `[Sedang]` (Selesai)
+  - File: halaman index admin/borrower, `reports/_nav`, `settings/_nav`
+  - Catatan: kelas `.data-table`, overflow horizontal Tailwind, pagination Laravel, tab berbasis tautan karena Flux Tabs Pro tidak tersedia.
+- [x] ✅ Task 14.11 - Modal konfirmasi, toast, dan dropdown aksi `[Sedang]` (Selesai)
+  - File: `partials/confirm-modal.blade.php`, `partials/flash.blade.php`, aksi tabel
+  - Catatan: `flux:modal` lewat `window.Flux.modal('confirm')`; toast lewat `$flux.toast`; CSRF dan submit form tetap aman.
+- [x] ✅ Task 14.12 - Dashboard admin `[Sedang]` (Selesai)
+  - File: `resources/views/admin/dashboard.blade.php`
+  - Catatan: KPI, tabel permintaan, kartu tindak lanjut, grafik aktivitas/kunjungan, dan akses cepat bermigrasi ke Flux.
+- [x] ✅ Task 14.13 - Dashboard guru/siswa `[Sedang]` (Selesai)
+  - File: `resources/views/borrower/dashboard.blade.php`
+  - Catatan: sapaan, pengumuman, KPI, pinjaman aktif, permintaan terbaru, dan riwayat bermigrasi ke Flux.
+- [x] ✅ Task 14.14 - Halaman katalog dan inventaris admin `[Sedang]` (Selesai)
+  - File: `admin/books/*`, `admin/categories/*`, `admin/authors/*`, `admin/publishers/*`, `admin/copies/*`
+  - Catatan: form, tabel, badge status, arsip/aktifkan, dan pagination bermigrasi; multiselect penulis diganti daftar checkbox agar data tetap terkirim.
+- [x] ✅ Task 14.15 - Halaman sirkulasi dan kunjungan admin `[Sedang]` (Selesai)
+  - File: `admin/circulation/requests/*`, `admin/circulation/loans/*`, `admin/visits/*`
+  - Catatan: detail pengajuan, checkout, pengembalian, filter status, dropdown aksi, dan konfirmasi bermigrasi.
+- [x] ✅ Task 14.16 - Halaman laporan admin `[Sedang]` (Selesai)
+  - File: `admin/reports/*`
+  - Catatan: filter, tabel, tombol cetak/ekspor, navigasi laporan, dan halaman cetak A4 tetap berfungsi.
+- [x] ✅ Task 14.17 - Pengguna, kartu anggota, pengumuman, dan pengaturan `[Sedang]` (Selesai)
+  - File: `admin/users/*`, `admin/member-cards/*`, `admin/announcements/*`, `admin/settings/*`
+  - Catatan: reset password, toggle status, upload logo/gambar, pengaturan carousel, dan kartu anggota bermigrasi.
+- [x] ✅ Task 14.18 - Halaman guru/siswa `[Sedang]` (Selesai)
+  - File: `borrower/loans/*`, `borrower/profile.blade.php`, `borrower/requests/create.blade.php`
+  - Catatan: tab pinjaman, tabel, form profil, dan form pengajuan; aturan kepemilikan tetap di backend.
+- [x] ✅ Task 14.19 - Halaman publik dan login `[Sedang]` (Selesai)
+  - File: `welcome.blade.php`, `catalog/*`, `auth/login.blade.php`, `layouts/public.blade.php`, `layouts/auth.blade.php`
+  - Catatan: header publik Flux, kartu buku, badge, form login; carousel Alpine/vanilla mempertahankan autoplay, pause, indikator, reduced motion, dan `id="landingCarousel"`.
+- [x] ✅ Task 14.20 - Kiosk dan halaman cetak `[Sedang]` (Selesai)
+  - File: `visits/kiosk.blade.php`, `layouts/kiosk.blade.php`, `layouts/print.blade.php`, `layouts/print-card.blade.php`, `admin/reports/print.blade.php`, `admin/member-cards/print.blade.php`
+  - Catatan: kiosk tetap autofocus/scan dan terang; halaman cetak memakai CSS mandiri, tanpa `@fluxAppearance`; barcode dan tata letak A4 dipertahankan.
+- [x] ✅ Task 14.21 - Hapus Bootstrap dan konsolidasi aset `[Sedang]` (Selesai)
+  - File: `package.json`, `package-lock.json`, `resources/css/app.css`, `resources/js/app.js`, layout/komponen
+  - Catatan: `bootstrap`, `bootstrap-icons`, dan `@popperjs/core` dihapus; tidak ada `data-bs-`, `bi bi-`, `btn btn-`, `text-bg-`, atau `form-control` di view.
+- [x] ✅ Task 14.22 - Test otomatis dan perbaikan regresi `[Sedang]` (Selesai)
+  - File: `tests/Feature/*`
+  - Catatan: ditambah `NavigationTest` (sidebar admin/guru/siswa + theme switcher); assertion `text-bg-info` diganti `data-variant="info"`; 188 test lulus (1191 assertion).
+- [x] ✅ Task 14.23 - QA responsif, aksesibilitas, cetak, kiosk, dan mode gelap `[Sedang]` (Selesai)
+  - File: penyesuaian view/CSS
+  - Catatan: audit kode untuk 360/390/768/1024/1440 px, sidebar panel geser, tabel scrollable, kontras/teks status, kiosk autofocus, dan cetak A4; verifikasi manual browser direkomendasikan pada perangkat sekolah.
+- [x] ✅ Task 14.24 - Perbarui `design.md` dan `AGENTS.md` `[Mudah]` (Selesai)
+  - File: `agents/design.md`, `AGENTS.md`, `README.md`
+  - Catatan: design.md menjadi versi 2.0 Flux UI; mandat Bootstrap dihapus; sidebar accordion, dropdown, tema, token, komponen, dan setup Tailwind/Livewire dijelaskan.
+- [x] ✅ Task 14.25 - Perbarui README/UAT, verifikasi akhir, dan catatan Fase 9 `[Sedang]` (Selesai)
+  - File: `README.md`, `agents/uat-checklist.md`, `agents/tasklist.md`
+  - Catatan: prasyarat Flux, catatan aset `/flux/*`, dan 3 skenario UAT tema/sidebar ditambahkan; test, build, view:cache, dan Pint lulus; progress 100% (177/177).
+
+---
+
 ## Catatan Fase 1
 
 - Fase 1 selesai dan siap direview sebelum masuk Fase 2.
@@ -689,3 +769,28 @@
   - `README.md` — alur kiosk, toggle pengaturan, keamanan cache/indeks/rate limit, dan troubleshooting 404.
   - `agents/uat-checklist.md` — versi 1.1, **82 skenario** (8 skenario kiosk baru), ringkasan verifikasi otomatis diperbarui, dan total kategori disesuaikan.
 - Ditunda/opsional: tampilan riwayat kunjungan mandiri per anggota, notifikasi kunjungan realtime, dan mode layar penuh/kilat khusus tablet kiosk.
+
+## Catatan Fase 9
+
+- Fase 9 (redesign Flux UI) selesai dan siap direview. Seluruh checklist mencapai **100% (177/177)**.
+- Stack akhir: **Flux UI (Flux Free) 2.21**, **Livewire 4.4**, **Tailwind CSS 4.3**, dan Vite 6. Bootstrap, Bootstrap Icons, dan Popper dihapus.
+- Perintah verifikasi yang sudah dijalankan:
+  - `php artisan test` — **188 test lulus, 1191 assertion** (3 test navigasi baru).
+  - `npm run build` — berhasil.
+  - `php artisan view:cache` — seluruh Blade berhasil dikompilasi.
+  - `php vendor/bin/pint --dirty` — berhasil.
+- Perubahan utama:
+  - Semua peran memakai `flux:sidebar` dengan grup menu accordion (`flux:sidebar.group expandable`) yang terbuka otomatis pada halaman aktif.
+  - Header memuat breadcrumb, notifikasi, pemilih tema Terang/Gelap/Sistem, dan dropdown akun.
+  - Profil peminjam memiliki saklar mode gelap yang terhubung ke `$flux.appearance`.
+  - Komponen bersama dimigrasikan ke Flux/Tailwind: status badge, kartu KPI, kartu buku, empty state, page header, form error, dan ikon Heroicons.
+  - Konfirmasi memakai `flux:modal`, feedback memakai `$flux.toast`, dan form tetap memakai loading state serta proteksi CSRF.
+  - Kiosk dan halaman cetak tetap terang, tanpa `@fluxAppearance`; layout A4, barcode, dan tombol cetak dipertahankan.
+- Dokumentasi:
+  - `agents/design.md` — versi 2.0 Flux UI, token tema, layout sidebar, komponen, tema, dan panduan implementasi.
+  - `AGENTS.md` dan `README.md` — mandat Bootstrap diganti Flux UI/Livewire/Tailwind.
+  - `agents/uat-checklist.md` — versi 1.2, **85 skenario** (3 skenario sidebar/tema baru).
+- Catatan QA:
+  - Verifikasi otomatis mencakup render sidebar admin/guru/siswa dan theme switcher publik.
+  - QA visual manual pada 360/390/768/1024/1440 px serta cetak PDF tetap disarankan di perangkat sekolah sebelum rilis.
+- Ditunda/opsional: komponen Flux Pro (Tabs, Date Picker, Chart), pencarian global di header, dan kustomisasi tema per sekolah.

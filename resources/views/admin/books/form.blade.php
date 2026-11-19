@@ -9,22 +9,13 @@
         :subtitle="$book->exists ? 'Perbarui data bibliografi dan status katalog.' : 'Masukkan data bibliografi buku baru.'"
     >
         <x-slot:actions>
-            <a href="{{ route('admin.books.index') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Kembali
-            </a>
+            <flux:button variant="outline" icon="arrow-left" href="{{ route('admin.books.index') }}">
+                Kembali
+            </flux:button>
         </x-slot:actions>
     </x-page-header>
 
-    @if ($errors->any())
-        <div class="alert alert-danger" role="alert">
-            <div class="fw-semibold mb-1">Periksa kembali data berikut:</div>
-            <ul class="mb-0 ps-3">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    <x-form-errors title="Periksa kembali data berikut:" />
 
     @php($selectedAuthorIds = array_map('intval', (array) old('authors', $selectedAuthors)))
 
@@ -32,172 +23,179 @@
         @csrf
         @method($book->exists ? 'PUT' : 'POST')
 
-        <div class="row g-3">
-            <div class="col-12 col-xl-8">
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h2 class="h6 mb-0">Informasi Utama</h2>
+        <div class="grid gap-4 xl:grid-cols-3">
+            <div class="space-y-4 xl:col-span-2">
+                <flux:card class="p-0!">
+                    <div class="border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+                        <flux:heading size="lg" level="2">Informasi Utama</flux:heading>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label for="title" class="form-label">Judul buku <span class="text-danger">*</span></label>
-                                <input type="text" id="title" name="title" value="{{ old('title', $book->title) }}" class="form-control @error('title') is-invalid @enderror" maxlength="255" required>
-                                @error('title')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                    <div class="grid gap-5 p-5 sm:grid-cols-2">
+                        <div class="sm:col-span-2">
+                            <flux:field>
+                                <flux:label for="title">Judul buku <span class="text-rose-600">*</span></flux:label>
+                                <flux:input type="text" id="title" name="title" value="{{ old('title', $book->title) }}" maxlength="255" required autofocus />
+                                <flux:error name="title" />
+                            </flux:field>
+                        </div>
 
-                            <div class="col-12 col-md-6">
-                                <label for="category_id" class="form-label">Kategori <span class="text-danger">*</span></label>
-                                <select id="category_id" name="category_id" class="form-select @error('category_id') is-invalid @enderror" required>
-                                    <option value="">Pilih kategori</option>
-                                    @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}" @selected((int) old('category_id', $book->category_id) === $category->id)>
-                                            {{ $category->name }}{{ $category->is_active ? '' : ' (nonaktif)' }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('category_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        <flux:field>
+                            <flux:label for="category_id">Kategori <span class="text-rose-600">*</span></flux:label>
+                            <flux:select id="category_id" name="category_id" required>
+                                <option value="">Pilih kategori</option>
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category->id }}" @selected((int) old('category_id', $book->category_id) === $category->id)>
+                                        {{ $category->name }}{{ $category->is_active ? '' : ' (nonaktif)' }}
+                                    </option>
+                                @endforeach
+                            </flux:select>
+                            <flux:error name="category_id" />
+                        </flux:field>
 
-                            <div class="col-12 col-md-6">
-                                <label for="isbn" class="form-label">ISBN</label>
-                                <input type="text" id="isbn" name="isbn" value="{{ old('isbn', $book->isbn) }}" class="form-control @error('isbn') is-invalid @enderror" maxlength="32" placeholder="Opsional untuk koleksi lama">
-                                @error('isbn')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        <flux:field>
+                            <flux:label for="isbn">ISBN</flux:label>
+                            <flux:input type="text" id="isbn" name="isbn" value="{{ old('isbn', $book->isbn) }}" maxlength="32" placeholder="Opsional untuk koleksi lama" />
+                            <flux:error name="isbn" />
+                        </flux:field>
 
-                            <div class="col-12">
-                                <label for="authors" class="form-label">Penulis <span class="text-danger">*</span></label>
-                                <select id="authors" name="authors[]" class="form-select @error('authors') is-invalid @enderror" multiple size="7" required>
-                                    @foreach ($authors as $author)
-                                        <option value="{{ $author->id }}" @selected(in_array($author->id, $selectedAuthorIds, true))>{{ $author->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('authors')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                                <div class="form-text">Gunakan Ctrl (Windows) atau Cmd (macOS) untuk memilih lebih dari satu penulis.</div>
-                            </div>
+                        <div class="sm:col-span-2">
+                            <flux:field>
+                                <flux:label>Penulis <span class="text-rose-600">*</span></flux:label>
+                                <flux:description>Pilih satu atau lebih penulis. Daftar dapat digulir.</flux:description>
+                                <div class="mt-2 max-h-56 overflow-y-auto rounded-lg border border-zinc-200 p-3 dark:border-zinc-700" data-scrollable-region>
+                                    <div class="grid gap-2 sm:grid-cols-2">
+                                        @foreach ($authors as $author)
+                                            <flux:checkbox
+                                                id="author-{{ $author->id }}"
+                                                name="authors[]"
+                                                value="{{ $author->id }}"
+                                                :checked="in_array($author->id, $selectedAuthorIds, true)"
+                                                label="{{ $author->name }}"
+                                            />
+                                        @endforeach
+                                    </div>
+                                </div>
+                                <flux:error name="authors" />
+                            </flux:field>
                         </div>
                     </div>
-                </div>
+                </flux:card>
 
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h2 class="h6 mb-0">Informasi Penerbitan</h2>
+                <flux:card class="p-0!">
+                    <div class="border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+                        <flux:heading size="lg" level="2">Informasi Penerbitan</flux:heading>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-12 col-md-6">
-                                <label for="publisher_id" class="form-label">Penerbit</label>
-                                <select id="publisher_id" name="publisher_id" class="form-select @error('publisher_id') is-invalid @enderror">
+                    <div class="grid gap-5 p-5 sm:grid-cols-6">
+                        <div class="sm:col-span-3">
+                            <flux:field>
+                                <flux:label for="publisher_id">Penerbit</flux:label>
+                                <flux:select id="publisher_id" name="publisher_id">
                                     <option value="">Pilih penerbit</option>
                                     @foreach ($publishers as $publisher)
                                         <option value="{{ $publisher->id }}" @selected((int) old('publisher_id', $book->publisher_id) === $publisher->id)>
                                             {{ $publisher->name }}
                                         </option>
                                     @endforeach
-                                </select>
-                                @error('publisher_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                                </flux:select>
+                                <flux:error name="publisher_id" />
+                            </flux:field>
+                        </div>
 
-                            <div class="col-6 col-md-3">
-                                <label for="publication_year" class="form-label">Tahun terbit</label>
-                                <input type="number" id="publication_year" name="publication_year" value="{{ old('publication_year', $book->publication_year) }}" class="form-control @error('publication_year') is-invalid @enderror" min="1000" max="{{ date('Y') + 1 }}">
-                                @error('publication_year')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        <div class="sm:col-span-2">
+                            <flux:field>
+                                <flux:label for="publication_year">Tahun terbit</flux:label>
+                                <flux:input type="number" id="publication_year" name="publication_year" value="{{ old('publication_year', $book->publication_year) }}" min="1000" max="{{ date('Y') + 1 }}" />
+                                <flux:error name="publication_year" />
+                            </flux:field>
+                        </div>
 
-                            <div class="col-6 col-md-3">
-                                <label for="edition" class="form-label">Edisi</label>
-                                <input type="text" id="edition" name="edition" value="{{ old('edition', $book->edition) }}" class="form-control @error('edition') is-invalid @enderror" maxlength="100">
-                                @error('edition')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        <div class="sm:col-span-1">
+                            <flux:field>
+                                <flux:label for="edition">Edisi</flux:label>
+                                <flux:input type="text" id="edition" name="edition" value="{{ old('edition', $book->edition) }}" maxlength="100" />
+                                <flux:error name="edition" />
+                            </flux:field>
+                        </div>
 
-                            <div class="col-12 col-md-6">
-                                <label for="language" class="form-label">Bahasa <span class="text-danger">*</span></label>
-                                <input type="text" id="language" name="language" value="{{ old('language', $book->language ?: 'Indonesia') }}" class="form-control @error('language') is-invalid @enderror" maxlength="50" required>
-                                @error('language')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        <div class="sm:col-span-3">
+                            <flux:field>
+                                <flux:label for="language">Bahasa <span class="text-rose-600">*</span></flux:label>
+                                <flux:input type="text" id="language" name="language" value="{{ old('language', $book->language ?: 'Indonesia') }}" maxlength="50" required />
+                                <flux:error name="language" />
+                            </flux:field>
                         </div>
                     </div>
-                </div>
+                </flux:card>
 
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h2 class="h6 mb-0">Deskripsi dan Sampul</h2>
+                <flux:card class="p-0!">
+                    <div class="border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+                        <flux:heading size="lg" level="2">Deskripsi dan Sampul</flux:heading>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label for="summary" class="form-label">Ringkasan</label>
-                                <textarea id="summary" name="summary" rows="6" class="form-control @error('summary') is-invalid @enderror" maxlength="5000">{{ old('summary', $book->summary) }}</textarea>
-                                @error('summary')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                    <div class="grid gap-5 p-5 sm:grid-cols-3">
+                        <div class="sm:col-span-3">
+                            <flux:field>
+                                <flux:label for="summary">Ringkasan</flux:label>
+                                <flux:textarea id="summary" name="summary" rows="6" maxlength="5000">{{ old('summary', $book->summary) }}</flux:textarea>
+                                <flux:error name="summary" />
+                            </flux:field>
+                        </div>
 
-                            <div class="col-12 col-md-4">
-                                <img src="{{ $book->cover_url }}" alt="Pratinjau sampul {{ $book->title ?: 'buku' }}" class="book-cover border w-100">
-                            </div>
+                        <div>
+                            <img src="{{ $book->cover_url }}" alt="Pratinjau sampul {{ $book->title ?: 'buku' }}" class="aspect-3/4 w-full rounded-lg border border-zinc-200 object-cover dark:border-zinc-700">
+                        </div>
 
-                            <div class="col-12 col-md-8">
-                                <label for="cover" class="form-label">Gambar sampul</label>
-                                <input type="file" id="cover" name="cover" class="form-control @error('cover') is-invalid @enderror" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
-                                @error('cover')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <div class="form-text">Format JPG, PNG, atau WEBP. Ukuran maksimal 2 MB. Rasio yang disarankan 3:4.</div>
+                        <div class="sm:col-span-2">
+                            <flux:field>
+                                <flux:label for="cover">Gambar sampul</flux:label>
+                                <flux:input type="file" id="cover" name="cover" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+                                <flux:description>Format JPG, PNG, atau WEBP. Ukuran maksimal 2 MB. Rasio yang disarankan 3:4.</flux:description>
+                                <flux:error name="cover" />
+                            </flux:field>
 
-                                @if ($book->cover_path)
-                                    <div class="form-check mt-3">
-                                        <input type="checkbox" id="remove_cover" name="remove_cover" value="1" class="form-check-input" @checked(old('remove_cover'))>
-                                        <label for="remove_cover" class="form-check-label">Hapus sampul saat ini</label>
-                                    </div>
-                                @endif
-                            </div>
+                            @if ($book->cover_path)
+                                <div class="mt-4">
+                                    <flux:checkbox
+                                        id="remove_cover"
+                                        name="remove_cover"
+                                        value="1"
+                                        :checked="(bool) old('remove_cover')"
+                                        label="Hapus sampul saat ini"
+                                    />
+                                </div>
+                            @endif
                         </div>
                     </div>
-                </div>
+                </flux:card>
             </div>
 
-            <div class="col-12 col-xl-4">
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h2 class="h6 mb-0">Status Katalog</h2>
+            <div class="space-y-4">
+                <flux:card class="p-0!">
+                    <div class="border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+                        <flux:heading size="lg" level="2">Status Katalog</flux:heading>
                     </div>
-                    <div class="card-body">
-                        <div class="form-check form-switch">
-                            <input type="hidden" name="is_active" value="0">
-                            <input type="checkbox" id="is_active" name="is_active" value="1" class="form-check-input" @checked(old('is_active', $book->is_active ?? true))>
-                            <label for="is_active" class="form-check-label">Tampilkan di katalog publik</label>
-                        </div>
-                        <div class="form-text">
-                            Buku yang diarsipkan tetap tersimpan beserta riwayat eksemplarnya, tetapi tidak tampil di katalog publik.
-                        </div>
+                    <div class="p-5">
+                        <input type="hidden" name="is_active" value="0">
+                        <flux:switch
+                            id="is_active"
+                            name="is_active"
+                            value="1"
+                            :checked="(bool) old('is_active', $book->is_active ?? true)"
+                            label="Tampilkan di katalog publik"
+                            description="Buku yang diarsipkan tetap tersimpan beserta riwayat eksemplarnya, tetapi tidak tampil di katalog publik."
+                        />
+                        <flux:error name="is_active" />
                     </div>
-                </div>
+                </flux:card>
 
-                <div class="card">
-                    <div class="card-body">
-                        <button type="submit" class="btn btn-primary w-100" data-loading-text="Menyimpan...">
-                            <i class="bi bi-save me-1" aria-hidden="true"></i>{{ $book->exists ? 'Simpan Perubahan' : 'Simpan Buku' }}
-                        </button>
-                        <a href="{{ route('admin.books.index') }}" class="btn btn-outline-secondary w-100 mt-2">Batal</a>
+                <flux:card>
+                    <div class="flex flex-col gap-2">
+                        <flux:button type="submit" variant="primary" icon="check" data-loading-text="Menyimpan...">
+                            {{ $book->exists ? 'Simpan Perubahan' : 'Simpan Buku' }}
+                        </flux:button>
+                        <flux:button variant="outline" href="{{ route('admin.books.index') }}">
+                            Batal
+                        </flux:button>
                     </div>
-                </div>
+                </flux:card>
             </div>
         </div>
     </form>

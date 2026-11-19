@@ -6,59 +6,54 @@
 @section('content')
     <x-page-header title="Kategori" subtitle="Kelola kategori koleksi yang digunakan pada katalog.">
         <x-slot:actions>
-            <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Tambah Kategori
-            </a>
+            <flux:button variant="primary" icon="plus" href="{{ route('admin.categories.create') }}">
+                Tambah Kategori
+            </flux:button>
         </x-slot:actions>
     </x-page-header>
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <form method="GET" action="{{ route('admin.categories.index') }}" class="row g-2 align-items-end">
-                <div class="col-12 col-md-6">
-                    <label for="q" class="form-label">Cari kategori</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-search" aria-hidden="true"></i></span>
-                        <input type="search" id="q" name="q" value="{{ $search }}" class="form-control" placeholder="Nama kategori">
-                    </div>
-                </div>
+    <flux:card class="mb-4">
+        <form method="GET" action="{{ route('admin.categories.index') }}" class="grid items-end gap-3 md:grid-cols-6">
+            <div class="md:col-span-3">
+                <flux:field>
+                    <flux:label for="q">Cari kategori</flux:label>
+                    <flux:input type="search" id="q" name="q" value="{{ $search }}" icon="magnifying-glass" placeholder="Nama kategori" />
+                </flux:field>
+            </div>
 
-                <div class="col-8 col-md-4">
-                    <label for="status" class="form-label">Status</label>
-                    <select id="status" name="status" class="form-select">
+            <div class="md:col-span-2">
+                <flux:field>
+                    <flux:label for="status">Status</flux:label>
+                    <flux:select id="status" name="status">
                         <option value="">Semua status</option>
                         <option value="aktif" @selected($status === 'aktif')>Aktif</option>
                         <option value="nonaktif" @selected($status === 'nonaktif')>Nonaktif</option>
-                    </select>
-                </div>
+                    </flux:select>
+                </flux:field>
+            </div>
 
-                <div class="col-4 col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-grow-1">Filter</button>
-                    @if ($search !== '' || $status !== '')
-                        <a href="{{ route('admin.categories.index') }}" class="btn btn-outline-secondary" aria-label="Reset filter">
-                            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                        </a>
-                    @endif
-                </div>
-            </form>
-        </div>
-    </div>
+            <div class="flex gap-2">
+                <flux:button type="submit" variant="primary" class="flex-1">Filter</flux:button>
+                @if ($search !== '' || $status !== '')
+                    <flux:button variant="outline" href="{{ route('admin.categories.index') }}" icon="arrow-path" aria-label="Reset filter" />
+                @endif
+            </div>
+        </form>
+    </flux:card>
 
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h6 mb-0">Daftar Kategori</h2>
-            <span class="small text-muted">{{ $categories->total() }} kategori</span>
+    <flux:card class="p-0!">
+        <div class="flex items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+            <flux:heading size="lg" level="2">Daftar Kategori</flux:heading>
+            <flux:badge color="zinc" size="sm">{{ $categories->total() }} kategori</flux:badge>
         </div>
 
         @if ($categories->isEmpty())
-            <div class="card-body">
-                <x-empty-state icon="tags" title="Belum ada kategori" message="Tambahkan kategori untuk mengelompokkan koleksi.">
-                    <a href="{{ route('admin.categories.create') }}" class="btn btn-primary btn-sm">Tambah Kategori</a>
-                </x-empty-state>
-            </div>
+            <x-empty-state icon="tags" title="Belum ada kategori" message="Tambahkan kategori untuk mengelompokkan koleksi.">
+                <flux:button variant="primary" size="sm" href="{{ route('admin.categories.create') }}">Tambah Kategori</flux:button>
+            </x-empty-state>
         @else
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+            <div class="overflow-x-auto" data-scrollable-region>
+                <table class="data-table">
                     <thead>
                         <tr>
                             <th scope="col">Nama</th>
@@ -72,10 +67,10 @@
                         @foreach ($categories as $category)
                             <tr>
                                 <td>
-                                    <div class="fw-semibold">{{ $category->name }}</div>
-                                    <div class="small text-muted">{{ $category->description ?: 'Tanpa deskripsi' }}</div>
+                                    <div class="font-semibold">{{ $category->name }}</div>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $category->description ?: 'Tanpa deskripsi' }}</div>
                                 </td>
-                                <td><code>{{ $category->slug }}</code></td>
+                                <td><code class="rounded bg-zinc-100 px-1.5 py-0.5 text-xs dark:bg-white/10">{{ $category->slug }}</code></td>
                                 <td class="text-center">{{ $category->books_count }}</td>
                                 <td>
                                     <x-status-badge
@@ -85,19 +80,19 @@
                                     />
                                 </td>
                                 <td class="text-end">
-                                    <div class="d-inline-flex gap-1">
-                                        <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                    <div class="inline-flex gap-1">
+                                        <flux:button size="sm" variant="outline" href="{{ route('admin.categories.edit', $category) }}">Edit</flux:button>
                                         <form method="POST" action="{{ route('admin.categories.toggle', $category) }}">
                                             @csrf
-                                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                            <flux:button type="submit" size="sm" variant="outline">
                                                 {{ $category->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
-                                            </button>
+                                            </flux:button>
                                         </form>
                                         @if ($category->books_count === 0)
                                             <form method="POST" action="{{ route('admin.categories.destroy', $category) }}" data-confirm="Hapus kategori {{ $category->name }}?">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                                <flux:button type="submit" size="sm" variant="danger">Hapus</flux:button>
                                             </form>
                                         @endif
                                     </div>
@@ -108,12 +103,12 @@
                 </table>
             </div>
 
-            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <span class="small text-muted">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 px-5 py-4 dark:border-white/10">
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">
                     Menampilkan {{ $categories->firstItem() }}&ndash;{{ $categories->lastItem() }} dari {{ $categories->total() }} kategori
                 </span>
                 {{ $categories->links() }}
             </div>
         @endif
-    </div>
+    </flux:card>
 @endsection

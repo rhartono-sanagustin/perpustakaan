@@ -3,121 +3,112 @@
 @section('title', 'Katalog Buku')
 
 @section('content')
-    <section class="container-xl py-4 py-lg-5">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
-            <div>
-                <h1 class="h3 mb-1">Katalog Buku</h1>
-                <p class="text-muted mb-0">Cari koleksi perpustakaan dan periksa ketersediaan eksemplar.</p>
-            </div>
-            <span class="badge text-bg-light border align-self-md-center">
-                {{ $books->total() }} judul ditemukan
-            </span>
-        </div>
+    <section class="mx-auto w-full max-w-7xl px-4 py-6 lg:px-8 lg:py-10">
+        <x-page-header title="Katalog Buku" subtitle="Cari koleksi perpustakaan dan periksa ketersediaan eksemplar.">
+            <x-slot:actions>
+                <flux:badge color="zinc" size="lg">{{ $books->total() }} judul ditemukan</flux:badge>
+            </x-slot:actions>
+        </x-page-header>
 
-        <div class="card mb-4">
-            <div class="card-body">
-                <form method="GET" action="{{ route('catalog.index') }}" role="search" class="row g-3 align-items-end">
-                    <div class="col-12 col-lg-5">
-                        <label for="q" class="form-label">Cari buku</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-search" aria-hidden="true"></i></span>
-                            <input
-                                type="search"
-                                id="q"
-                                name="q"
-                                value="{{ $search }}"
-                                class="form-control"
-                                placeholder="Cari judul, penulis, ISBN, atau kata kunci"
-                                maxlength="100"
-                            >
-                        </div>
-                    </div>
+        <flux:card class="mb-6">
+            <form method="GET" action="{{ route('catalog.index') }}" role="search" class="grid items-end gap-3 lg:grid-cols-12">
+                <div class="lg:col-span-5">
+                    <flux:field>
+                        <flux:label for="q">Cari buku</flux:label>
+                        <flux:input
+                            type="search"
+                            id="q"
+                            name="q"
+                            value="{{ $search }}"
+                            icon="magnifying-glass"
+                            placeholder="Cari judul, penulis, ISBN, atau kata kunci"
+                            maxlength="100"
+                        />
+                    </flux:field>
+                </div>
 
-                    <div class="col-12 col-sm-6 col-lg-3">
-                        <label for="category" class="form-label">Kategori</label>
-                        <select id="category" name="category" class="form-select" data-auto-submit>
+                <div class="lg:col-span-3" data-auto-submit>
+                    <flux:field>
+                        <flux:label for="category">Kategori</flux:label>
+                        <flux:select id="category" name="category">
                             <option value="">Semua kategori</option>
                             @foreach ($categories as $category)
                                 <option value="{{ $category->slug }}" @selected($categorySlug === $category->slug)>
                                     {{ $category->name }} ({{ $category->books_count }})
                                 </option>
                             @endforeach
-                        </select>
-                    </div>
+                        </flux:select>
+                    </flux:field>
+                </div>
 
-                    <div class="col-12 col-sm-6 col-lg-2">
-                        <label for="availability" class="form-label">Ketersediaan</label>
-                        <select id="availability" name="availability" class="form-select" data-auto-submit>
+                <div class="lg:col-span-2" data-auto-submit>
+                    <flux:field>
+                        <flux:label for="availability">Ketersediaan</flux:label>
+                        <flux:select id="availability" name="availability">
                             <option value="">Semua</option>
                             <option value="tersedia" @selected($availability === 'tersedia')>Tersedia</option>
                             <option value="habis" @selected($availability === 'habis')>Tidak tersedia</option>
-                        </select>
-                    </div>
+                        </flux:select>
+                    </flux:field>
+                </div>
 
-                    <div class="col-12 col-lg-2 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary flex-grow-1">
-                            <i class="bi bi-funnel me-1" aria-hidden="true"></i>Terapkan
-                        </button>
-                        @if ($search !== '' || $categorySlug !== '' || $availability !== '')
-                            <a href="{{ route('catalog.index') }}" class="btn btn-outline-secondary" aria-label="Reset filter">
-                                <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                            </a>
-                        @endif
-                    </div>
-                </form>
+                <div class="flex gap-2 lg:col-span-2">
+                    <flux:button type="submit" variant="primary" icon="funnel" class="flex-1">
+                        Terapkan
+                    </flux:button>
+                    @if ($search !== '' || $categorySlug !== '' || $availability !== '')
+                        <flux:button variant="outline" href="{{ route('catalog.index') }}" icon="arrow-path" aria-label="Reset filter" />
+                    @endif
+                </div>
+            </form>
 
-                @if ($search !== '' || $selectedCategory || $availability !== '')
-                    <div class="d-flex flex-wrap align-items-center gap-2 mt-3 pt-3 border-top">
-                        <span class="small text-muted">Filter aktif:</span>
-                        @if ($search !== '')
-                            <span class="badge text-bg-light border">Kata kunci: {{ $search }}</span>
-                        @endif
-                        @if ($selectedCategory)
-                            <span class="badge text-bg-light border">Kategori: {{ $selectedCategory->name }}</span>
-                        @endif
-                        @if ($availability !== '')
-                            <span class="badge text-bg-light border">
-                                {{ $availability === 'tersedia' ? 'Tersedia' : 'Tidak tersedia' }}
-                            </span>
-                        @endif
-                        <a href="{{ route('catalog.index') }}" class="small ms-auto">Reset filter</a>
-                    </div>
-                @endif
-            </div>
-        </div>
+            @if ($search !== '' || $selectedCategory || $availability !== '')
+                <div class="mt-4 flex flex-wrap items-center gap-2 border-t border-zinc-100 pt-4 dark:border-white/10">
+                    <span class="text-xs text-zinc-500 dark:text-zinc-400">Filter aktif:</span>
+                    @if ($search !== '')
+                        <flux:badge color="zinc" size="sm">Kata kunci: {{ $search }}</flux:badge>
+                    @endif
+                    @if ($selectedCategory)
+                        <flux:badge color="zinc" size="sm">Kategori: {{ $selectedCategory->name }}</flux:badge>
+                    @endif
+                    @if ($availability !== '')
+                        <flux:badge color="zinc" size="sm">{{ $availability === 'tersedia' ? 'Tersedia' : 'Tidak tersedia' }}</flux:badge>
+                    @endif
+                    <a href="{{ route('catalog.index') }}" class="ms-auto text-xs font-medium text-[var(--color-accent-content)] hover:underline">Reset filter</a>
+                </div>
+            @endif
+        </flux:card>
 
         @if ($books->isEmpty())
-            <div class="card">
-                <div class="card-body">
-                    <x-empty-state
-                        icon="search"
-                        title="Buku tidak ditemukan"
-                        message="Coba ubah kata kunci atau reset filter untuk melihat seluruh koleksi."
-                    >
-                        <a href="{{ route('catalog.index') }}" class="btn btn-outline-primary btn-sm">
-                            <i class="bi bi-arrow-counterclockwise me-1" aria-hidden="true"></i>Reset Filter
-                        </a>
-                    </x-empty-state>
-                </div>
-            </div>
+            <flux:card>
+                <x-empty-state
+                    icon="magnifying-glass"
+                    title="Buku tidak ditemukan"
+                    message="Coba ubah kata kunci atau reset filter untuk melihat seluruh koleksi."
+                >
+                    <flux:button variant="outline" size="sm" icon="arrow-path" href="{{ route('catalog.index') }}">
+                        Reset Filter
+                    </flux:button>
+                </x-empty-state>
+            </flux:card>
         @else
-            <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mb-3">
-                <span class="small text-muted">
+            <div class="mb-4 flex flex-col justify-between gap-2 sm:flex-row">
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">
                     Menampilkan {{ $books->firstItem() }}&ndash;{{ $books->lastItem() }} dari {{ $books->total() }} judul
                 </span>
-                <span class="small text-muted">
-                    <i class="bi bi-info-circle me-1" aria-hidden="true"></i>
+                <span class="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
+                    <flux:icon.information-circle variant="mini" class="size-4" />
                     Ketersediaan dihitung dari eksemplar berstatus Tersedia.
                 </span>
             </div>
 
-            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                 @foreach ($books as $book)
                     <x-book-card :book="$book" />
                 @endforeach
             </div>
 
-            <div class="mt-4">
+            <div class="mt-6">
                 {{ $books->links() }}
             </div>
         @endif

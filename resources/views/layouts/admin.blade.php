@@ -1,4 +1,15 @@
 @inject('identity', 'App\Services\LibraryIdentity')
+@php
+    $user = auth()->user();
+    $initials = \Illuminate\Support\Str::of($user->name)
+        ->explode(' ')
+        ->filter()
+        ->take(2)
+        ->map(fn ($part) => \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($part, 0, 1)))
+        ->implode('');
+    $breadcrumb = trim($__env->yieldContent('breadcrumb', 'Dashboard'));
+    $crumbs = array_values(array_filter(array_map('trim', explode('/', $breadcrumb))));
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -8,179 +19,217 @@
     <title>@yield('title', 'Admin') &mdash; {{ $identity->libraryName() }}</title>
     <link rel="icon" href="{{ $identity->logoUrl() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @fluxAppearance
 </head>
-<body>
-    <div class="admin-shell d-flex">
-        <aside class="offcanvas-lg offcanvas-start admin-sidebar" tabindex="-1" id="adminSidebar" aria-labelledby="adminSidebarLabel">
-            <div class="offcanvas-header border-bottom d-lg-none">
-                <h2 class="offcanvas-title h6 mb-0" id="adminSidebarLabel">Menu Admin</h2>
-                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Tutup"></button>
-            </div>
-            <div class="offcanvas-body d-flex flex-column">
-                <a href="{{ route('admin.dashboard') }}" class="sidebar-brand">
-                    <x-library-logo size="sm" />
-                    <span class="d-flex flex-column lh-sm min-w-0">
-                        <span class="fw-semibold text-truncate">{{ $identity->libraryName() }}</span>
-                        <span class="small text-muted text-truncate">{{ $identity->schoolName() }}</span>
-                    </span>
-                </a>
+<body class="min-h-screen bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
+    <flux:sidebar sticky collapsible class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
+        <flux:sidebar.header>
+            <flux:sidebar.brand :name="$identity->libraryName()" href="{{ route('admin.dashboard') }}">
+                <img src="{{ $identity->logoUrl() }}" alt="" class="h-6 w-6 object-contain">
+            </flux:sidebar.brand>
 
-                <nav class="sidebar-nav nav flex-column gap-1 mt-3" aria-label="Navigasi admin">
-                    <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
-                        <i class="bi bi-speedometer2" aria-hidden="true"></i>Dashboard
-                    </a>
+            <flux:sidebar.collapse />
+        </flux:sidebar.header>
 
-                    <div class="sidebar-heading">Katalog Buku</div>
-                    <a class="nav-link {{ request()->routeIs('admin.books.index', 'admin.books.create', 'admin.books.edit') ? 'active' : '' }}" href="{{ route('admin.books.index') }}">
-                        <i class="bi bi-journal-bookmark" aria-hidden="true"></i>Daftar Buku
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}">
-                        <i class="bi bi-tags" aria-hidden="true"></i>Kategori
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('admin.authors.*') ? 'active' : '' }}" href="{{ route('admin.authors.index') }}">
-                        <i class="bi bi-pen" aria-hidden="true"></i>Penulis
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('admin.publishers.*') ? 'active' : '' }}" href="{{ route('admin.publishers.index') }}">
-                        <i class="bi bi-building" aria-hidden="true"></i>Penerbit
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('admin.copies.*', 'admin.books.copies.*') ? 'active' : '' }}" href="{{ route('admin.copies.index') }}">
-                        <i class="bi bi-collection" aria-hidden="true"></i>Eksemplar/Inventaris
-                    </a>
-
-                    <div class="sidebar-heading">Transaksi Peminjaman</div>
-                    <a class="nav-link {{ request()->routeIs('admin.requests.*') ? 'active' : '' }}" href="{{ route('admin.requests.index') }}">
-                        <i class="bi bi-inbox" aria-hidden="true"></i>Permintaan Peminjaman
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('admin.loans.index') ? 'active' : '' }}" href="{{ route('admin.loans.index') }}">
-                        <i class="bi bi-arrow-left-right" aria-hidden="true"></i>Peminjaman Aktif
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('admin.returns.*') ? 'active' : '' }}" href="{{ route('admin.returns.index') }}">
-                        <i class="bi bi-arrow-return-left" aria-hidden="true"></i>Pengembalian
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('admin.loans.history', 'admin.loans.return') ? 'active' : '' }}" href="{{ route('admin.loans.history') }}">
-                        <i class="bi bi-clock-history" aria-hidden="true"></i>Riwayat Transaksi
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('admin.visits.*') ? 'active' : '' }}" href="{{ route('admin.visits.index') }}">
-                        <i class="bi bi-upc-scan" aria-hidden="true"></i>Kunjungan
-                    </a>
-
-                    <div class="sidebar-heading">Laporan</div>
-                    <a class="nav-link {{ request()->routeIs('admin.reports.index') ? 'active' : '' }}" href="{{ route('admin.reports.index') }}">
-                        <i class="bi bi-bar-chart" aria-hidden="true"></i>Ringkasan
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('admin.reports.loans') ? 'active' : '' }}" href="{{ route('admin.reports.loans') }}">
-                        <i class="bi bi-file-earmark-text" aria-hidden="true"></i>Peminjaman
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('admin.reports.returns') ? 'active' : '' }}" href="{{ route('admin.reports.returns') }}">
-                        <i class="bi bi-arrow-return-left" aria-hidden="true"></i>Pengembalian
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('admin.reports.overdue') ? 'active' : '' }}" href="{{ route('admin.reports.overdue') }}">
-                        <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>Keterlambatan
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('admin.reports.inventory') ? 'active' : '' }}" href="{{ route('admin.reports.inventory') }}">
-                        <i class="bi bi-box-seam" aria-hidden="true"></i>Inventaris
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('admin.reports.popular') ? 'active' : '' }}" href="{{ route('admin.reports.popular') }}">
-                        <i class="bi bi-star" aria-hidden="true"></i>Buku Populer
-                    </a>
-
-                    <div class="sidebar-heading">Manajemen</div>
-                    <a class="nav-link {{ request()->routeIs('admin.member-cards.*') ? 'active' : '' }}" href="{{ route('admin.member-cards.index') }}">
-                        <i class="bi bi-person-vcard" aria-hidden="true"></i>Kartu Anggota
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
-                        <i class="bi bi-people" aria-hidden="true"></i>Pengguna
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('admin.announcements.*') ? 'active' : '' }}" href="{{ route('admin.announcements.index') }}">
-                        <i class="bi bi-megaphone" aria-hidden="true"></i>Pengumuman
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" href="{{ route('admin.settings.index') }}">
-                        <i class="bi bi-gear" aria-hidden="true"></i>Pengaturan
-                    </a>
-                </nav>
-
-                <div class="mt-auto pt-3 border-top small text-muted">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="bi bi-person-circle" aria-hidden="true"></i>
-                        <div class="min-w-0">
-                            <div class="fw-semibold text-truncate">{{ auth()->user()->name }}</div>
-                            <div class="text-truncate">{{ auth()->user()->roleLabel() }}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <div class="admin-main flex-grow-1 d-flex flex-column">
-            <header class="admin-topbar px-3 px-lg-4 py-3 d-flex align-items-center gap-3">
-                <button class="btn btn-outline-secondary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminSidebar" aria-controls="adminSidebar" aria-label="Buka menu">
-                    <i class="bi bi-list" aria-hidden="true"></i>
-                </button>
-
-                <div class="flex-grow-1 min-w-0">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb mb-0 small">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Admin</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">@yield('breadcrumb', 'Dashboard')</li>
-                        </ol>
-                    </nav>
-                </div>
-
-                <div class="dropdown" data-notifications data-mode="admin" data-endpoint="{{ route('admin.notifications') }}">
-                    <button class="btn btn-light border position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifikasi">
-                        <i class="bi bi-bell" aria-hidden="true"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger d-none" data-notification-badge>0</span>
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-end notification-dropdown">
-                        <div class="notification-header">
-                            <span class="fw-semibold">Notifikasi</span>
-                            <button type="button" class="btn btn-sm btn-link text-decoration-none p-0" data-notification-sound aria-pressed="true" aria-label="Matikan suara notifikasi">
-                                <i class="bi bi-volume-up" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                        <div class="notification-body" data-notification-body>
-                            <div class="notification-empty">Memuat notifikasi...</div>
-                        </div>
-                        <div class="notification-footer" data-notification-updated></div>
-                    </div>
-                </div>
-
-                <div class="dropdown">
-                    <button class="btn btn-light border dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menu akun {{ auth()->user()->name }}">
-                        <i class="bi bi-person-circle" aria-hidden="true"></i>
-                        <span class="d-none d-sm-inline">{{ auth()->user()->name }}</span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <span class="dropdown-item-text small text-muted">
-                                {{ auth()->user()->email ?? auth()->user()->nomor_induk }}
-                            </span>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="dropdown-item text-danger">
-                                    <i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>Keluar
-                                </button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
-            </header>
-
-            <main class="flex-grow-1 p-3 p-lg-4">
-                @yield('content')
-            </main>
-
-            <footer class="px-3 px-lg-4 py-3 small text-muted border-top bg-white">
-                {{ $identity->libraryName() }} &mdash; {{ $identity->schoolName() }}
-            </footer>
+        <div class="-mt-3 px-2 text-[0.7rem] leading-snug text-zinc-500 in-data-flux-sidebar-collapsed-desktop:hidden dark:text-zinc-400">
+            {{ $identity->schoolName() }}
         </div>
-    </div>
 
+        <flux:sidebar.nav>
+            <flux:sidebar.item icon="home" href="{{ route('admin.dashboard') }}" :current="request()->routeIs('admin.dashboard')">
+                Dashboard
+            </flux:sidebar.item>
+
+            <flux:sidebar.group
+                expandable
+                heading="Katalog Buku"
+                icon="book-open"
+                :expanded="request()->routeIs('admin.books.*', 'admin.categories.*', 'admin.authors.*', 'admin.publishers.*', 'admin.copies.*')"
+            >
+                <flux:sidebar.item icon="book-open" href="{{ route('admin.books.index') }}" :current="request()->routeIs('admin.books.index', 'admin.books.create', 'admin.books.edit')">
+                    Daftar Buku
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="tag" href="{{ route('admin.categories.index') }}" :current="request()->routeIs('admin.categories.*')">
+                    Kategori
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="pencil" href="{{ route('admin.authors.index') }}" :current="request()->routeIs('admin.authors.*')">
+                    Penulis
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="building-office" href="{{ route('admin.publishers.index') }}" :current="request()->routeIs('admin.publishers.*')">
+                    Penerbit
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="rectangle-stack" href="{{ route('admin.copies.index') }}" :current="request()->routeIs('admin.copies.*', 'admin.books.copies.*')">
+                    Eksemplar / Inventaris
+                </flux:sidebar.item>
+            </flux:sidebar.group>
+
+            <flux:sidebar.group
+                expandable
+                heading="Sirkulasi"
+                icon="arrows-right-left"
+                :expanded="request()->routeIs('admin.requests.*', 'admin.loans.*', 'admin.returns.*', 'admin.visits.*')"
+            >
+                <flux:sidebar.item icon="inbox" href="{{ route('admin.requests.index') }}" :current="request()->routeIs('admin.requests.*')">
+                    Permintaan Peminjaman
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="arrows-right-left" href="{{ route('admin.loans.index') }}" :current="request()->routeIs('admin.loans.index')">
+                    Peminjaman Aktif
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="arrow-uturn-left" href="{{ route('admin.returns.index') }}" :current="request()->routeIs('admin.returns.*')">
+                    Pengembalian
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="clock" href="{{ route('admin.loans.history') }}" :current="request()->routeIs('admin.loans.history', 'admin.loans.return')">
+                    Riwayat Transaksi
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="qr-code" href="{{ route('admin.visits.index') }}" :current="request()->routeIs('admin.visits.*')">
+                    Kunjungan
+                </flux:sidebar.item>
+            </flux:sidebar.group>
+
+            <flux:sidebar.group
+                expandable
+                heading="Laporan"
+                icon="chart-bar"
+                :expanded="request()->routeIs('admin.reports.*')"
+            >
+                <flux:sidebar.item icon="chart-bar" href="{{ route('admin.reports.index') }}" :current="request()->routeIs('admin.reports.index')">
+                    Ringkasan
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="document-text" href="{{ route('admin.reports.loans') }}" :current="request()->routeIs('admin.reports.loans')">
+                    Peminjaman
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="arrow-uturn-left" href="{{ route('admin.reports.returns') }}" :current="request()->routeIs('admin.reports.returns')">
+                    Pengembalian
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="exclamation-triangle" href="{{ route('admin.reports.overdue') }}" :current="request()->routeIs('admin.reports.overdue')">
+                    Keterlambatan
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="archive-box" href="{{ route('admin.reports.inventory') }}" :current="request()->routeIs('admin.reports.inventory')">
+                    Inventaris
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="star" href="{{ route('admin.reports.popular') }}" :current="request()->routeIs('admin.reports.popular')">
+                    Buku Populer
+                </flux:sidebar.item>
+            </flux:sidebar.group>
+
+            <flux:sidebar.group
+                expandable
+                heading="Manajemen"
+                icon="users"
+                :expanded="request()->routeIs('admin.member-cards.*', 'admin.users.*', 'admin.announcements.*', 'admin.settings.*')"
+            >
+                <flux:sidebar.item icon="identification" href="{{ route('admin.member-cards.index') }}" :current="request()->routeIs('admin.member-cards.*')">
+                    Kartu Anggota
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="users" href="{{ route('admin.users.index') }}" :current="request()->routeIs('admin.users.*')">
+                    Pengguna
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="megaphone" href="{{ route('admin.announcements.index') }}" :current="request()->routeIs('admin.announcements.*')">
+                    Pengumuman
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="cog-6-tooth" href="{{ route('admin.settings.index') }}" :current="request()->routeIs('admin.settings.*')">
+                    Pengaturan
+                </flux:sidebar.item>
+            </flux:sidebar.group>
+
+            <flux:sidebar.group expandable heading="Tautan Publik" icon="arrow-top-right-on-square">
+                <flux:sidebar.item icon="book-open" href="{{ route('catalog.index') }}">
+                    Katalog Publik
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="qr-code" href="{{ route('visits.kiosk') }}">
+                    Kiosk Kunjungan
+                </flux:sidebar.item>
+            </flux:sidebar.group>
+        </flux:sidebar.nav>
+
+        <flux:spacer />
+
+        <flux:dropdown position="top" align="start">
+            <flux:sidebar.profile :name="$user->name" :initials="$initials" />
+
+            <flux:menu>
+                <flux:menu.heading>{{ $user->name }}</flux:menu.heading>
+                <div class="px-2 pb-2 text-xs text-zinc-500 dark:text-zinc-400">{{ $user->roleLabel() }} &middot; {{ $user->email ?? $user->nomor_induk }}</div>
+                <flux:menu.separator />
+                <flux:menu.item href="{{ route('admin.settings.index') }}" icon="cog-6-tooth">
+                    Pengaturan
+                </flux:menu.item>
+                <flux:menu.separator />
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" variant="danger" class="w-full">
+                        Keluar
+                    </flux:menu.item>
+                </form>
+            </flux:menu>
+        </flux:dropdown>
+    </flux:sidebar>
+
+    <flux:header class="sticky top-0 z-20 min-h-16 border-b border-zinc-200 bg-white/90 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/90">
+        <div class="flex w-full items-center gap-2 px-4 lg:px-8">
+            <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
+
+            <div class="min-w-0 flex-1">
+                <flux:breadcrumbs class="text-sm">
+                    <flux:breadcrumbs.item href="{{ route('admin.dashboard') }}">Admin</flux:breadcrumbs.item>
+                    @foreach ($crumbs as $crumb)
+                        <flux:breadcrumbs.item>{{ $crumb }}</flux:breadcrumbs.item>
+                    @endforeach
+                </flux:breadcrumbs>
+            </div>
+
+            <div class="flex items-center gap-1">
+                @include('partials.notifications-menu', [
+                    'mode' => 'admin',
+                    'endpoint' => route('admin.notifications'),
+                    'sound' => true,
+                ])
+
+                @include('partials.theme-switcher')
+
+                <flux:dropdown position="bottom" align="end">
+                    <flux:profile
+                        :name="$user->name"
+                        :initials="$initials"
+                        class="max-sm:[&>span]:hidden"
+                        aria-label="Menu akun {{ $user->name }}"
+                    />
+
+                    <flux:menu>
+                        <flux:menu.heading>{{ $user->name }}</flux:menu.heading>
+                        <div class="px-2 pb-2 text-xs text-zinc-500 dark:text-zinc-400">{{ $user->roleLabel() }} &middot; {{ $user->email ?? $user->nomor_induk }}</div>
+                        <flux:menu.separator />
+                        <flux:menu.item href="{{ route('admin.settings.index') }}" icon="cog-6-tooth">
+                            Pengaturan
+                        </flux:menu.item>
+                        <flux:menu.item href="{{ route('home') }}" icon="arrow-top-right-on-square">
+                            Lihat Situs
+                        </flux:menu.item>
+                        <flux:menu.separator />
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" variant="danger" class="w-full">
+                                Keluar
+                            </flux:menu.item>
+                        </form>
+                    </flux:menu>
+                </flux:dropdown>
+            </div>
+        </div>
+    </flux:header>
+
+    <flux:main>
+        @yield('content')
+
+        <footer class="mt-8 border-t border-zinc-200 pt-4 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+            {{ $identity->libraryName() }} &mdash; {{ $identity->schoolName() }}
+        </footer>
+    </flux:main>
+
+    <flux:toast position="top end" />
     @include('partials.confirm-modal')
     @include('partials.flash')
     @stack('scripts')
+    @fluxScripts
 </body>
 </html>

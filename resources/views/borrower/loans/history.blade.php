@@ -3,45 +3,55 @@
 @section('title', 'Riwayat')
 
 @section('content')
-    <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
-        <div>
-            <h1 class="h3 mb-1">Riwayat</h1>
-            <p class="text-muted mb-0">Lihat riwayat peminjaman yang sudah dikembalikan dan pengajuan yang selesai.</p>
-        </div>
-        <a href="{{ route('borrower.loans.index') }}" class="btn btn-outline-primary align-self-md-start">
-            <i class="bi bi-arrow-left-right me-1" aria-hidden="true"></i>Pinjaman Saya
-        </a>
-    </div>
+    <x-page-header title="Riwayat" subtitle="Lihat riwayat peminjaman yang sudah dikembalikan dan pengajuan yang selesai.">
+        <x-slot:actions>
+            <flux:button variant="outline" icon="arrows-right-left" href="{{ route('borrower.loans.index') }}">
+                Pinjaman Saya
+            </flux:button>
+        </x-slot:actions>
+    </x-page-header>
 
-    <ul class="nav nav-pills flex-wrap gap-2 mb-4" role="tablist" aria-label="Jenis riwayat">
-        <li class="nav-item" role="presentation">
-            <a href="{{ route('borrower.loans.history', ['tab' => 'pinjaman']) }}" class="nav-link {{ $tab === 'pinjaman' ? 'active' : '' }}" role="tab" aria-selected="{{ $tab === 'pinjaman' ? 'true' : 'false' }}">
-                <i class="bi bi-clock-history me-1" aria-hidden="true"></i>Riwayat Peminjaman
-                <span class="badge {{ $tab === 'pinjaman' ? 'text-bg-light' : 'text-bg-secondary' }} ms-1">{{ $returnedCount }}</span>
-            </a>
-        </li>
-        <li class="nav-item" role="presentation">
-            <a href="{{ route('borrower.loans.history', ['tab' => 'pengajuan']) }}" class="nav-link {{ $tab === 'pengajuan' ? 'active' : '' }}" role="tab" aria-selected="{{ $tab === 'pengajuan' ? 'true' : 'false' }}">
-                <i class="bi bi-inbox me-1" aria-hidden="true"></i>Riwayat Pengajuan
-                <span class="badge {{ $tab === 'pengajuan' ? 'text-bg-light' : 'text-bg-secondary' }} ms-1">{{ $finishedRequestCount }}</span>
-            </a>
-        </li>
-    </ul>
+    <nav class="mb-4 flex flex-wrap gap-2" aria-label="Jenis riwayat">
+        <a
+            href="{{ route('borrower.loans.history', ['tab' => 'pinjaman']) }}"
+            @class([
+                'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition',
+                'bg-[var(--color-accent)] text-[var(--color-accent-foreground)] shadow-xs' => $tab === 'pinjaman',
+                'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-white/10' => $tab !== 'pinjaman',
+            ])
+            @if ($tab === 'pinjaman') aria-current="page" @endif
+        >
+            <flux:icon.clock variant="mini" class="size-4" />
+            Riwayat Peminjaman
+            <flux:badge :color="$tab === 'pinjaman' ? 'white' : 'zinc'" size="sm">{{ $returnedCount }}</flux:badge>
+        </a>
+        <a
+            href="{{ route('borrower.loans.history', ['tab' => 'pengajuan']) }}"
+            @class([
+                'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition',
+                'bg-[var(--color-accent)] text-[var(--color-accent-foreground)] shadow-xs' => $tab === 'pengajuan',
+                'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-white/10' => $tab !== 'pengajuan',
+            ])
+            @if ($tab === 'pengajuan') aria-current="page" @endif
+        >
+            <flux:icon.inbox variant="mini" class="size-4" />
+            Riwayat Pengajuan
+            <flux:badge :color="$tab === 'pengajuan' ? 'white' : 'zinc'" size="sm">{{ $finishedRequestCount }}</flux:badge>
+        </a>
+    </nav>
 
     @if ($tab === 'pengajuan')
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h2 class="h6 mb-0">Pengajuan Ditolak atau Dibatalkan</h2>
-                <span class="small text-muted">{{ $requestHistory->total() }} data</span>
+        <flux:card class="p-0!">
+            <div class="flex items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+                <flux:heading size="lg" level="2">Pengajuan Ditolak atau Dibatalkan</flux:heading>
+                <flux:badge color="zinc" size="sm">{{ $requestHistory->total() }} data</flux:badge>
             </div>
 
             @if ($requestHistory->isEmpty())
-                <div class="card-body">
-                    <x-empty-state icon="inbox" title="Belum ada riwayat pengajuan" message="Pengajuan yang ditolak atau dibatalkan akan tampil di sini." />
-                </div>
+                <x-empty-state icon="inbox" title="Belum ada riwayat pengajuan" message="Pengajuan yang ditolak atau dibatalkan akan tampil di sini." />
             @else
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+                <div class="overflow-x-auto" data-scrollable-region>
+                    <table class="data-table">
                         <thead>
                             <tr>
                                 <th scope="col">Buku</th>
@@ -54,12 +64,12 @@
                             @foreach ($requestHistory as $loanRequest)
                                 <tr>
                                     <td>
-                                        <a href="{{ route('catalog.show', $loanRequest->book) }}" class="fw-semibold text-reset">{{ $loanRequest->book->title }}</a>
-                                        <div class="small text-muted">#{{ $loanRequest->reference }}</div>
+                                        <a href="{{ route('catalog.show', $loanRequest->book) }}" class="font-semibold hover:underline">{{ $loanRequest->book->title }}</a>
+                                        <div class="text-xs text-zinc-500 dark:text-zinc-400">#{{ $loanRequest->reference }}</div>
                                     </td>
-                                    <td class="small text-muted">{{ $loanRequest->requested_at->locale('id')->translatedFormat('d M Y, H:i') }}</td>
+                                    <td class="text-xs whitespace-nowrap text-zinc-500 dark:text-zinc-400">{{ $loanRequest->requested_at->locale('id')->translatedFormat('d M Y, H:i') }}</td>
                                     <td><x-status-badge :label="$loanRequest->statusLabel()" :variant="$loanRequest->statusVariant()" /></td>
-                                    <td class="small text-muted">
+                                    <td class="text-xs text-zinc-500 dark:text-zinc-400">
                                         {{ $loanRequest->rejection_reason ?: ($loanRequest->notes ?: '-') }}
                                     </td>
                                 </tr>
@@ -68,28 +78,26 @@
                     </table>
                 </div>
 
-                <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <span class="small text-muted">Menampilkan {{ $requestHistory->firstItem() }}&ndash;{{ $requestHistory->lastItem() }} dari {{ $requestHistory->total() }} pengajuan</span>
+                <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 px-5 py-4 dark:border-white/10">
+                    <span class="text-xs text-zinc-500 dark:text-zinc-400">Menampilkan {{ $requestHistory->firstItem() }}&ndash;{{ $requestHistory->lastItem() }} dari {{ $requestHistory->total() }} pengajuan</span>
                     {{ $requestHistory->links() }}
                 </div>
             @endif
-        </div>
+        </flux:card>
     @else
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h2 class="h6 mb-0">Peminjaman yang Sudah Dikembalikan</h2>
-                <span class="small text-muted">{{ $loanHistory->total() }} data</span>
+        <flux:card class="p-0!">
+            <div class="flex items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+                <flux:heading size="lg" level="2">Peminjaman yang Sudah Dikembalikan</flux:heading>
+                <flux:badge color="zinc" size="sm">{{ $loanHistory->total() }} data</flux:badge>
             </div>
 
             @if ($loanHistory->isEmpty())
-                <div class="card-body">
-                    <x-empty-state icon="clock-history" title="Belum ada riwayat peminjaman" message="Peminjaman yang sudah dikembalikan akan tampil di sini.">
-                        <a href="{{ route('catalog.index') }}" class="btn btn-primary btn-sm">Jelajahi Katalog</a>
-                    </x-empty-state>
-                </div>
+                <x-empty-state icon="clock" title="Belum ada riwayat peminjaman" message="Peminjaman yang sudah dikembalikan akan tampil di sini.">
+                    <flux:button variant="primary" size="sm" href="{{ route('catalog.index') }}">Jelajahi Katalog</flux:button>
+                </x-empty-state>
             @else
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+                <div class="overflow-x-auto" data-scrollable-region>
+                    <table class="data-table">
                         <thead>
                             <tr>
                                 <th scope="col">Buku</th>
@@ -103,16 +111,16 @@
                             @foreach ($loanHistory as $loan)
                                 <tr>
                                     <td>
-                                        <div class="fw-semibold">{{ $loan->copy->book->title }}</div>
-                                        <div class="small text-muted">{{ $loan->copy->inventory_code }} &middot; #{{ $loan->reference }}</div>
+                                        <div class="font-semibold">{{ $loan->copy->book->title }}</div>
+                                        <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $loan->copy->inventory_code }} &middot; #{{ $loan->reference }}</div>
                                     </td>
-                                    <td class="small text-muted">{{ $loan->borrowed_at->locale('id')->translatedFormat('d M Y') }}</td>
-                                    <td class="small text-muted">{{ $loan->returned_at?->locale('id')->translatedFormat('d M Y') ?? '-' }}</td>
+                                    <td class="text-xs whitespace-nowrap text-zinc-500 dark:text-zinc-400">{{ $loan->borrowed_at->locale('id')->translatedFormat('d M Y') }}</td>
+                                    <td class="text-xs whitespace-nowrap text-zinc-500 dark:text-zinc-400">{{ $loan->returned_at?->locale('id')->translatedFormat('d M Y') ?? '-' }}</td>
                                     <td>
                                         @if ($loan->return_condition)
                                             <x-status-badge :label="$loan->return_condition->label()" :variant="$loan->return_condition->badgeVariant()" />
                                         @else
-                                            <span class="small text-muted">-</span>
+                                            <span class="text-xs text-zinc-500 dark:text-zinc-400">-</span>
                                         @endif
                                     </td>
                                     <td><x-status-badge :label="$loan->statusLabel()" :variant="$loan->statusVariant()" /></td>
@@ -122,11 +130,11 @@
                     </table>
                 </div>
 
-                <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <span class="small text-muted">Menampilkan {{ $loanHistory->firstItem() }}&ndash;{{ $loanHistory->lastItem() }} dari {{ $loanHistory->total() }} peminjaman</span>
+                <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 px-5 py-4 dark:border-white/10">
+                    <span class="text-xs text-zinc-500 dark:text-zinc-400">Menampilkan {{ $loanHistory->firstItem() }}&ndash;{{ $loanHistory->lastItem() }} dari {{ $loanHistory->total() }} peminjaman</span>
                     {{ $loanHistory->links() }}
                 </div>
             @endif
-        </div>
+        </flux:card>
     @endif
 @endsection

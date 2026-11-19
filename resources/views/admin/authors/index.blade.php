@@ -6,49 +6,42 @@
 @section('content')
     <x-page-header title="Penulis" subtitle="Kelola data penulis yang terhubung dengan koleksi.">
         <x-slot:actions>
-            <a href="{{ route('admin.authors.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Tambah Penulis
-            </a>
+            <flux:button variant="primary" icon="plus" href="{{ route('admin.authors.create') }}">
+                Tambah Penulis
+            </flux:button>
         </x-slot:actions>
     </x-page-header>
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <form method="GET" action="{{ route('admin.authors.index') }}" class="row g-2 align-items-end">
-                <div class="col-12 col-md-8">
-                    <label for="q" class="form-label">Cari penulis</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-search" aria-hidden="true"></i></span>
-                        <input type="search" id="q" name="q" value="{{ $search }}" class="form-control" placeholder="Nama penulis">
-                    </div>
-                </div>
-                <div class="col-12 col-md-4 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-grow-1">Cari</button>
-                    @if ($search !== '')
-                        <a href="{{ route('admin.authors.index') }}" class="btn btn-outline-secondary" aria-label="Reset pencarian">
-                            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                        </a>
-                    @endif
-                </div>
-            </form>
-        </div>
-    </div>
+    <flux:card class="mb-4">
+        <form method="GET" action="{{ route('admin.authors.index') }}" class="grid items-end gap-3 md:grid-cols-4">
+            <div class="md:col-span-3">
+                <flux:field>
+                    <flux:label for="q">Cari penulis</flux:label>
+                    <flux:input type="search" id="q" name="q" value="{{ $search }}" icon="magnifying-glass" placeholder="Nama penulis" />
+                </flux:field>
+            </div>
+            <div class="flex gap-2">
+                <flux:button type="submit" variant="primary" class="flex-1">Cari</flux:button>
+                @if ($search !== '')
+                    <flux:button variant="outline" href="{{ route('admin.authors.index') }}" icon="arrow-path" aria-label="Reset pencarian" />
+                @endif
+            </div>
+        </form>
+    </flux:card>
 
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h6 mb-0">Daftar Penulis</h2>
-            <span class="small text-muted">{{ $authors->total() }} penulis</span>
+    <flux:card class="p-0!">
+        <div class="flex items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+            <flux:heading size="lg" level="2">Daftar Penulis</flux:heading>
+            <flux:badge color="zinc" size="sm">{{ $authors->total() }} penulis</flux:badge>
         </div>
 
         @if ($authors->isEmpty())
-            <div class="card-body">
-                <x-empty-state icon="pen" title="Belum ada penulis" message="Tambahkan penulis agar dapat dihubungkan dengan buku.">
-                    <a href="{{ route('admin.authors.create') }}" class="btn btn-primary btn-sm">Tambah Penulis</a>
-                </x-empty-state>
-            </div>
+            <x-empty-state icon="pen" title="Belum ada penulis" message="Tambahkan penulis agar dapat dihubungkan dengan buku.">
+                <flux:button variant="primary" size="sm" href="{{ route('admin.authors.create') }}">Tambah Penulis</flux:button>
+            </x-empty-state>
         @else
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+            <div class="overflow-x-auto" data-scrollable-region>
+                <table class="data-table">
                     <thead>
                         <tr>
                             <th scope="col">Nama</th>
@@ -60,17 +53,17 @@
                     <tbody>
                         @foreach ($authors as $author)
                             <tr>
-                                <td class="fw-semibold">{{ $author->name }}</td>
-                                <td class="small text-muted">{{ \Illuminate\Support\Str::limit($author->bio ?: '-', 90) }}</td>
+                                <td class="font-semibold">{{ $author->name }}</td>
+                                <td class="text-xs text-zinc-500 dark:text-zinc-400">{{ \Illuminate\Support\Str::limit($author->bio ?: '-', 90) }}</td>
                                 <td class="text-center">{{ $author->books_count }}</td>
                                 <td class="text-end">
-                                    <div class="d-inline-flex gap-1">
-                                        <a href="{{ route('admin.authors.edit', $author) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                    <div class="inline-flex gap-1">
+                                        <flux:button size="sm" variant="outline" href="{{ route('admin.authors.edit', $author) }}">Edit</flux:button>
                                         @if ($author->books_count === 0)
                                             <form method="POST" action="{{ route('admin.authors.destroy', $author) }}" data-confirm="Hapus penulis {{ $author->name }}?">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                                <flux:button type="submit" size="sm" variant="danger">Hapus</flux:button>
                                             </form>
                                         @endif
                                     </div>
@@ -81,12 +74,12 @@
                 </table>
             </div>
 
-            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <span class="small text-muted">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 px-5 py-4 dark:border-white/10">
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">
                     Menampilkan {{ $authors->firstItem() }}&ndash;{{ $authors->lastItem() }} dari {{ $authors->total() }} penulis
                 </span>
                 {{ $authors->links() }}
             </div>
         @endif
-    </div>
+    </flux:card>
 @endsection

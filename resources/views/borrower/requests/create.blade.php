@@ -3,50 +3,37 @@
 @section('title', 'Ajukan Peminjaman')
 
 @section('content')
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('borrower.dashboard') }}">Beranda</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('catalog.index') }}">Katalog</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('catalog.show', $book) }}">Detail Buku</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Ajukan Peminjaman</li>
-        </ol>
-    </nav>
+    <flux:breadcrumbs class="mb-4">
+        <flux:breadcrumbs.item href="{{ route('borrower.dashboard') }}">Beranda</flux:breadcrumbs.item>
+        <flux:breadcrumbs.item href="{{ route('catalog.index') }}">Katalog</flux:breadcrumbs.item>
+        <flux:breadcrumbs.item href="{{ route('catalog.show', $book) }}">Detail Buku</flux:breadcrumbs.item>
+        <flux:breadcrumbs.item>Ajukan Peminjaman</flux:breadcrumbs.item>
+    </flux:breadcrumbs>
 
-    <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
-        <div>
-            <h1 class="h3 mb-1">Ajukan Peminjaman</h1>
-            <p class="text-muted mb-0">Periksa ringkasan buku dan ketentuan peminjaman sebelum mengirim pengajuan.</p>
-        </div>
-        <a href="{{ route('catalog.show', $book) }}" class="btn btn-outline-secondary align-self-md-start">
-            <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Kembali ke Detail Buku
-        </a>
-    </div>
+    <x-page-header title="Ajukan Peminjaman" subtitle="Periksa ringkasan buku dan ketentuan peminjaman sebelum mengirim pengajuan.">
+        <x-slot:actions>
+            <flux:button variant="outline" icon="arrow-left" href="{{ route('catalog.show', $book) }}">
+                Kembali ke Detail Buku
+            </flux:button>
+        </x-slot:actions>
+    </x-page-header>
 
-    @if ($errors->any())
-        <div class="alert alert-danger" role="alert">
-            <div class="fw-semibold mb-1">Pengajuan belum dapat dikirim:</div>
-            <ul class="mb-0 ps-3">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    <x-form-errors title="Pengajuan belum dapat dikirim:" />
 
-    <div class="row g-4">
-        <div class="col-12 col-lg-7">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="h6 mb-0">Ringkasan Buku</h2>
+    <div class="grid gap-4 xl:grid-cols-5">
+        <div class="xl:col-span-3">
+            <flux:card class="p-0!">
+                <div class="border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+                    <flux:heading size="lg" level="2">Ringkasan Buku</flux:heading>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex gap-3">
-                        <img src="{{ $book->cover_url }}" alt="Sampul {{ $book->title }}" class="admin-cover" style="width: 88px; height: 120px;">
+                <div class="p-5">
+                    <div class="flex gap-3">
+                        <img src="{{ $book->cover_url }}" alt="Sampul {{ $book->title }}" class="h-[120px] w-[88px] shrink-0 rounded-md object-cover">
                         <div class="min-w-0">
-                            <h3 class="h5 mb-1">{{ $book->title }}</h3>
-                            <p class="text-muted mb-2">{{ $book->authors_label ?: 'Penulis tidak diketahui' }}</p>
-                            <div class="d-flex flex-wrap gap-2">
-                                <span class="badge text-bg-primary">{{ $book->category?->name ?? 'Tanpa kategori' }}</span>
+                            <flux:heading size="lg" level="3" class="text-lg!">{{ $book->title }}</flux:heading>
+                            <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $book->authors_label ?: 'Penulis tidak diketahui' }}</p>
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                <flux:badge color="sky">{{ $book->category?->name ?? 'Tanpa kategori' }}</flux:badge>
                                 <x-status-badge
                                     :label="$eligibility['available_copies'].' eksemplar tersedia'"
                                     :variant="$eligibility['available_copies'] > 0 ? 'success' : 'secondary'"
@@ -56,96 +43,98 @@
                         </div>
                     </div>
 
-                    <dl class="row small mt-4 mb-0">
-                        <dt class="col-sm-4 text-muted">Penerbit</dt>
-                        <dd class="col-sm-8">{{ $book->publisher?->name ?? '-' }}</dd>
+                    <dl class="mt-5 grid gap-x-4 gap-y-2 text-sm sm:grid-cols-4">
+                        <dt class="text-zinc-500 dark:text-zinc-400">Penerbit</dt>
+                        <dd class="sm:col-span-3">{{ $book->publisher?->name ?? '-' }}</dd>
 
-                        <dt class="col-sm-4 text-muted">Tahun terbit</dt>
-                        <dd class="col-sm-8">{{ $book->publication_year ?? '-' }}</dd>
+                        <dt class="text-zinc-500 dark:text-zinc-400">Tahun terbit</dt>
+                        <dd class="sm:col-span-3">{{ $book->publication_year ?? '-' }}</dd>
 
-                        <dt class="col-sm-4 text-muted">ISBN</dt>
-                        <dd class="col-sm-8">{{ $book->isbn ?? 'Tidak tersedia' }}</dd>
+                        <dt class="text-zinc-500 dark:text-zinc-400">ISBN</dt>
+                        <dd class="sm:col-span-3">{{ $book->isbn ?? 'Tidak tersedia' }}</dd>
 
-                        <dt class="col-sm-4 text-muted">Bahasa</dt>
-                        <dd class="col-sm-8">{{ $book->language }}</dd>
+                        <dt class="text-zinc-500 dark:text-zinc-400">Bahasa</dt>
+                        <dd class="sm:col-span-3">{{ $book->language }}</dd>
                     </dl>
                 </div>
-            </div>
+            </flux:card>
 
-            <div class="alert alert-info mt-4" role="alert">
-                <div class="fw-semibold mb-1"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>Pengajuan belum berarti buku dipinjam.</div>
-                Buku baru resmi dipinjam setelah admin mencatat penyerahan (checkout) dan menetapkan tanggal jatuh tempo.
-            </div>
+            <flux:callout icon="information-circle" class="mt-4">
+                <flux:callout.heading>Pengajuan belum berarti buku dipinjam.</flux:callout.heading>
+                <flux:callout.text>Buku baru resmi dipinjam setelah admin mencatat penyerahan (checkout) dan menetapkan tanggal jatuh tempo.</flux:callout.text>
+            </flux:callout>
         </div>
 
-        <div class="col-12 col-lg-5">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h2 class="h6 mb-0">Ketentuan Peminjaman</h2>
+        <div class="space-y-4 xl:col-span-2">
+            <flux:card class="p-0!">
+                <div class="border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+                    <flux:heading size="lg" level="2">Ketentuan Peminjaman</flux:heading>
                 </div>
-                <div class="card-body">
-                    <dl class="row small mb-0">
-                        <dt class="col-7 text-muted">Kuota terpakai</dt>
-                        <dd class="col-5 text-end">{{ $eligibility['quota_used'] }} / {{ $eligibility['quota_max'] }}</dd>
+                <div class="p-5">
+                    <dl class="grid grid-cols-3 gap-x-3 gap-y-2 text-sm">
+                        <dt class="text-zinc-500 dark:text-zinc-400">Kuota terpakai</dt>
+                        <dd class="col-span-2 text-end">{{ $eligibility['quota_used'] }} / {{ $eligibility['quota_max'] }}</dd>
 
-                        <dt class="col-7 text-muted">Sisa kuota</dt>
-                        <dd class="col-5 text-end">{{ $eligibility['remaining_quota'] }} eksemplar</dd>
+                        <dt class="text-zinc-500 dark:text-zinc-400">Sisa kuota</dt>
+                        <dd class="col-span-2 text-end">{{ $eligibility['remaining_quota'] }} eksemplar</dd>
 
-                        <dt class="col-7 text-muted">Durasi pinjam</dt>
-                        <dd class="col-5 text-end">{{ $eligibility['duration_days'] }} hari</dd>
+                        <dt class="text-zinc-500 dark:text-zinc-400">Durasi pinjam</dt>
+                        <dd class="col-span-2 text-end">{{ $eligibility['duration_days'] }} hari</dd>
 
-                        <dt class="col-7 text-muted">Batas pengambilan</dt>
-                        <dd class="col-5 text-end">{{ $eligibility['pickup_deadline_days'] }} hari setelah disetujui</dd>
+                        <dt class="text-zinc-500 dark:text-zinc-400">Batas pengambilan</dt>
+                        <dd class="col-span-2 text-end">{{ $eligibility['pickup_deadline_days'] }} hari setelah disetujui</dd>
                     </dl>
                 </div>
-            </div>
+            </flux:card>
 
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="h6 mb-0">Form Pengajuan</h2>
+            <flux:card class="p-0!">
+                <div class="border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+                    <flux:heading size="lg" level="2">Form Pengajuan</flux:heading>
                 </div>
-                <div class="card-body">
+                <div class="p-5">
                     @if ($eligibility['allowed'])
                         <form method="POST" action="{{ route('borrower.requests.store', $book) }}" data-loading>
                             @csrf
 
-                            <div class="mb-3">
-                                <label for="notes" class="form-label">Catatan untuk admin <span class="text-muted">(opsional)</span></label>
-                                <textarea id="notes" name="notes" rows="3" maxlength="500" class="form-control @error('notes') is-invalid @enderror" placeholder="Contoh: dibutuhkan untuk tugas Bahasa Indonesia.">{{ old('notes') }}</textarea>
-                                @error('notes')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                            <flux:field class="mb-4">
+                                <flux:label for="notes">Catatan untuk admin <span class="font-normal text-zinc-500">(opsional)</span></flux:label>
+                                <flux:textarea id="notes" name="notes" rows="3" maxlength="500" placeholder="Contoh: dibutuhkan untuk tugas Bahasa Indonesia.">{{ old('notes') }}</flux:textarea>
+                                <flux:error name="notes" />
+                            </flux:field>
 
-                            <button type="submit" class="btn btn-primary w-100" data-loading-text="Mengirim pengajuan...">
-                                <i class="bi bi-send me-1" aria-hidden="true"></i>Kirim Pengajuan
-                            </button>
-                            <a href="{{ route('catalog.show', $book) }}" class="btn btn-outline-secondary w-100 mt-2">Batal</a>
+                            <flux:button type="submit" variant="primary" icon="paper-airplane" class="w-full" data-loading-text="Mengirim pengajuan...">
+                                Kirim Pengajuan
+                            </flux:button>
+                            <flux:button variant="outline" href="{{ route('catalog.show', $book) }}" class="mt-2 w-full">
+                                Batal
+                            </flux:button>
                         </form>
                     @else
-                        <div class="alert alert-warning mb-3" role="alert">
-                            <div class="fw-semibold mb-1">Pengajuan tidak dapat dikirim.</div>
-                            {{ $eligibility['reason'] }}
-                        </div>
+                        <flux:callout variant="warning" icon="exclamation-triangle" class="mb-4">
+                            <flux:callout.heading>Pengajuan tidak dapat dikirim.</flux:callout.heading>
+                            <flux:callout.text>{{ $eligibility['reason'] }}</flux:callout.text>
+                        </flux:callout>
 
                         @if ($eligibility['open_request'])
-                            <div class="d-flex flex-column flex-sm-row gap-2">
-                                <a href="{{ route('borrower.loans.index', ['tab' => $eligibility['open_request']->isApproved() ? 'disetujui' : 'menunggu']) }}" class="btn btn-outline-primary">
+                            <div class="flex flex-col gap-2 sm:flex-row">
+                                <flux:button variant="outline" href="{{ route('borrower.loans.index', ['tab' => $eligibility['open_request']->isApproved() ? 'disetujui' : 'menunggu']) }}">
                                     Lihat Pengajuan
-                                </a>
+                                </flux:button>
                                 @can('cancel', $eligibility['open_request'])
                                     <form method="POST" action="{{ route('borrower.requests.cancel', $eligibility['open_request']) }}" data-confirm="Batalkan pengajuan untuk buku ini?">
                                         @csrf
-                                        <button type="submit" class="btn btn-outline-danger w-100">Batalkan Pengajuan</button>
+                                        <flux:button type="submit" variant="danger" class="w-full">Batalkan Pengajuan</flux:button>
                                     </form>
                                 @endcan
                             </div>
                         @endif
 
-                        <a href="{{ route('catalog.index') }}" class="btn btn-outline-secondary w-100 mt-2">Kembali ke Katalog</a>
+                        <flux:button variant="outline" href="{{ route('catalog.index') }}" class="mt-2 w-full">
+                            Kembali ke Katalog
+                        </flux:button>
                     @endif
                 </div>
-            </div>
+            </flux:card>
         </div>
     </div>
 @endsection

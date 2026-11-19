@@ -1,8 +1,20 @@
 @props(['label', 'variant' => 'secondary', 'icon' => null])
 
-<span {{ $attributes->class(['badge', 'text-bg-'.$variant, 'd-inline-flex', 'align-items-center', 'gap-1']) }}>
+@php
+    $color = match ($variant) {
+        'primary' => 'sky',
+        'success' => 'green',
+        'info' => 'cyan',
+        'warning' => 'amber',
+        'danger' => 'red',
+        'secondary' => 'zinc',
+        default => $variant,
+    };
+@endphp
+
+<flux:badge :color="$color" size="sm" data-variant="{{ $variant }}" {{ $attributes }}>
     @if ($icon)
-        <i class="bi bi-{{ $icon }}" aria-hidden="true"></i>
+        <x-icon :name="$icon" variant="mini" class="size-3.5" />
     @endif
     {{ $label }}
-</span>
+</flux:badge>

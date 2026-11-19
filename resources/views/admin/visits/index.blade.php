@@ -9,198 +9,167 @@
         subtitle="Scan kartu anggota untuk mencatat kunjungan guru dan siswa."
     >
         <x-slot:actions>
-            <a href="{{ route('admin.member-cards.index') }}" class="btn btn-outline-primary">
-                <i class="bi bi-person-vcard me-1" aria-hidden="true"></i>Kartu Anggota
-            </a>
+            <flux:button variant="outline" icon="identification" href="{{ route('admin.member-cards.index') }}">
+                Kartu Anggota
+            </flux:button>
         </x-slot:actions>
     </x-page-header>
 
-    <div class="row row-cols-2 row-cols-md-4 g-2 mb-4">
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body py-3">
-                    <div class="fs-4 fw-bold">{{ $counts['total'] }}</div>
-                    <div class="small text-muted">Kunjungan hari ini</div>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body py-3">
-                    <div class="fs-4 fw-bold">{{ $counts['unique'] }}</div>
-                    <div class="small text-muted">Pengunjung unik</div>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body py-3">
-                    <div class="fs-4 fw-bold">{{ $counts['guru'] }}</div>
-                    <div class="small text-muted">Kunjungan guru</div>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body py-3">
-                    <div class="fs-4 fw-bold">{{ $counts['siswa'] }}</div>
-                    <div class="small text-muted">Kunjungan siswa</div>
-                </div>
-            </div>
-        </div>
+    <div class="mb-4 grid grid-cols-2 gap-2 md:grid-cols-4">
+        @foreach ([
+            ['value' => $counts['total'], 'label' => 'Kunjungan hari ini'],
+            ['value' => $counts['unique'], 'label' => 'Pengunjung unik'],
+            ['value' => $counts['guru'], 'label' => 'Kunjungan guru'],
+            ['value' => $counts['siswa'], 'label' => 'Kunjungan siswa'],
+        ] as $stat)
+            <flux:card class="py-3!">
+                <div class="text-2xl font-bold">{{ $stat['value'] }}</div>
+                <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $stat['label'] }}</div>
+            </flux:card>
+        @endforeach
     </div>
 
-    <div class="card mb-3">
-        <div class="card-header">
-            <h2 class="h6 mb-0">Scan Kartu Anggota</h2>
+    <flux:card class="mb-4 p-0!">
+        <div class="border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+            <flux:heading size="lg" level="2">Scan Kartu Anggota</flux:heading>
         </div>
-        <div class="card-body">
-            <form method="POST" action="{{ route('admin.visits.store') }}" class="row g-2 align-items-end" data-loading>
+        <div class="p-5">
+            <form method="POST" action="{{ route('admin.visits.store') }}" class="grid items-end gap-3 lg:grid-cols-4" data-loading>
                 @csrf
 
-                <div class="col-12 col-lg-8">
-                    <label for="nomor_induk" class="form-label">Nomor induk</label>
-                    <div class="input-group input-group-lg">
-                        <span class="input-group-text"><i class="bi bi-upc-scan" aria-hidden="true"></i></span>
-                        <input
+                <div class="lg:col-span-3">
+                    <flux:field>
+                        <flux:label for="nomor_induk">Nomor induk</flux:label>
+                        <flux:input
                             type="text"
                             id="nomor_induk"
                             name="nomor_induk"
                             value="{{ old('nomor_induk') }}"
-                            class="form-control @error('nomor_induk') is-invalid @enderror"
+                            icon="qr-code"
+                            size="lg"
                             placeholder="Scan barcode atau ketik nomor induk"
                             autocomplete="off"
                             maxlength="50"
                             autofocus
                             required
-                        >
-                        @error('nomor_induk')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="form-text">
-                        Arahkan kursor ke kolom ini lalu scan barcode pada kartu anggota. Scanner USB mengirim Enter otomatis.
-                    </div>
+                        />
+                        <flux:description>
+                            Arahkan kursor ke kolom ini lalu scan barcode pada kartu anggota. Scanner USB mengirim Enter otomatis.
+                        </flux:description>
+                        <flux:error name="nomor_induk" />
+                    </flux:field>
                 </div>
 
-                <div class="col-12 col-lg-4">
-                    <button type="submit" class="btn btn-primary btn-lg w-100" data-loading-text="Mencatat...">
-                        <i class="bi bi-check2-circle me-1" aria-hidden="true"></i>Catat Kunjungan
-                    </button>
-                </div>
+                <flux:button type="submit" variant="primary" icon="check-circle" class="h-10 w-full" data-loading-text="Mencatat...">
+                    Catat Kunjungan
+                </flux:button>
             </form>
         </div>
-    </div>
+    </flux:card>
 
     @if ($member)
-        <div class="card border-primary mb-3">
-            <div class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center gap-2">
-                <h2 class="h6 mb-0">Anggota yang Baru Dipindai</h2>
-                <span class="badge text-bg-primary">{{ $member->roleLabel() }}</span>
+        <flux:card class="mb-4 border-s-4! border-s-[var(--color-accent)]!">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-zinc-100 pb-4 dark:border-white/10">
+                <flux:heading size="lg" level="2">Anggota yang Baru Dipindai</flux:heading>
+                <flux:badge color="sky">{{ $member->roleLabel() }}</flux:badge>
             </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-12 col-lg-4">
-                        <div class="fw-semibold fs-5">{{ $member->name }}</div>
-                        <div class="text-muted">{{ $member->nomor_induk }}</div>
-                        <div class="small text-muted mt-1">
-                            {{ $member->isGuru() ? ($member->unit_kerja ?? 'Unit kerja belum diisi') : ($member->kelas ?? 'Kelas belum diisi') }}
+            <div class="grid gap-5 lg:grid-cols-3">
+                <div>
+                    <div class="text-lg font-semibold">{{ $member->name }}</div>
+                    <div class="text-zinc-500 dark:text-zinc-400">{{ $member->nomor_induk }}</div>
+                    <div class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                        {{ $member->isGuru() ? ($member->unit_kerja ?? 'Unit kerja belum diisi') : ($member->kelas ?? 'Kelas belum diisi') }}
+                    </div>
+                    <div class="mt-2">
+                        <x-status-badge :label="$member->statusLabel()" :variant="$member->status->badgeVariant()" />
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2">
+                    <div class="mb-3 grid grid-cols-2 gap-2">
+                        <div class="rounded-lg border border-zinc-200 p-3 dark:border-zinc-700">
+                            <div class="text-lg font-bold">{{ $member->loans->count() }}</div>
+                            <div class="text-xs text-zinc-500 dark:text-zinc-400">Pinjaman aktif</div>
                         </div>
-                        <div class="mt-2">
-                            <x-status-badge :label="$member->statusLabel()" :variant="$member->status->badgeVariant()" />
+                        <div class="rounded-lg border border-zinc-200 p-3 dark:border-zinc-700">
+                            <div class="text-lg font-bold text-rose-600 dark:text-rose-400">{{ $member->loans->filter(fn ($loan) => $loan->isOverdue())->count() }}</div>
+                            <div class="text-xs text-zinc-500 dark:text-zinc-400">Terlambat</div>
                         </div>
                     </div>
 
-                    <div class="col-12 col-lg-8">
-                        <div class="row row-cols-2 g-2 mb-3">
-                            <div class="col">
-                                <div class="border rounded p-2">
-                                    <div class="fs-5 fw-bold">{{ $member->loans->count() }}</div>
-                                    <div class="small text-muted">Pinjaman aktif</div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="border rounded p-2">
-                                    <div class="fs-5 fw-bold text-danger">{{ $member->loans->filter(fn ($loan) => $loan->isOverdue())->count() }}</div>
-                                    <div class="small text-muted">Terlambat</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        @if ($member->loans->isEmpty())
-                            <p class="small text-muted mb-0">Tidak ada pinjaman aktif.</p>
-                        @else
-                            <div class="table-responsive">
-                                <table class="table table-sm align-middle mb-0">
-                                    <thead>
+                    @if ($member->loans->isEmpty())
+                        <flux:text>Tidak ada pinjaman aktif.</flux:text>
+                    @else
+                        <div class="overflow-x-auto" data-scrollable-region>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Buku</th>
+                                        <th scope="col">Jatuh Tempo</th>
+                                        <th scope="col">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($member->loans as $loan)
                                         <tr>
-                                            <th scope="col">Buku</th>
-                                            <th scope="col">Jatuh Tempo</th>
-                                            <th scope="col">Status</th>
+                                            <td>
+                                                <div>{{ $loan->copy->book->title }}</div>
+                                                <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $loan->copy->inventory_code }}</div>
+                                            </td>
+                                            <td class="text-xs">{{ $loan->due_at?->locale('id')->translatedFormat('d M Y') ?? '-' }}</td>
+                                            <td>
+                                                <x-status-badge :label="$loan->statusLabel()" :variant="$loan->isOverdue() ? 'danger' : 'info'" />
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($member->loans as $loan)
-                                            <tr>
-                                                <td>
-                                                    <div>{{ $loan->copy->book->title }}</div>
-                                                    <div class="small text-muted">{{ $loan->copy->inventory_code }}</div>
-                                                </td>
-                                                <td class="small">{{ $loan->due_at?->locale('id')->translatedFormat('d M Y') ?? '-' }}</td>
-                                                <td>
-                                                    <x-status-badge :label="$loan->statusLabel()" :variant="$loan->isOverdue() ? 'danger' : 'info'" />
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @endif
-
-                        <div class="d-flex flex-wrap gap-2 mt-3">
-                            <a href="{{ route('admin.users.card', $member) }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-person-vcard me-1" aria-hidden="true"></i>Cetak Kartu
-                            </a>
-                            <a href="{{ route('admin.loans.index', ['q' => $member->nomor_induk]) }}" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-arrow-left-right me-1" aria-hidden="true"></i>Lihat Pinjaman
-                            </a>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
+                    @endif
+
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <flux:button size="sm" variant="outline" icon="printer" href="{{ route('admin.users.card', $member) }}" target="_blank" rel="noopener">
+                            Cetak Kartu
+                        </flux:button>
+                        <flux:button size="sm" variant="outline" icon="arrows-right-left" href="{{ route('admin.loans.index', ['q' => $member->nomor_induk]) }}">
+                            Lihat Pinjaman
+                        </flux:button>
                     </div>
                 </div>
             </div>
-        </div>
+        </flux:card>
     @endif
 
-    <div class="card overflow-hidden">
-        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
-            <h2 class="h6 mb-0">Kunjungan Hari Ini</h2>
-            <div class="d-flex flex-wrap align-items-center gap-2">
-                <form method="GET" action="{{ route('admin.visits.index') }}" class="d-flex align-items-center gap-2">
-                    <label for="sumber" class="form-label mb-0 small text-muted">Sumber</label>
-                    <select id="sumber" name="sumber" class="form-select form-select-sm" data-auto-submit>
-                        <option value="">Semua sumber</option>
-                        @foreach (\App\Enums\VisitSource::cases() as $source)
-                            <option value="{{ $source->value }}" @selected($sourceFilter === $source->value)>
-                                {{ $source->label() }}
-                            </option>
-                        @endforeach
-                    </select>
+    <flux:card class="p-0!">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+            <flux:heading size="lg" level="2">Kunjungan Hari Ini</flux:heading>
+            <div class="flex flex-wrap items-center gap-2">
+                <form method="GET" action="{{ route('admin.visits.index') }}" class="flex items-center gap-2">
+                    <label for="sumber" class="text-xs text-zinc-500 dark:text-zinc-400">Sumber</label>
+                    <div class="w-40" data-auto-submit>
+                        <flux:select id="sumber" name="sumber" size="sm">
+                            <option value="">Semua sumber</option>
+                            @foreach (\App\Enums\VisitSource::cases() as $source)
+                                <option value="{{ $source->value }}" @selected($sourceFilter === $source->value)>
+                                    {{ $source->label() }}
+                                </option>
+                            @endforeach
+                        </flux:select>
+                    </div>
                 </form>
-                <span class="small text-muted">{{ now()->locale('id')->translatedFormat('l, d F Y') }}</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">{{ now()->locale('id')->translatedFormat('l, d F Y') }}</span>
             </div>
         </div>
 
         @if ($visits->isEmpty())
-            <div class="card-body">
-                <x-empty-state
-                    icon="person-check"
-                    title="Belum ada kunjungan"
-                    message="Kunjungan yang tercatat hari ini akan tampil di sini."
-                />
-            </div>
+            <x-empty-state
+                icon="person-check"
+                title="Belum ada kunjungan"
+                message="Kunjungan yang tercatat hari ini akan tampil di sini."
+            />
         @else
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+            <div class="overflow-x-auto" data-scrollable-region>
+                <table class="data-table">
                     <thead>
                         <tr>
                             <th scope="col">Waktu</th>
@@ -216,25 +185,22 @@
                     <tbody>
                         @foreach ($visits as $visit)
                             <tr>
-                                <td class="fw-semibold">{{ $visit->visited_at->format('H:i') }}</td>
+                                <td class="font-semibold">{{ $visit->visited_at->format('H:i') }}</td>
                                 <td>{{ $visit->user->name }}</td>
                                 <td>{{ $visit->user->nomor_induk }}</td>
                                 <td>
-                                    <span class="badge text-bg-light border">{{ $visit->user->roleLabel() }}</span>
+                                    <flux:badge color="zinc" size="sm">{{ $visit->user->roleLabel() }}</flux:badge>
                                 </td>
                                 <td>
                                     <x-status-badge :label="$visit->source->label()" :variant="$visit->source->badgeVariant()" />
                                 </td>
-                                <td class="small text-muted">{{ $visit->user->kelas ?? $visit->user->unit_kerja ?? '-' }}</td>
-                                <td class="small text-muted">{{ $visit->recorder?->name ?? '-' }}</td>
+                                <td class="text-xs text-zinc-500 dark:text-zinc-400">{{ $visit->user->kelas ?? $visit->user->unit_kerja ?? '-' }}</td>
+                                <td class="text-xs text-zinc-500 dark:text-zinc-400">{{ $visit->recorder?->name ?? '-' }}</td>
                                 <td class="text-end">
-                                    <form method="POST" action="{{ route('admin.visits.destroy', $visit) }}" data-confirm="Batalkan kunjungan {{ $visit->user->name }} pukul {{ $visit->visited_at->format('H:i') }}?" class="d-inline">
+                                    <form method="POST" action="{{ route('admin.visits.destroy', $visit) }}" data-confirm="Batalkan kunjungan {{ $visit->user->name }} pukul {{ $visit->visited_at->format('H:i') }}?">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Batalkan kunjungan">
-                                            <i class="bi bi-x-lg" aria-hidden="true"></i>
-                                            <span class="visually-hidden">Batalkan kunjungan {{ $visit->user->name }}</span>
-                                        </button>
+                                        <flux:button type="submit" size="sm" variant="danger" icon="x-mark" title="Batalkan kunjungan" aria-label="Batalkan kunjungan {{ $visit->user->name }}" />
                                     </form>
                                 </td>
                             </tr>
@@ -243,5 +209,5 @@
                 </table>
             </div>
         @endif
-    </div>
+    </flux:card>
 @endsection

@@ -205,6 +205,6 @@ class VisitTest extends TestCase
             ->assertOk()
             ->assertSee('Anggota Scan Mandiri')
             ->assertDontSee('Anggota Scan Admin')
-            ->assertSee('text-bg-info', false);
+            ->assertSee('data-variant="info"', false);
     }
 }
