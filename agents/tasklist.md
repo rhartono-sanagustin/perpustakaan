@@ -1,8 +1,8 @@
 # Tasklist — Sistem Informasi Perpustakaan Sekolah
 
-**Terakhir diperbarui:** 19 November 2026  
-**Progress keseluruhan:** 100% (177 dari 177 task)  
-**Fase saat ini:** Fase 9 — Redesign Flux UI (selesai; 25/25 task)
+**Terakhir diperbarui:** 22 November 2026  
+**Progress keseluruhan:** 100% (188 dari 188 task)  
+**Fase saat ini:** Fase 11 — Perbaikan Ikon Flux (selesai; 1/1 task)
 
 > Catatan: progress dihitung dari jumlah checklist task, bukan estimasi jam kerja.
 > Setiap task selesai ditandai `[x] ✅` dan diberi catatan file yang dibuat/diubah.
@@ -541,6 +541,49 @@
 
 ---
 
+## 15. Fase 10 — Ekspor & Impor Data
+
+- [x] ✅ Task 15.1 - Tambah dependensi pembaca dan penulis XLSX tanpa `ext-zip` `[Mudah]` (Selesai)
+  - File: `composer.json`, `composer.lock`
+  - Catatan: `shuchkin/simplexlsx` 1.1.19 dan `shuchkin/simplexlsxgen` 1.5.17; hanya membutuhkan `simplexml`, `libxml`, `zlib`, dan `mbstring`.
+- [x] ✅ Task 15.2 - Konfigurasi batas impor dan utilitas spreadsheet `[Sedang]` (Selesai)
+  - File: `config/library.php`, `app/Support/SpreadsheetData.php`, `app/Support/ImportReport.php`, `app/Support/UserFilters.php`, `app/Support/BookFilters.php`
+  - Catatan: batas 1.000 baris, 5 MB, dan 100 pesan error; normalisasi nama kolom; laporan dibuat/diperbarui/gagal; filter dipakai bersama oleh daftar dan ekspor.
+- [x] ✅ Task 15.3 - Buat pembaca CSV/XLSX dan penulis XLSX `[Sedang]` (Selesai)
+  - File: `app/Services/SpreadsheetReader.php`, `app/Services/XlsxExporter.php`
+  - Catatan: deteksi delimiter dan BOM CSV, sheet pertama Excel, validasi kolom ganda/batas baris, nomor baris asli dipertahankan, header beku, dan nol di depan nomor induk/ISBN tetap teks.
+- [x] ✅ Task 15.4 - Ekspor pengguna CSV/Excel sesuai filter `[Sedang]` (Selesai)
+  - File: `app/Http/Controllers/Admin/UserCsvController.php`, `resources/views/admin/users/index.blade.php`, `app/Policies/UserPolicy.php`, `routes/web.php`
+  - Catatan: tombol CSV/Excel, kolom nama s.d. nomor telepon, filter peran/status/pencarian ikut terpakai, audit `user.exported`.
+- [x] ✅ Task 15.5 - Impor pengguna CSV/Excel `[Sedang]` (Selesai)
+  - File: `app/Services/UserImportService.php`, `app/Http/Requests/Admin/ImportUsersRequest.php`, `resources/views/admin/users/import.blade.php`, `resources/views/admin/_import-report.blade.php`
+  - Catatan: upsert berdasarkan nomor induk, sandi wajib untuk akun baru, sandi kosong mempertahankan sandi lama, akun admin aktif dilindungi, hasil parsial dan template unduhan, audit `user.imported`.
+- [x] ✅ Task 15.6 - Ekspor katalog buku CSV/Excel sesuai filter `[Sedang]` (Selesai)
+  - File: `app/Http/Controllers/Admin/BookCsvController.php`, `resources/views/admin/books/index.blade.php`, `app/Policies/BookPolicy.php`, `routes/web.php`
+  - Catatan: kolom ID s.d. status katalog, kategori/penerbit/penulis ikut diekspor (penulis dipisah `|`), filter kategori/status/pencarian, audit `book.exported`.
+- [x] ✅ Task 15.7 - Impor katalog buku CSV/Excel `[Sedang]` (Selesai)
+  - File: `app/Services/BookImportService.php`, `app/Http/Requests/Admin/ImportBooksRequest.php`, `resources/views/admin/books/import.blade.php`
+  - Catatan: upsert berdasarkan ID lalu ISBN, beberapa penulis dengan `|`, opsi buat kategori/penulis/penerbit otomatis, hanya data bibliografi (bukan eksemplar), audit `book.imported`.
+- [x] ✅ Task 15.8 - Audit ringkasan dan otorisasi ekspor/impor `[Mudah]` (Selesai)
+  - File: `app/Services/AuditLogger.php`, `app/Policies/UserPolicy.php`, `app/Policies/BookPolicy.php`, `routes/web.php`
+  - Catatan: `recordEvent()` untuk event tanpa entitas tunggal; ability `export`/`import` khusus admin; route export, form impor, proses impor, dan template terdaftar untuk pengguna dan buku.
+- [x] ✅ Task 15.9 - Test ekspor/impor, hasil parsial, dan otorisasi `[Sedang]` (Selesai)
+  - File: `tests/Feature/Admin/UserImportExportTest.php`, `tests/Feature/Admin/BookImportExportTest.php`
+  - Catatan: 21 test baru (143 assertion) mencakup CSV/XLSX, filter, nol di depan, sandi, proteksi akun sendiri, master data otomatis, validasi per baris, template, render halaman, dan 403 peminjam; total suite 209 test lulus (1334 assertion).
+- [x] ✅ Task 15.10 - Dokumentasi, verifikasi akhir, dan catatan Fase 10 `[Mudah]` (Selesai)
+  - File: `README.md`, `agents/uat-checklist.md`, `agents/tasklist.md`
+  - Catatan: bagian Ekspor dan impor data, 6 skenario UAT baru (total 91), build, Blade cache, dan Pint lulus; progress 100% (187/187).
+
+---
+
+## 16. Fase 11 — Perbaikan Ikon Flux
+
+- [x] ✅ Task 16.1 - Perbaiki nama ikon Flux yang tidak valid di halaman eksemplar, carousel, dan kiosk `[Mudah]` (Selesai)
+  - File: `resources/views/admin/copies/index.blade.php`, `resources/views/admin/settings/carousel/index.blade.php`, `app/Http/Controllers/VisitKioskController.php`, `tests/Feature/Admin/BookCopyManagementTest.php`, `tests/Feature/Admin/CarouselSlideTest.php`, `tests/Feature/VisitKioskTest.php`
+  - Catatan: `journal-bookmark` pada tombol **Pilih Buku** diganti `book-open`; `images` pada empty state carousel diganti `photo`; ikon hasil kiosk `person-slash`/`person-badge`/`question-circle` diganti `no-symbol`/`identification`/`question-mark-circle`. Test regresi menambahkan render halaman eksemplar, empty state carousel, dan panel hasil kiosk; 30 test terkait lulus, `view:cache` dan Pint lulus.
+
+---
+
 ## Catatan Fase 1
 
 - Fase 1 selesai dan siap direview sebelum masuk Fase 2.
@@ -794,3 +837,33 @@
   - Verifikasi otomatis mencakup render sidebar admin/guru/siswa dan theme switcher publik.
   - QA visual manual pada 360/390/768/1024/1440 px serta cetak PDF tetap disarankan di perangkat sekolah sebelum rilis.
 - Ditunda/opsional: komponen Flux Pro (Tabs, Date Picker, Chart), pencarian global di header, dan kustomisasi tema per sekolah.
+
+## Catatan Fase 10
+
+- Fase 10 (ekspor & impor data) selesai dan siap direview. Seluruh checklist mencapai **100% (187/187)**.
+- Perintah verifikasi yang sudah dijalankan:
+  - `php artisan test` — **209 test lulus, 1334 assertion** (21 test baru: 10 pengguna + 11 buku).
+  - `npm run build` — berhasil.
+  - `php artisan view:cache` — seluruh Blade berhasil dikompilasi.
+  - `php vendor/bin/pint` pada file yang diubah — berhasil.
+  - `php artisan route:list --path=admin/users` dan `--path=admin/books` — route export, impor, dan template terdaftar.
+- Cakupan:
+  - Ekspor CSV dan Excel untuk pengguna dan katalog buku, mengikuti filter yang sedang aktif; CSV tetap memakai BOM UTF-8, delimiter `;`, dan proteksi formula injection.
+  - Impor CSV/XLSX dengan hasil parsial: baris valid disimpan, baris gagal dilaporkan per nomor baris tanpa membatalkan baris lain.
+  - Impor pengguna memakai **nomor induk** sebagai kunci; sandi wajib untuk akun baru dan boleh kosong untuk akun lama; akun admin yang sedang login tidak dapat diubah.
+  - Impor buku memakai **ID** lalu **ISBN** sebagai kunci; beberapa penulis dipisah `|`; kategori/penulis/penerbit dapat dibuat otomatis atau dimatikan; impor hanya data bibliografi, bukan eksemplar.
+  - Batas impor: 5 MB, 1.000 baris, dan 100 pesan error; untuk Excel hanya sheet pertama yang dibaca.
+  - Template CSV/Excel tersedia di halaman impor; ringkasan ekspor/impor dicatat sebagai `user.exported`, `user.imported`, `book.exported`, dan `book.imported`.
+- Dokumentasi:
+  - `README.md` — bagian **Ekspor dan impor data**, kebutuhan ekstensi PHP, serta perilaku parsial dan kunci pembaruan.
+  - `agents/uat-checklist.md` — versi 1.3, **91 skenario** (6 skenario ekspor/impor baru), ringkasan verifikasi otomatis diperbarui.
+- Catatan QA:
+  - Verifikasi otomatis mencakup unduh CSV/XLSX, pembacaan ulang Excel, nol di depan, sandi, proteksi akun sendiri, master data otomatis, validasi per baris, template, render halaman, dan otorisasi 403.
+  - QA visual manual pada 360/390/768/1024/1440 px serta uji berkas Excel asli dari perangkat sekolah tetap disarankan sebelum rilis.
+- Ditunda/opsional: impor eksemplar/inventaris, ekspor Excel untuk laporan (saat ini laporan tetap CSV), pembatalan hasil impor, dan validasi kolom interaktif di template.
+
+## Catatan Fase 11
+
+- Perbaikan error `Flux component [icon.journal-bookmark] does not exist` pada halaman **Eksemplar / Inventaris**; tombol **Pilih Buku** kini memakai `book-open`.
+- Audit seluruh nama ikon statis dan dinamis menemukan dua sumber error laten lain: empty state carousel memakai `images` (diganti `photo`) dan panel hasil kiosk memakai `person-slash`, `person-badge`, serta `question-circle` (diganti `no-symbol`, `identification`, dan `question-mark-circle`).
+- Verifikasi: `php artisan test` — **211 test lulus (1345 assertion)**; `php artisan view:cache` dan `php vendor/bin/pint --dirty` lulus. Progress **100% (188/188)**.

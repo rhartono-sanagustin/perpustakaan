@@ -15,7 +15,7 @@ use App\Models\Loan;
 use App\Models\LoanRequest;
 use App\Models\User;
 use App\Services\AuditLogger;
-use Illuminate\Database\Eloquent\Builder;
+use App\Support\UserFilters;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -28,33 +28,18 @@ class UserController extends Controller
     {
         $this->authorize('viewAny', User::class);
 
-        $search = $this->stringQuery($request, 'q', 100);
-        $role = UserRole::tryFrom((string) $request->query('role'));
-        $status = UserStatus::tryFrom((string) $request->query('status'));
+        $filters = UserFilters::fromRequest($request);
 
-        $users = User::query()
-            ->when($search !== '', function (Builder $query) use ($search): void {
-                $like = '%'.$search.'%';
-
-                $query->where(function (Builder $query) use ($like): void {
-                    $query->where('name', 'like', $like)
-                        ->orWhere('email', 'like', $like)
-                        ->orWhere('nomor_induk', 'like', $like)
-                        ->orWhere('kelas', 'like', $like)
-                        ->orWhere('unit_kerja', 'like', $like);
-                });
-            })
-            ->when($role !== null, fn (Builder $query) => $query->where('role', $role->value))
-            ->when($status !== null, fn (Builder $query) => $query->where('status', $status->value))
+        $users = $filters->apply(User::query())
             ->orderBy('name')
             ->paginate(15)
             ->withQueryString();
 
         return view('admin.users.index', [
             'users' => $users,
-            'search' => $search,
-            'role' => $role,
-            'status' => $status,
+            'search' => $filters->search,
+            'role' => $filters->role,
+            'status' => $filters->status,
             'roles' => UserRole::cases(),
             'statuses' => UserStatus::cases(),
             'counts' => [
@@ -209,12 +194,5 @@ class UserController extends Controller
             'unit_kerja' => $user->unit_kerja,
             'no_telepon' => $user->no_telepon,
         ];
-    }
-
-    private function stringQuery(Request $request, string $key, int $limit): string
-    {
-        $value = $request->query($key);
-
-        return is_string($value) ? mb_substr(trim($value), 0, $limit) : '';
     }
 }

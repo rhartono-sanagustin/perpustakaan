@@ -116,11 +116,23 @@ class VisitKioskTest extends TestCase
             ->assertSessionHas('visit_result', fn (array $result): bool => $result['status'] === 'inactive'
                 && $result['name'] === $inactive->name);
 
+        $this->get(route('visits.kiosk'))
+            ->assertOk()
+            ->assertSee('Akun Nonaktif');
+
         $this->post(route('visits.kiosk.store'), ['nomor_induk' => $admin->nomor_induk])
             ->assertSessionHas('visit_result', fn (array $result): bool => $result['status'] === 'not_borrower');
 
+        $this->get(route('visits.kiosk'))
+            ->assertOk()
+            ->assertSee('Bukan Kartu Anggota');
+
         $this->post(route('visits.kiosk.store'), ['nomor_induk' => 'TIDAK-ADA'])
             ->assertSessionHas('visit_result', fn (array $result): bool => $result['status'] === 'not_found');
+
+        $this->get(route('visits.kiosk'))
+            ->assertOk()
+            ->assertSee('Kartu Tidak Dikenali');
 
         $this->assertSame(0, LibraryVisit::query()->count());
     }

@@ -25,7 +25,7 @@
     @if ($slides->isEmpty())
         <flux:card>
             <x-empty-state
-                icon="images"
+                icon="photo"
                 title="Belum ada slide carousel"
                 message="Tambahkan gambar untuk ditampilkan di landing page."
             >

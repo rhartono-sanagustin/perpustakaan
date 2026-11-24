@@ -6,7 +6,7 @@ Aplikasi perpustakaan sekolah berbasis Laravel 12, Flux UI, Livewire, dan Tailwi
 
 - **Publik** — beranda dengan carousel, katalog buku, detail buku, pencarian/filter, tombol bagikan, dan kiosk kunjungan mandiri tanpa login.
 - **Siswa dan guru** — login dengan email atau nomor induk, mengajukan pinjaman per judul, membatalkan pengajuan, memantau pinjaman aktif/terlambat, melihat riwayat, dan memperbarui profil.
-- **Admin** — dashboard dengan grafik peminjaman dan kunjungan, CRUD buku/eksemplar/kategori/penulis/penerbit, antrean pengajuan, checkout, pengembalian, laporan, CSV, halaman cetak, pengguna, pengaturan, pengumuman, dan audit log.
+- **Admin** — dashboard dengan grafik peminjaman dan kunjungan, CRUD buku/eksemplar/kategori/penulis/penerbit, antrean pengajuan, checkout, pengembalian, laporan, CSV, halaman cetak, pengguna, pengaturan, pengumuman, audit log, serta ekspor/impor CSV dan Excel untuk pengguna dan katalog buku.
 - **Kartu anggota** — kartu ID-1 (85,6 × 54 mm) untuk guru dan siswa aktif dengan barcode Code 128 dari nomor induk; cetak tunggal atau massal hingga 8 kartu per lembar A4.
 - **Kunjungan** — scan barcode kartu anggota, ringkasan pinjaman anggota, pencatatan kunjungan hari ini, pembatalan kunjungan hari ini, grafik kunjungan 7 hari, dan kiosk mandiri untuk pengunjung.
 - **Tampilan** — Flux UI dengan sidebar accordion untuk semua peran, tema terang/gelap/sistem, komponen Blade yang konsisten, dan halaman kiosk/cetak yang selalu terang.
@@ -14,7 +14,7 @@ Aplikasi perpustakaan sekolah berbasis Laravel 12, Flux UI, Livewire, dan Tailwi
 
 ## Kebutuhan
 
-- PHP 8.2 atau lebih baru dengan ekstensi `pdo_mysql` (atau `pdo_sqlite`) dan `mbstring`.
+- PHP 8.2 atau lebih baru dengan ekstensi `pdo_mysql` (atau `pdo_sqlite`), `mbstring`, `simplexml`, `libxml`, dan `zlib`.
 - Composer 2.
 - Node.js 20+ dan npm.
 - MySQL 8 (disarankan) atau SQLite.
@@ -134,6 +134,19 @@ Saat kiosk dinonaktifkan, halaman `/kunjungan` mengembalikan 404 dan tautan di b
 - Filter periode default adalah bulan berjalan.
 - Ekspor CSV memakai BOM UTF-8, delimiter `;`, dan perlindungan formula injection.
 - Halaman cetak laporan memakai A4 landscape dengan identitas sekolah dan tanda tangan petugas.
+
+## Ekspor dan impor data
+
+Ekspor dan impor tersedia untuk **Manajemen → Pengguna** dan **Katalog → Buku**. Hanya admin yang dapat mengaksesnya.
+
+1. **Ekspor** — tombol **CSV** dan **Excel** mengunduh data sesuai filter yang sedang aktif (pencarian, peran/status pengguna, atau kategori/status katalog).
+2. **Impor** — klik **Impor**, unduh template CSV/Excel, isi datanya, lalu unggah kembali.
+3. **Format** — CSV dengan pemisah `;` atau `,` (UTF-8) dan Excel `.xlsx`. Untuk Excel, hanya sheet pertama yang dibaca. Batas impor: 5 MB dan 1.000 baris data.
+4. **Hasil parsial** — baris valid tetap disimpan; baris gagal dilewati dan ditampilkan pada laporan beserta nomor barisnya (maksimal 100 pesan).
+5. **Pengguna** — kunci pembaruan adalah **Nomor Induk**. Kata sandi wajib untuk akun baru (minimal 8 karakter); akun lama boleh dikosongkan agar sandi tetap berlaku. Kolom opsional yang kosong tidak menimpa nilai lama, dan akun admin yang sedang login tidak dapat diubah melalui impor.
+6. **Buku** — kunci pembaruan adalah **ID**, lalu **ISBN** bila ID kosong. Beberapa penulis dipisahkan dengan `|`. Opsi **Buat kategori, penulis, dan penerbit yang belum ada** dapat dimatikan agar baris dengan data master baru dilaporkan gagal.
+7. **Khusus buku** — impor hanya membuat/memperbarui data bibliografi, bukan eksemplar. Tambahkan eksemplar setelah impor agar buku dapat dipinjam.
+8. **Audit** — ringkasan ekspor/impor dicatat sebagai `user.exported`, `user.imported`, `book.exported`, dan `book.imported`.
 
 ## Tugas terjadwal
 

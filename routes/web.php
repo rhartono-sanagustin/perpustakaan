@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\BookCopyController;
+use App\Http\Controllers\Admin\BookCsvController;
 use App\Http\Controllers\Admin\CarouselSlideController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\Admin\MemberCardController;
 use App\Http\Controllers\Admin\PublisherController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\UserCsvController;
 use App\Http\Controllers\Admin\VisitController;
 use App\Http\Controllers\Admin\VisitSettingController;
 use App\Http\Controllers\Auth\LoginController;
@@ -67,6 +69,11 @@ Route::middleware(['auth', 'active', 'role:admin'])
 
         Route::get('/copies', [BookCopyController::class, 'all'])->name('copies.index');
 
+        Route::get('/books/export', [BookCsvController::class, 'export'])->name('books.export');
+        Route::get('/books/import', [BookCsvController::class, 'importForm'])->name('books.import');
+        Route::post('/books/import', [BookCsvController::class, 'import'])->name('books.import.store');
+        Route::get('/books/import/template', [BookCsvController::class, 'template'])->name('books.import.template');
+
         Route::resource('books', BookController::class)->except(['show', 'destroy']);
         Route::post('/books/{book}/archive', [BookController::class, 'archive'])->name('books.archive');
         Route::post('/books/{book}/activate', [BookController::class, 'activate'])->name('books.activate');
@@ -111,6 +118,11 @@ Route::middleware(['auth', 'active', 'role:admin'])
         Route::get('/reports/{report}/print', [ReportController::class, 'print'])
             ->whereIn('report', ['ringkasan', 'peminjaman', 'pengembalian', 'keterlambatan', 'inventaris', 'populer'])
             ->name('reports.print');
+
+        Route::get('/users/export', [UserCsvController::class, 'export'])->name('users.export');
+        Route::get('/users/import', [UserCsvController::class, 'importForm'])->name('users.import');
+        Route::post('/users/import', [UserCsvController::class, 'import'])->name('users.import.store');
+        Route::get('/users/import/template', [UserCsvController::class, 'template'])->name('users.import.template');
 
         Route::resource('users', UserController::class)->except(['show']);
         Route::get('/users/{user}/kartu', [MemberCardController::class, 'show'])->name('users.card');

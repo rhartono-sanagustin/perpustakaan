@@ -1,8 +1,8 @@
 # Checklist UAT — Sistem Informasi Perpustakaan Sekolah
 
-**Versi dokumen:** 1.2  
-**Terakhir diperbarui:** 19 November 2026  
-**Cakupan:** MVP Fase 1–9 (autentikasi, katalog, sirkulasi, laporan, pengguna, pengaturan, pengumuman, notifikasi, kartu anggota, kunjungan, kiosk kunjungan mandiri, Flux UI, sidebar accordion, tema terang/gelap/sistem)  
+**Versi dokumen:** 1.3  
+**Terakhir diperbarui:** 22 November 2026  
+**Cakupan:** MVP Fase 1–10 (autentikasi, katalog, sirkulasi, laporan, pengguna, pengaturan, pengumuman, notifikasi, kartu anggota, kunjungan, kiosk kunjungan mandiri, Flux UI, sidebar accordion, tema terang/gelap/sistem, ekspor/impor CSV & Excel)  
 **Lingkungan acuan:** Laravel 12.71, PHP 8.2.26, Flux UI + Livewire 4 + Tailwind CSS 4, MySQL `perpustakaan` (dev) / `perpustakaan_test` (test)
 
 ---
@@ -68,14 +68,15 @@ Isi kolom **Status** dengan salah satu nilai:
 
 ## 3. Ringkasan verifikasi otomatis
 
-Verifikasi berikut sudah dijalankan pada 16 November 2026 dan menjadi bukti pendukung UAT manual.
+Verifikasi berikut sudah dijalankan pada 22 November 2026 dan menjadi bukti pendukung UAT manual.
 
 | Pemeriksaan | Perintah/metode | Hasil |
 |---|---|---|
-| Test suite lengkap | `php artisan test` | **185 test lulus, 1178 assertion** |
+| Test suite lengkap | `php artisan test` | **209 test lulus, 1334 assertion** |
+| Test ekspor/impor | `php artisan test tests/Feature/Admin/UserImportExportTest.php tests/Feature/Admin/BookImportExportTest.php` | 21 test, **143 assertion** (CSV/XLSX, filter, parsial, sandi, master data, otorisasi, audit) |
 | Test E2E alur MVP | `php artisan test tests/Feature/MvpFlowTest.php` | 1 test, **102 assertion** (katalog → pengajuan → setujui → checkout → kembali → laporan/CSV → kartu → kunjungan → audit) |
 | Test kiosk kunjungan | `php artisan test tests/Feature/VisitKioskTest.php tests/Feature/Admin/VisitSettingTest.php` | 14 test, menangkap alur publik, duplikat, kode tidak valid, toggle, audit, dan rate limit |
-| Build produksi | `npm run build` | Berhasil, 64 modul |
+| Build produksi | `npm run build` | Berhasil |
 | Kompilasi Blade | `php artisan view:cache` | Seluruh template berhasil |
 | Format kode | `php vendor/bin/pint --dirty` | Lulus |
 | QA responsif | Chrome DevTools Protocol, 5 halaman × 5 lebar (360/390/768/1024/1440) | **25 kombinasi, 0 horizontal overflow** |
@@ -221,7 +222,18 @@ Verifikasi berikut sudah dijalankan pada 16 November 2026 dan menjadi bukti pend
 | UAT-QA-03 | Kontras dan status non-warna | Periksa teks, tombol outline, badge status | Kontras teks memenuhi WCAG AA; status selalu disertai teks/label, bukan hanya warna | ⬜ | |
 | UAT-QA-04 | Cetak di perangkat nyata | Cetak satu lembar kartu dan satu laporan di printer sekolah | Skala 100%; barcode tajam dan terbaca; footer kartu/tanda tangan laporan tidak terpotong | ⬜ | |
 
-### 4.11 Operasional
+### 4.11 Ekspor dan impor data (Fase 10)
+
+| ID | Skenario | Langkah singkat | Hasil yang diharapkan | Status | Catatan |
+|---|---|---|---|---|---|
+| UAT-EXP-01 | Ekspor pengguna | Buka **Manajemen → Pengguna**, terapkan filter peran/status/pencarian, klik **CSV** lalu **Excel** | Berkas terunduh sesuai filter; kolom Nama s.d. Nomor Telepon lengkap; nomor induk berawalan nol tetap teks di Excel; audit `user.exported` tercatat | ⬜ | |
+| UAT-EXP-02 | Ekspor katalog buku | Buka **Katalog → Buku**, terapkan filter kategori/status/pencarian, klik **CSV** lalu **Excel** | Berkas sesuai filter; kategori, penerbit, dan beberapa penulis (dipisah `|`) tampil; audit `book.exported` tercatat | ⬜ | |
+| UAT-IMP-01 | Impor pengguna valid | Unduh template pengguna, isi akun baru dan perubahan akun lama (sandi diisi/kosong), lalu unggah | Akun baru dibuat; akun lama diperbarui berdasarkan nomor induk; sandi kosong tidak mengubah sandi lama; laporan dibuat/diperbarui tampil; audit `user.imported` | ⬜ | |
+| UAT-IMP-02 | Impor pengguna gagal sebagian | Campur baris valid dengan baris tanpa sandi baru, nomor induk ganda, email duplikat, dan baris akun admin yang sedang login | Baris valid tetap tersimpan; baris gagal dilewati dan dilaporkan dengan nomor baris; akun admin aktif tidak berubah | ⬜ | |
+| UAT-IMP-03 | Impor buku + master otomatis | Unduh template buku, isi buku baru dengan kategori/penulis/penerbit baru dan beberapa penulis `|`, biarkan opsi buat master aktif | Buku dibuat; kategori, penulis, dan penerbit baru dibuat; relasi penulis benar; belum ada eksemplar; laporan dan audit `book.imported` tampil | ⬜ | |
+| UAT-IMP-04 | Impor buku divalidasi | Impor baris dengan ID tak dikenal, ISBN ganda, tahun salah, dan judul kosong; ulangi dengan opsi buat master dimatikan | Baris valid tetap masuk; baris bermasalah dilaporkan; tidak ada data master yatim; buku hasil impor belum dapat dipinjam sebelum eksemplar ditambahkan | ⬜ | |
+
+### 4.12 Operasional
 
 | ID | Skenario | Langkah singkat | Hasil yang diharapkan | Status | Catatan |
 |---|---|---|---|---|---|
@@ -245,8 +257,9 @@ Verifikasi berikut sudah dijalankan pada 16 November 2026 dan menjadi bukti pend
 | Kartu anggota & kunjungan | 11 | | | |
 | Kiosk kunjungan mandiri | 8 | | | |
 | Realtime, UX, responsif | 12 | | | |
+| Ekspor dan impor data | 6 | | | |
 | Operasional | 3 | | | |
-| **Total** | **85** | | | |
+| **Total** | **91** | | | |
 
 ---
 
