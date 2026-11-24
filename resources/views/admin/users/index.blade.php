@@ -4,11 +4,16 @@
 @section('breadcrumb', 'Manajemen / Pengguna')
 
 @section('content')
+    @php($exportParams = array_diff_key(request()->query(), ['page' => null]))
+
     <x-page-header
         title="Pengguna"
         subtitle="Kelola akun admin, guru, dan siswa beserta status aksesnya."
     >
         <x-slot:actions>
+            <flux:button variant="outline" icon="arrow-up-tray" href="{{ route('admin.users.import') }}">
+                Impor
+            </flux:button>
             <flux:button variant="primary" icon="user-plus" href="{{ route('admin.users.create') }}">
                 Tambah Pengguna
             </flux:button>
@@ -72,9 +77,19 @@
     </flux:card>
 
     <flux:card class="p-0!">
-        <div class="flex items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4 dark:border-white/10">
-            <flux:heading size="lg" level="2">Daftar Pengguna</flux:heading>
-            <flux:badge color="zinc" size="sm">{{ $users->total() }} akun</flux:badge>
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+            <div class="flex items-center gap-2">
+                <flux:heading size="lg" level="2">Daftar Pengguna</flux:heading>
+                <flux:badge color="zinc" size="sm">{{ $users->total() }} akun</flux:badge>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <flux:button size="sm" variant="outline" icon="arrow-down-tray" href="{{ route('admin.users.export', ['format' => 'csv'] + $exportParams) }}">
+                    CSV
+                </flux:button>
+                <flux:button size="sm" variant="outline" icon="arrow-down-tray" href="{{ route('admin.users.export', ['format' => 'xlsx'] + $exportParams) }}">
+                    Excel
+                </flux:button>
+            </div>
         </div>
 
         @if ($users->isEmpty())

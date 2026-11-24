@@ -54,10 +54,10 @@ class VisitKioskController extends Controller
             },
             'icon' => match ($result->status) {
                 VisitRecordingStatus::Recorded => 'check-circle',
-                VisitRecordingStatus::Duplicate => 'clock-history',
-                VisitRecordingStatus::Inactive => 'person-slash',
-                VisitRecordingStatus::NotBorrower => 'person-badge',
-                default => 'question-circle',
+                VisitRecordingStatus::Duplicate => 'clock',
+                VisitRecordingStatus::Inactive => 'no-symbol',
+                VisitRecordingStatus::NotBorrower => 'identification',
+                default => 'question-mark-circle',
             },
             'title' => match ($result->status) {
                 VisitRecordingStatus::Recorded => 'Kunjungan Tercatat',

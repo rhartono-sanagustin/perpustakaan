@@ -105,6 +105,18 @@ class BookCopyManagementTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_admin_can_open_global_copy_inventory(): void
+    {
+        $admin = User::factory()->admin()->create();
+        BookCopy::factory()->create();
+
+        $this->actingAs($admin)
+            ->get(route('admin.copies.index'))
+            ->assertOk()
+            ->assertSee('Eksemplar / Inventaris')
+            ->assertSee('Pilih Buku');
+    }
+
     public function test_borrower_cannot_manage_copies(): void
     {
         $siswa = User::factory()->siswa()->create();

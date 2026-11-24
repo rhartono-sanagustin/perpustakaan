@@ -16,14 +16,37 @@ class AuditLogger
      */
     public function record(string $action, Model $entity, ?array $oldValues = null, ?array $newValues = null): AuditLog
     {
+        return $this->recordEvent(
+            $action,
+            $entity->getMorphClass(),
+            $entity->getKey(),
+            $oldValues,
+            $newValues
+        );
+    }
+
+    /**
+     * Catat tindakan yang tidak terikat pada satu baris model, misalnya
+     * ringkasan ekspor atau impor.
+     *
+     * @param  array<string, mixed>|null  $oldValues
+     * @param  array<string, mixed>|null  $newValues
+     */
+    public function recordEvent(
+        string $action,
+        string $entityType,
+        int|string|null $entityId = null,
+        ?array $oldValues = null,
+        ?array $newValues = null
+    ): AuditLog {
         $request = request();
         $userAgent = $request->userAgent();
 
         return AuditLog::query()->create([
             'actor_id' => Auth::id(),
             'action' => $action,
-            'entity_type' => $entity->getMorphClass(),
-            'entity_id' => $entity->getKey(),
+            'entity_type' => $entityType,
+            'entity_id' => $entityId,
             'old_values' => $oldValues,
             'new_values' => $newValues,
             'ip_address' => $request->ip(),

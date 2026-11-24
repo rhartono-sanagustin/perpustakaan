@@ -148,4 +148,20 @@ return [
         'disk' => 'public',
         'path' => 'carousel',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Ekspor dan Impor Data
+    |--------------------------------------------------------------------------
+    |
+    | Batas ini melindungi server dari berkas impor yang terlalu besar.
+    | Format yang didukung: CSV (pemisah ; atau ,) dan Excel .xlsx.
+    |
+    */
+
+    'imports' => [
+        'max_rows' => 1000,
+        'max_file_kb' => 5120,
+        'error_limit' => 100,
+    ],
 ];

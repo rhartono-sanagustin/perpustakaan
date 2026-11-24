@@ -26,6 +26,16 @@ class CarouselSlideTest extends TestCase
             ->assertSee('Tambah Slide');
     }
 
+    public function test_admin_can_view_empty_carousel_page(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->get(route('admin.settings.carousel.index'))
+            ->assertOk()
+            ->assertSee('Belum ada slide carousel');
+    }
+
     public function test_guest_and_non_admin_cannot_manage_carousel(): void
     {
         $this->get(route('admin.settings.carousel.index'))

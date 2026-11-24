@@ -6,7 +6,7 @@
 @section('content')
     <x-page-header title="Eksemplar / Inventaris" subtitle="Pantau seluruh eksemplar fisik dan statusnya.">
         <x-slot:actions>
-            <flux:button variant="outline" icon="journal-bookmark" href="{{ route('admin.books.index') }}">
+            <flux:button variant="outline" icon="book-open" href="{{ route('admin.books.index') }}">
                 Pilih Buku
             </flux:button>
         </x-slot:actions>

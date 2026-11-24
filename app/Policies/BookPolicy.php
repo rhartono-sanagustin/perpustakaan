@@ -22,6 +22,16 @@ class BookPolicy
         return $user->isAdmin();
     }
 
+    public function export(User $user): bool
+    {
+        return $user->isAdmin();
+    }
+
+    public function import(User $user): bool
+    {
+        return $user->isAdmin();
+    }
+
     public function update(User $user, Book $book): bool
     {
         return $user->isAdmin();

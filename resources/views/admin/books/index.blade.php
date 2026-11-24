@@ -4,8 +4,13 @@
 @section('breadcrumb', 'Buku')
 
 @section('content')
+    @php($exportParams = array_diff_key(request()->query(), ['page' => null]))
+
     <x-page-header title="Daftar Buku" subtitle="Kelola data bibliografi, status katalog, dan eksemplar.">
         <x-slot:actions>
+            <flux:button variant="outline" icon="arrow-up-tray" href="{{ route('admin.books.import') }}">
+                Impor
+            </flux:button>
             <flux:button variant="primary" icon="plus" href="{{ route('admin.books.create') }}">
                 Tambah Buku
             </flux:button>
@@ -54,9 +59,19 @@
     </flux:card>
 
     <flux:card class="p-0!">
-        <div class="flex items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4 dark:border-white/10">
-            <flux:heading size="lg" level="2">Data Buku</flux:heading>
-            <flux:badge color="zinc" size="sm">{{ $books->total() }} judul</flux:badge>
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4 dark:border-white/10">
+            <div class="flex items-center gap-2">
+                <flux:heading size="lg" level="2">Data Buku</flux:heading>
+                <flux:badge color="zinc" size="sm">{{ $books->total() }} judul</flux:badge>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <flux:button size="sm" variant="outline" icon="arrow-down-tray" href="{{ route('admin.books.export', ['format' => 'csv'] + $exportParams) }}">
+                    CSV
+                </flux:button>
+                <flux:button size="sm" variant="outline" icon="arrow-down-tray" href="{{ route('admin.books.export', ['format' => 'xlsx'] + $exportParams) }}">
+                    Excel
+                </flux:button>
+            </div>
         </div>
 
         @if ($books->isEmpty())

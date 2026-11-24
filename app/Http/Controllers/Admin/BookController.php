@@ -9,6 +9,7 @@ use App\Models\Book;
 use App\Models\Category;
 use App\Models\Publisher;
 use App\Services\AuditLogger;
+use App\Support\BookFilters;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,21 +24,11 @@ class BookController extends Controller
     {
         $this->authorize('viewAny', Book::class);
 
-        $search = $this->stringQuery($request, 'q', 100);
-        $status = $this->stringQuery($request, 'status', 20);
-        $categoryId = filter_var($request->query('category_id'), FILTER_VALIDATE_INT) ?: null;
+        $filters = BookFilters::fromRequest($request);
 
-        if (! in_array($status, ['aktif', 'arsip'], true)) {
-            $status = '';
-        }
-
-        $books = Book::query()
+        $books = $filters->apply(Book::query())
             ->with(['category', 'authors'])
             ->withCopyCounts()
-            ->when($search !== '', fn ($query) => $query->search($search))
-            ->when($categoryId, fn ($query) => $query->where('category_id', $categoryId))
-            ->when($status === 'aktif', fn ($query) => $query->where('is_active', true))
-            ->when($status === 'arsip', fn ($query) => $query->where('is_active', false))
             ->latest()
             ->paginate(10)
             ->withQueryString();
@@ -45,9 +36,9 @@ class BookController extends Controller
         return view('admin.books.index', [
             'books' => $books,
             'categories' => Category::orderBy('name')->get(),
-            'search' => $search,
-            'status' => $status,
-            'categoryId' => $categoryId,
+            'search' => $filters->search,
+            'status' => $filters->status,
+            'categoryId' => $filters->categoryId,
         ]);
     }
 
@@ -193,12 +184,5 @@ class BookController extends Controller
             'is_active' => $book->is_active,
             'authors' => $book->authors->pluck('id')->sort()->values()->all(),
         ];
-    }
-
-    private function stringQuery(Request $request, string $key, int $limit): string
-    {
-        $value = $request->query($key);
-
-        return is_string($value) ? mb_substr(trim($value), 0, $limit) : '';
     }
 }

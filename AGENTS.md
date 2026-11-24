@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Project state
-Laravel 12.71 / PHP 8.2.26 (composer `^8.2`; keep code PHP 8.2-compatible) school library app (Sistem Informasi Perpustakaan Sekolah) with role-based access (admin/guru/siswa), catalog, loan requests, circulation, reports, member cards, and visit kiosk. The UI is built with Flux UI (Flux Free) + Livewire + Tailwind CSS 4; Bootstrap has been removed. Tests: 185 PHPUnit tests.
+Laravel 12.71 / PHP 8.2.26 (composer `^8.2`; keep code PHP 8.2-compatible) school library app (Sistem Informasi Perpustakaan Sekolah) with role-based access (admin/guru/siswa), catalog, loan requests, circulation, reports, member cards, visit kiosk, and CSV/Excel export-import. The UI is built with Flux UI (Flux Free) + Livewire + Tailwind CSS 4; Bootstrap has been removed. Tests: 211 PHPUnit tests.
 
 ## Read first
 - `agents/prd.md` — roles, business rules, loan/copy statuses, MVP scope.
